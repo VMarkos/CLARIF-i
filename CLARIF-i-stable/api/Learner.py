@@ -37,7 +37,9 @@ class Learner:
         traces = []
         
         # Check if start state already matches goal state
-        if self._states_match(start_state, goal_state):
+        if start_state == goal_state:
+            # If they match, return the start state as a trace
+            # with no rules applied
             traces.append([(start_state, None)])
             return True, traces
         
@@ -47,15 +49,15 @@ class Learner:
         
         while queue:
             current_state, path = queue.pop(0)
-            state_key = self._state_to_key(current_state)
+            # state_key = self._state_to_key(current_state)
             
-            if state_key in visited:
+            if current_state in visited:
                 continue
                 
-            visited.add(state_key)
+            visited.add(current_state)
             
             # Check if current state matches goal state
-            if self._states_match(current_state, goal_state):
+            if current_state == goal_state:
                 # Convert path to trace format
                 trace = [(start_state, None)]
                 for state, rule in path:
@@ -65,9 +67,11 @@ class Learner:
             
             # Try to apply rules to current state
             for rule in self.hypothesis:
-                if self._rule_applies(rule, current_state):
-                    new_state = self._apply_rule(rule, current_state)
+                if rule.applies(current_state):
+                    # Apply the rule to get the new state
+                    new_state = rule.apply(current_state)
                     new_path = path + [(new_state, rule)]
+                    # Append the new state and path to the queue
                     queue.append((new_state, new_path))
         
         # If we found any traces, return success
@@ -83,24 +87,6 @@ class Learner:
             partial_traces.append(trace)
         
         return False, partial_traces
-    
-    def _states_match(self, state1: Dict[str, str], state2: Dict[str, str]) -> bool:
-        """Check if two states match."""
-        return all(state1.get(k) == v for k, v in state2.items())
-    
-    def _state_to_key(self, state: Dict[str, str]) -> str:
-        """Convert state to a string key for visited set."""
-        return ','.join(f"{k}={v}" for k, v in sorted(state.items()))
-    
-    def _rule_applies(self, rule: Rule, state: Dict[str, str]) -> bool:
-        """Check if a rule can be applied to a state."""
-        return all(state.get(k) == v for k, v in rule.condition.items())
-    
-    def _apply_rule(self, rule: Rule, state: Dict[str, str]) -> Dict[str, str]:
-        """Apply a rule to a state."""
-        new_state = state.copy()
-        new_state.update(rule.preference)
-        return new_state
     
     def update_hypothesis(self, feedback_rules: List[Rule]):
         """
@@ -118,11 +104,12 @@ class Learner:
         self.hypothesis.sort(reverse=True)
         
         # Remove duplicate rules (keeping highest priority)
+        # TODO : Implement a more efficient way to remove duplicates
         seen_conditions = set()
         unique_rules = []
         for rule in self.hypothesis:
-            condition_key = tuple(sorted(rule.condition.items()))
-            if condition_key not in seen_conditions:
-                seen_conditions.add(condition_key)
+            condition = rule.condition
+            if condition not in seen_conditions:
+                seen_conditions.add(condition)
                 unique_rules.append(rule)
-        self.hypothesis = unique_rules 
+        self.hypothesis = unique_rules

@@ -10,9 +10,23 @@ from copy import deepcopy
 class Rule:
     def __init__(self, name: str, condition: State, action: State, priority: int = 1):
         self.name: str = name
-        self.condition: list[State] = condition
+        self.condition: State = condition
         self.action: State = action
         self.priority: int = priority
+
+    def __key(self) -> tuple:
+        """Compute rule key by body and head"""
+        return (self.condition, self.action)
+
+    def __hash__(self) -> int:
+        """Compute rule hash by body and head"""
+        return hash(self.__key())
+    
+    def __eq__(self, other: "Rule") -> bool:
+        """Boolean equality based on body and head"""
+        if not isinstance(other, Rule):
+            return False
+        return self.__key() == other.__key()
 
     def __str__(self):
         return f"{self.name}: IF {self.condition} THEN {self.action} (priority: {self.priority})"
