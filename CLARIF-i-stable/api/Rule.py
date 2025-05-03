@@ -34,8 +34,10 @@ class Rule:
         return self.condition <= state
     
     def apply(self, state: State) -> State:
+        """ Applies a rule to a state by updating the state with the action (head) of the rule. """
         new_state = deepcopy(state)
-        # new_state.
+        new_state.update(state)
+        return new_state
 
     @classmethod
     def from_dict(cls, data: dict) -> 'Rule':

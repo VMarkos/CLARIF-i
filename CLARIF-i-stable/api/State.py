@@ -4,8 +4,8 @@ class State:
     def __init__(self, state: dict[str, str]) -> None:
         self.state: dict[str, str] = state
 
-    def update(self, item: object) -> "State":
-        self.state.update(item)
+    def update(self, other: "State") -> "State":
+        self.state.update(other.state)
 
     def __deepcopy__(self) -> "State":
         copycat: "State" = State(self.state.copy())
