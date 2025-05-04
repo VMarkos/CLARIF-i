@@ -8,11 +8,12 @@ from State import State
 from copy import deepcopy
 
 class Rule:
-    def __init__(self, name: str, condition: State, action: State, priority: int = 1):
+    def __init__(self, name: str, condition: State, action: State, priority: int = 1, explanation: str = ""):
         self.name: str = name
         self.condition: State = condition
         self.action: State = action
         self.priority: int = priority
+        self.explanation: str = explanation
 
     def __key(self) -> tuple:
         """Compute rule key by body and head"""
@@ -50,7 +51,7 @@ class Rule:
     def apply(self, state: State) -> State:
         """ Applies a rule to a state by updating the state with the action (head) of the rule. """
         new_state = deepcopy(state)
-        new_state.update(state)
+        new_state.update(self.action)
         return new_state
 
     @classmethod

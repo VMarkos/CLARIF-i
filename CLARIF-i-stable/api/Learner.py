@@ -18,7 +18,7 @@ class Learner:
     
     def __init__(self, initial_rules: List[Rule]):
         """Initialize the learner with initial rules."""
-        self.hypothesis = sorted(initial_rules, reverse=True)
+        self.hypothesis: list[Rule] = sorted(initial_rules, reverse=True)
     
     def search_path(self, start_state: Dict[str, str], goal_state: Dict[str, str]) -> Tuple[bool, List[List[Tuple[Dict[str, str], Optional[Rule]]]]]:
         """

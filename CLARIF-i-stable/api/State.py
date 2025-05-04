@@ -7,6 +7,14 @@ class State:
     def update(self, other: "State") -> "State":
         self.state.update(other.state)
 
+    def get(self, key: str) -> str:
+        if key not in self.state.keys():
+            raise KeyError(f"Variable '{key}' not found!")
+        return self.state.get(key)
+
+    def __iter__(self) -> iter:
+        return iter(self.state.items()) # FIXME Maybe `iter()` is not needed here
+
     def __deepcopy__(self) -> "State":
         copycat: "State" = State(self.state.copy())
         return copycat
