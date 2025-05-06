@@ -11,11 +11,17 @@ class State:
         if key not in self.state.keys():
             raise KeyError(f"Variable '{key}' not found!")
         return self.state.get(key)
+    
+    def swap(self, k1: str, k2: str) -> None:
+        temp: str = self.state.get(k1)
+        self.state[k1] = self.state.get(k2)
+        self.state[k2] = temp
 
     def __iter__(self) -> iter:
-        return iter(self.state.items()) # FIXME Maybe `iter()` is not needed here
+        return iter(self.state) # FIXME Maybe `iter()` is not needed here
 
-    def __deepcopy__(self) -> "State":
+    # @classmethod
+    def __deepcopy__(self, memo) -> "State":
         copycat: "State" = State(self.state.copy())
         return copycat
 

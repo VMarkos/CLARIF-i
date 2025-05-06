@@ -6,7 +6,7 @@ Learner implementation for the coachable search framework.
 
 from typing import Dict, List, Tuple, Set, Optional
 
-from Rule import Rule
+from .Rule import Rule
 
 class Learner:
     """
@@ -16,7 +16,7 @@ class Learner:
         hypothesis: List of rules that represent the learner's current understanding
     """
     
-    def __init__(self, initial_rules: List[Rule]):
+    def __init__(self, initial_rules: List[Rule] = []):
         """Initialize the learner with initial rules."""
         self.hypothesis: list[Rule] = sorted(initial_rules, reverse=True)
     

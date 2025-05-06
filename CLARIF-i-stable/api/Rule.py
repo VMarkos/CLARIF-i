@@ -4,7 +4,7 @@
 Rule representation for the coachable search framework.
 """
 
-from State import State
+from .State import State
 from copy import deepcopy
 
 class Rule:
@@ -40,7 +40,7 @@ class Rule:
         return {
             'name': self.name,
             'condition': self.condition.__dict__,
-            'action': self.action,
+            'action': self.action.__dict__,
             'priority': self.priority
         }
 

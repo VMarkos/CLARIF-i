@@ -1,7 +1,7 @@
 # api/Coach.py
 
-from State import State
-from Rule import Rule
+from .State import State
+from .Rule import Rule
 
 from copy import deepcopy
 
