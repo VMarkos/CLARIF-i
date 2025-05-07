@@ -34,6 +34,7 @@ class Coach:
             current_value = current_state
             if current_value != goal_value:
                 rule = Rule(
+                    name="",
                     condition=deepcopy(current_state),
                     action=State({key, goal_value}),
                     priority=1,

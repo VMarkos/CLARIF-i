@@ -18,7 +18,7 @@ class State:
         self.state[k2] = temp
 
     def __iter__(self) -> iter:
-        return iter(self.state) # FIXME Maybe `iter()` is not needed here
+        return iter(self.state.items()) # FIXME Maybe `iter()` is not needed here
 
     # @classmethod
     def __deepcopy__(self, memo) -> "State":

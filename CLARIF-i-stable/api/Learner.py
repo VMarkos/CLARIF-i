@@ -7,6 +7,7 @@ Learner implementation for the coachable search framework.
 from typing import Dict, List, Tuple, Set, Optional
 
 from .Rule import Rule
+from .State import State
 
 class Learner:
     """
@@ -20,7 +21,7 @@ class Learner:
         """Initialize the learner with initial rules."""
         self.hypothesis: list[Rule] = sorted(initial_rules, reverse=True)
     
-    def search_path(self, start_state: Dict[str, str], goal_state: Dict[str, str]) -> Tuple[bool, List[List[Tuple[Dict[str, str], Optional[Rule]]]]]:
+    def search_path(self, start_state: Dict[str, str], goal_state: Dict[str, str]) -> Tuple[bool, List[List[Tuple[State, Optional[Rule]]]]]:
         """
         Search for paths from start state to goal state using current rules.
         

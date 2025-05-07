@@ -49,8 +49,15 @@ def main():
         for state in states
         if (flipped_state := flip_state(state)) != state
     ]
-    print("\n".join(map(str, target_rules)))
+    # print("\n".join(map(str, target_rules)))
     coach = Coach(target_rules)
+
+    steps = 0
+    path = learner.search_path(start_state, goal_state)
+    while (advice := coach.evaluate_inference(start_state, goal_state, path[1])) != (True, []):
+        learner.update_hypothesis(advice[1])
+        steps += 1
+    print(learner.hypothesis, steps, sep="\n")
 
 if __name__ == "__main__":
     main()
