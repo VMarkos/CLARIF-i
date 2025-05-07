@@ -20,7 +20,6 @@ class State:
     def __iter__(self) -> iter:
         return iter(self.state.items()) # FIXME Maybe `iter()` is not needed here
 
-    # @classmethod
     def __deepcopy__(self, memo) -> "State":
         copycat: "State" = State(self.state.copy())
         return copycat
@@ -40,4 +39,5 @@ class State:
         """Boolean equality based on dictionary equality"""
         if not isinstance(other, State):
             return False
-        return len(other.state.keys()) == len(self.state.keys()) and all(self.state[k] == v for k, v in other.state.items())
+        print(other, type(other))
+        return len(other.state.keys()) == len(self.state.keys()) and all(self.state[k] == v for k, v in other)
