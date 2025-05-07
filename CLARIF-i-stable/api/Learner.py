@@ -47,6 +47,7 @@ class Learner:
         # Try to find paths using current rules
         visited = set()
         queue = [(start_state, [])]
+        partial_traces_dict = { start_state: set() }
         
         while queue:
             current_state, path = queue.pop(0)
@@ -70,24 +71,31 @@ class Learner:
             for rule in self.hypothesis:
                 if rule.applies(current_state):
                     # Apply the rule to get the new state
+                    # print("applies:", rule)
                     new_state = rule.apply(current_state)
+                    print("new_state:", new_state)
                     new_path = path + [(new_state, rule)]
                     # Append the new state and path to the queue
                     queue.append((new_state, new_path))
+                    if new_state in partial_traces_dict:
+                        partial_traces_dict[new_state].add(new_path)
+                    else:
+                        partial_traces_dict[new_state] = { tuple(new_path) }
         
         # If we found any traces, return success
         if traces:
             return True, traces
         
         # If no complete paths found, return partial paths
-        partial_traces = []
-        for state, path in queue:
-            trace = [(start_state, None)]
-            for s, r in path:
-                trace.append((s, r))
-            partial_traces.append(trace)
+        # print("Partial traces", queue)
+        # partial_traces = []
+        # for state, path in queue:
+        #     trace = [(start_state, None)]
+        #     for s, r in path:
+        #         trace.append((s, r))
+        #     partial_traces.append(trace)
         
-        return False, partial_traces
+        return False, [ (state, path) for state, paths in partial_traces_dict.items() for path in paths ]
     
     def update_hypothesis(self, feedback_rules: List[Rule]):
         """

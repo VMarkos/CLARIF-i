@@ -37,26 +37,31 @@ def main():
 
     # Initialise target rules and coach
     KEYS = ['a', 'b', 'c']
-    states = ( State(dict(zip(KEYS, p))) for p in it.permutations(range(1, 4)) )
+    states = ( State(dict(zip(KEYS, p))) for p in it.permutations(map(str, range(1, 4))) )
     target_rules = [
         Rule(
-            f"",
+            f"R{i}",
             state,
             flipped_state,
             priority=1,
             explanation=f"flipping", # maybe something more explicit
         )
-        for state in states
+        for i, state in enumerate(states)
         if (flipped_state := flip_state(state)) != state
     ]
     # print("\n".join(map(str, target_rules)))
     coach = Coach(target_rules)
-
+    # return
     steps = 0
     path = learner.search_path(start_state, goal_state)
     while (advice := coach.evaluate_inference(start_state, goal_state, path[1])) != (True, []):
+        print(f"Hypothesis: {learner.hypothesis}", f"Advice: {advice}", sep="\n")
         learner.update_hypothesis(advice[1])
+        path = learner.search_path(start_state, goal_state)
+        # print("path:", [ (str(p[0]), [ (str(r[0]), r[1]) for r in p[1]]) for p in path[1]] )
         steps += 1
+        if steps == 3:
+            return
     print(learner.hypothesis, steps, sep="\n")
 
 if __name__ == "__main__":

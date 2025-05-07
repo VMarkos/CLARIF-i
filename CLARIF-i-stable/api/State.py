@@ -1,7 +1,7 @@
 # api/State.py
 
 class State:
-    def __init__(self, state: dict[str, str]) -> None:
+    def __init__(self, state: dict[str, str] = dict()) -> None:
         self.state: dict[str, str] = state
 
     def update(self, other: "State") -> "State":
@@ -12,10 +12,16 @@ class State:
             raise KeyError(f"Variable '{key}' not found!")
         return self.state.get(key)
     
+    def set(self, key: str, val: str) -> None:
+        self.state[key] = val
+    
     def swap(self, k1: str, k2: str) -> None:
         temp: str = self.state.get(k1)
         self.state[k1] = self.state.get(k2)
         self.state[k2] = temp
+
+    def __bool__(self) -> bool:
+        return len(self.state) != 0
 
     def __iter__(self) -> iter:
         return iter(self.state.items()) # FIXME Maybe `iter()` is not needed here
@@ -29,7 +35,9 @@ class State:
 
     def __hash__(self) -> int:
         """Compute state hash by its (unique) string representation"""
-        return hash(self.__str__())
+        h = hash(str(self))
+        # print(self, h)
+        return h
 
     def __str__(self) -> str:
         """String representation of state as a dictionary"""
@@ -37,7 +45,14 @@ class State:
 
     def __eq__(self, other: "State") -> bool:
         """Boolean equality based on dictionary equality"""
+        # print("Checking for eq")
         if not isinstance(other, State):
             return False
-        print(other, type(other))
-        return len(other.state.keys()) == len(self.state.keys()) and all(self.state[k] == v for k, v in other)
+        if len(other.state.keys()) != len(self.state.keys()):
+            return False
+        try:
+            keys_match = all(self.state[k] == v for k, v in other)
+        except KeyError:
+            return False
+        # print(self.state, other.state)
+        return keys_match
