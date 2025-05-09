@@ -61,9 +61,9 @@ class Learner:
             # Check if current state matches goal state
             if current_state == goal_state:
                 # Convert path to trace format
-                trace = [(start_state, None)]
-                for state, rule in path:
-                    trace.append((state, rule))
+                trace = (start_state, path)
+                # for state, rule in path:
+                #     trace.append((state, rule))
                 traces.append(trace)
                 continue
             

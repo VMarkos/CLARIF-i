@@ -60,8 +60,8 @@ def main():
         path = learner.search_path(start_state, goal_state)
         # print("path:", [ (str(p[0]), [ (str(r[0]), r[1]) for r in p[1]]) for p in path[1]] )
         steps += 1
-        if steps == 3:
-            return
+        # if steps == 3:
+        #     return
     print(learner.hypothesis, steps, sep="\n")
 
 if __name__ == "__main__":
