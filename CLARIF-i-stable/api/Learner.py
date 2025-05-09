@@ -104,6 +104,7 @@ class Learner:
         Args:
             feedback_rules: List of rules provided as feedback
         """
+        print("feedback_rules:", feedback_rules)
         # Add new rules to hypothesis
         for rule in feedback_rules:
             if rule not in self.hypothesis:
@@ -121,4 +122,5 @@ class Learner:
             if condition not in seen_conditions:
                 seen_conditions.add(condition)
                 unique_rules.append(rule)
+        print("unique_rules", unique_rules)
         self.hypothesis = unique_rules

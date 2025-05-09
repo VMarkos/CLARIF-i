@@ -27,14 +27,14 @@ class Coach:
         if goal_state in ( trace[-1] for trace in traces ):
             return True, []
         
-        print(traces[-1])
+        print("traces[-1]", [ x for x in map(str, traces[-1]) ])
         return False, self._generate_goal_rules(traces[-1][0])
         
     # TODO Recall that for full states, priorities do not actually matter - just for partial states
 
     def _generate_goal_rules(self, current_state: State) -> list[Rule]:
         feedback_rules: list[Rule] = []
-        print(f"Current state: {current_state}")
+        print(f"Current state: {current_state if type(current_state) == State else current_state[0]}")
         # print("Target rules:","\n".join(map(str, self.target_rules.keys())))
         # print(current_state in self.target_rules)
         advised_rule = self.target_rules[current_state]
@@ -45,7 +45,7 @@ class Coach:
             action_state = State()
             if current_value != goal_value:
                 action_state.set(key, goal_value)
-            # print("Action state:", action_state)
+        print("Action state:", action_state)
         if action_state:
             rule = Rule(
                 name="",
