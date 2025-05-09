@@ -84,6 +84,8 @@ class Learner:
         
         # If we found any traces, return success
         if traces:
+            print("RETURNING FULL TRACES")
+            # FIXME Each trace should contain as first element the node it is approaching (or maybe find a better idea)
             return True, traces
         
         # If no complete paths found, return partial paths
@@ -94,7 +96,8 @@ class Learner:
         #     for s, r in path:
         #         trace.append((s, r))
         #     partial_traces.append(trace)
-        
+
+        print("RETURNING PARTIAL TRACES")  
         return False, [ (state, path) for state, paths in partial_traces_dict.items() for path in paths ]
     
     def update_hypothesis(self, feedback_rules: List[Rule]):
