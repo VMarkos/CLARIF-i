@@ -1,0 +1,24 @@
+from .State import State
+from typing import Callable
+
+class Action:
+    def __init__(self, callback: Callable[[State], State]) -> None:
+        self.callback: Callable[[State], State] = callback
+
+    def apply(self, state: State) -> State:
+        """Assuming that `self.callback` does not mutate `state`."""
+        return self.callback(state)
+
+    def __key(self) -> int:
+        return (self.callback)
+
+    def __hash__(self) -> int:
+        return hash(self.__key())
+    
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, Action):
+            return False
+        return self.__key() == other.__key()
+    
+    def __str__(self) -> str:
+        return self.callback.__name__

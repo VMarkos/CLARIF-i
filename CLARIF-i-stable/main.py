@@ -7,17 +7,30 @@ from api.State import State
 from api.Rule import Rule
 from api.Learner import Learner
 from api.Coach import Coach
+from api.Action import Action
 
-def flip_state(state: State, keys=['a', 'b', 'c']):
-    """ Flips the first incorrect pair in a state returning a new state"""
-    # print(type(state))
+def find_swap_action(state: State, keys=['a', 'b', 'c']) -> Action | None:
     for i in range(len(keys) - 1):
         cur_key, next_key = keys[i], keys[i + 1]
         if state.get(cur_key) > state.get(next_key):
-            flipped_state = deepcopy(state)
-            flipped_state.swap(cur_key, next_key)
-            return flipped_state
-    return deepcopy(state)
+            def swap_callback(state: State):
+                swapped_state = deepcopy(state)
+                swapped_state.swap(cur_key, next_key)
+                return swapped_state
+            swap_action = Action(swap_callback)
+            return swap_action
+    return None
+
+# def flip_state(state: State, keys=['a', 'b', 'c']):
+#     """ Flips the first incorrect pair in a state returning a new state"""
+#     # print(type(state))
+#     for i in range(len(keys) - 1):
+#         cur_key, next_key = keys[i], keys[i + 1]
+#         if state.get(cur_key) > state.get(next_key):
+#             flipped_state = deepcopy(state)
+#             flipped_state.swap(cur_key, next_key)
+#             return flipped_state
+#     return deepcopy(state)
 
 def main():
     # Initialise start and goal states
@@ -42,14 +55,14 @@ def main():
         Rule(
             f"R{i}",
             state,
-            flipped_state,
+            swap_action,
             priority=1,
             explanation=f"flipping", # maybe something more explicit
         )
         for i, state in enumerate(states)
-        if (flipped_state := flip_state(state)) != state
+        if (swap_action := find_swap_action(state)) != None
     ]
-    # print("\n".join(map(str, target_rules)))
+    print("\n".join(map(str, target_rules)))
     coach = Coach(target_rules)
     # return
     steps = 0
@@ -60,8 +73,8 @@ def main():
         path = learner.search_path(start_state, goal_state)
         # print("path:", [ (str(p[0]), [ (str(r[0]), r[1]) for r in p[1]]) for p in path[1]] )
         steps += 1
-        # if steps == 3:
-        #     return
+        if steps == 4:
+            return
     print(learner.hypothesis, steps, sep="\n")
 
 if __name__ == "__main__":

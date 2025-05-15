@@ -5,13 +5,14 @@ Rule representation for the coachable search framework.
 """
 
 from .State import State
+from .Action import Action
 from copy import deepcopy
 
 class Rule:
-    def __init__(self, name: str, condition: State, action: State, priority: int = 1, explanation: str = ""):
+    def __init__(self, name: str, condition: State, action: Action, priority: int = 1, explanation: str = ""):
         self.name: str = name
         self.condition: State = condition
-        self.action: State = action
+        self.action: Action = action
         self.priority: int = priority
         self.explanation: str = explanation
 
@@ -35,14 +36,15 @@ class Rule:
     def __repr__(self):
         return self.__str__()
 
-    def to_dict(self) -> dict:
-        """Convert the rule to a dictionary for serialization."""
-        return {
-            'name': self.name,
-            'condition': self.condition.__dict__,
-            'action': self.action.__dict__,
-            'priority': self.priority
-        }
+    # TODO Reconsider how this can be implemented using `Action`
+    # def to_dict(self) -> dict:
+    #     """Convert the rule to a dictionary for serialization."""
+    #     return {
+    #         'name': self.name,
+    #         'condition': self.condition.__dict__,
+    #         'action': self.action.__dict__,
+    #         'priority': self.priority
+    #     }
 
     def applies(self, state: State) -> bool:
         """Checks if a rule can be applied to a state, which is whenever the rule's body is covered by the `state`."""
@@ -51,7 +53,7 @@ class Rule:
     def apply(self, state: State) -> State:
         """ Applies a rule to a state by updating the state with the action (head) of the rule. """
         new_state = deepcopy(state)
-        new_state.update(self.action)
+        new_state.update(self.action.apply(new_state))
         return new_state
 
     @classmethod

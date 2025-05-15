@@ -39,20 +39,21 @@ class Coach:
         # print(current_state in self.target_rules)
         advised_rule = self.target_rules[current_state]
         advised_action = advised_rule.action
+        action_state = advised_action.apply(current_state)
 
-        for key, goal_value in advised_action:
-            current_value = current_state.get(key)
-            action_state = State()
-            if current_value != goal_value:
-                action_state.set(key, goal_value)
+        # for key, goal_value in advised_action:
+        #     current_value = current_state.get(key)
+        #     action_state = State()
+        #     if current_value != goal_value:
+        #         action_state.set(key, goal_value)
         print("Action state:", action_state)
         if action_state:
             rule = Rule(
                 name="",
                 condition=deepcopy(current_state),
-                action=action_state,
+                action=advised_action,
                 priority=1,
-                explanation=f"Change {key} from {current_value} to {goal_value}"
+                explanation=""
             )
             feedback_rules.append(rule)
         
