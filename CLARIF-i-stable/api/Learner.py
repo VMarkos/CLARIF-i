@@ -60,11 +60,10 @@ class Learner:
             
             # Check if current state matches goal state
             if current_state == goal_state:
-                # Convert path to trace format
-                trace = (start_state, path)
-                # for state, rule in path:
-                #     trace.append((state, rule))
-                traces.append(trace)
+                if current_state in partial_traces_dict:
+                    partial_traces_dict[current_state].add( tuple(new_path) )
+                else:
+                    partial_traces_dict[current_state] = { tuple(new_path) }
                 continue
             
             # Try to apply rules to current state
@@ -73,19 +72,20 @@ class Learner:
                     # Apply the rule to get the new state
                     # print("applies:", rule)
                     new_state = rule.apply(current_state)
-                    print("new_state:", new_state)
+                    # print("new_state:", new_state)
                     new_path = path + [(new_state, rule)]
                     # Append the new state and path to the queue
                     queue.append((new_state, new_path))
                     if new_state in partial_traces_dict:
-                        partial_traces_dict[new_state].add(new_path)
+                        partial_traces_dict[new_state].add( tuple(new_path) )
                     else:
                         partial_traces_dict[new_state] = { tuple(new_path) }
         
         # If we found any traces, return success
+        traces = [ (state, path) for state, paths in partial_traces_dict.items() for path in paths ]
         if traces:
-            print("RETURNING FULL TRACES")
-            # FIXME Each trace should contain as first element the node it is approaching (or maybe find a better idea)
+            # print("RETURNING FULL TRACES")
+            # print(f"\tLEARNER TRACES{[str(t[0]) for t in traces]}")
             return True, traces
         
         # If no complete paths found, return partial paths
@@ -97,8 +97,8 @@ class Learner:
         #         trace.append((s, r))
         #     partial_traces.append(trace)
 
-        print("RETURNING PARTIAL TRACES")  
-        return False, [ (state, path) for state, paths in partial_traces_dict.items() for path in paths ]
+        # print("RETURNING PARTIAL TRACES")  
+        return False, traces
     
     def update_hypothesis(self, feedback_rules: List[Rule]):
         """
@@ -107,7 +107,7 @@ class Learner:
         Args:
             feedback_rules: List of rules provided as feedback
         """
-        print("feedback_rules:", feedback_rules)
+        # print("feedback_rules:", feedback_rules)
         # Add new rules to hypothesis
         for rule in feedback_rules:
             if rule not in self.hypothesis:
@@ -125,5 +125,5 @@ class Learner:
             if condition not in seen_conditions:
                 seen_conditions.add(condition)
                 unique_rules.append(rule)
-        print("unique_rules", unique_rules)
+        # print("unique_rules", unique_rules)
         self.hypothesis = unique_rules

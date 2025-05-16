@@ -21,17 +21,6 @@ def find_swap_action(state: State, keys=['a', 'b', 'c']) -> Action | None:
             return swap_action
     return None
 
-# def flip_state(state: State, keys=['a', 'b', 'c']):
-#     """ Flips the first incorrect pair in a state returning a new state"""
-#     # print(type(state))
-#     for i in range(len(keys) - 1):
-#         cur_key, next_key = keys[i], keys[i + 1]
-#         if state.get(cur_key) > state.get(next_key):
-#             flipped_state = deepcopy(state)
-#             flipped_state.swap(cur_key, next_key)
-#             return flipped_state
-#     return deepcopy(state)
-
 def main():
     # Initialise start and goal states
     start_state = State({
@@ -62,19 +51,21 @@ def main():
         for i, state in enumerate(states)
         if (swap_action := find_swap_action(state)) != None
     ]
-    print("\n".join(map(str, target_rules)))
+    # print("\n".join(map(str, target_rules)))
     coach = Coach(target_rules)
     # return
     steps = 0
     path = learner.search_path(start_state, goal_state)
-    while (advice := coach.evaluate_inference(start_state, goal_state, path[1])) != (True, []):
-        print(f"Hypothesis: {learner.hypothesis}", f"Advice: {advice}", sep="\n")
+    while (advice := coach.evaluate_inference(start_state, goal_state, path[1])) != ( True, []):
+        # print(f">>> Advice[0] == {advice[1]}")
+        # print(f"Hypothesis: {learner.hypothesis}", f"Advice: {advice}", sep="\n")
         learner.update_hypothesis(advice[1])
         path = learner.search_path(start_state, goal_state)
         # print("path:", [ (str(p[0]), [ (str(r[0]), r[1]) for r in p[1]]) for p in path[1]] )
         steps += 1
-        if steps == 4:
-            return
+        # if steps == 4:
+        #     print(">>> Returning due to step limit")
+        #     return
     print(learner.hypothesis, steps, sep="\n")
 
 if __name__ == "__main__":
