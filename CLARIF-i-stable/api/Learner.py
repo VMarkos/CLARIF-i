@@ -33,15 +33,12 @@ class Learner:
             Tuple of (success, traces) where:
             - success is True if a path was found, False otherwise
             - traces is a list of reasoning traces, each trace being a list of (state, rule) pairs
-        """
-        # Initialize traces
-        traces = []
-        
+        """        
         # Check if start state already matches goal state
         if start_state == goal_state:
             # If they match, return the start state as a trace
             # with no rules applied
-            traces.append([(start_state, None)])
+            traces = [(start_state, None)]
             return True, traces
         
         # Try to find paths using current rules

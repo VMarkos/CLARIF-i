@@ -2,8 +2,9 @@ from .State import State
 from typing import Callable
 
 class Action:
-    def __init__(self, callback: Callable[[State], State]) -> None:
+    def __init__(self, callback: Callable[[State], State], name: str) -> None:
         self.callback: Callable[[State], State] = callback
+        self.name: str = name
 
     def apply(self, state: State) -> State:
         """Assuming that `self.callback` does not mutate `state`."""
@@ -21,4 +22,4 @@ class Action:
         return self.__key() == other.__key()
     
     def __str__(self) -> str:
-        return self.callback.__name__
+        return self.name

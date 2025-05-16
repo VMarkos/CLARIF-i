@@ -24,7 +24,6 @@ class Coach:
         if not traces:
             return False, self._generate_goal_rules(start_state)
         
-        # print(f">>> traces: {[str(t[0]) for t in traces]}")
         if goal_state in ( trace[0] for trace in traces ):
             return True, []
         

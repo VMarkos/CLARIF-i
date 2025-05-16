@@ -45,7 +45,6 @@ class State:
 
     def __eq__(self, other: "State") -> bool:
         """Boolean equality based on dictionary equality"""
-        # print("Checking for eq")
         if not isinstance(other, State):
             return False
         if len(other.state.keys()) != len(self.state.keys()):
@@ -54,5 +53,4 @@ class State:
             keys_match = all(self.state[k] == v for k, v in other)
         except KeyError:
             return False
-        # print(self.state, other.state)
         return keys_match
