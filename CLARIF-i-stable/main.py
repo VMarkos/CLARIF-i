@@ -5,9 +5,10 @@ from utils import generate_bubble_sort_test_case
 
 def main():
     results = dict()
-    for n in range(2, 4):
+    for n in range(2, 10):
         results[n] = []
-        for _ in range(2):
+        for i in range(100):
+            print(f"Running test n={n}, i={i}.", end="\r")
             bubble_test = generate_bubble_sort_test_case(n)
             bubble_test.run()
             results[n].append(bubble_test.report())
