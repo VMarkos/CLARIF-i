@@ -96,3 +96,30 @@ def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], S
     test_case: TestCase = TestCase(start_state, goal_state, get_triggered_rule, learner)
     return test_case
         
+def generate_partial_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], learner: Learner | None=None) -> TestCase:
+    # Generate start and goal states
+    digit_count = lambda n: 1 if 0 else int(math.log10(abs(n))) + 1
+    pad_num = lambda n, p: '0' * (p - len((s := str(n)))) + s
+    d = digit_count(n)
+    keys = [ f"k{pad_num(i, d)}" for i in range(n) ]
+    start_values = [ x for x in range(n) ]
+    random.shuffle(start_values)
+    start_state = State(dict(zip(keys, start_values)))
+    goal_state = State(dict(zip(keys, [ x for x in range(n) ])))
+    # print(f"Start: {start_state}\nGoal: {goal_state}")
+    # Generate rules
+    # states = ( State(dict(zip(keys, p))) for p in it.permutations(map(str, range(n))) )
+    # TODO Rules need not be generated all at once, just a generator, or a something like that, since we have factorially many rules
+    def get_triggered_rule(state: State) -> Rule:
+        swap_action = action_fn(state, keys)
+        # print(swap_action)
+        return Rule(
+            f"R({swap_action.name})",
+            state,
+            swap_action,
+            priority=0,
+            explanation=swap_action.name, # maybe something more explicit
+        )
+    # print("\n".join(map(str, target_rules)))
+    test_case: TestCase = TestCase(start_state, goal_state, get_triggered_rule, learner)
+    return test_case
