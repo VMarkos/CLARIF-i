@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coach-Driven Search</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h1 class="text-4xl font-bold text-center mb-8 text-blue-600">Coach-Driven Search</h1>
+        
+        <!-- Search Form -->
+        <div class="max-w-2xl mx-auto mb-8">
+            <div class="flex gap-4">
+                <input type="text" id="searchInput" 
+                       class="flex-grow p-4 rounded-lg border-2 border-blue-200 focus:border-blue-500 focus:outline-none"
+                       placeholder="Enter your search query...">
+                <button onclick="performSearch()" 
+                        class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors">
+                    Search
+                </button>
+            </div>
+        </div>
+
+        <!-- Results Container -->
+        <div class="max-w-4xl mx-auto">
+            <!-- Coach Analysis -->
+            <div id="analysis" class="bg-white p-6 rounded-lg shadow-md mb-6 hidden">
+                <h2 class="text-xl font-semibold mb-3 text-gray-800">Coach's Analysis</h2>
+                <p id="analysisText" class="text-gray-600"></p>
+            </div>
+
+            <!-- Search Results -->
+            <div id="results" class="bg-white p-6 rounded-lg shadow-md mb-6 hidden">
+                <h2 class="text-xl font-semibold mb-3 text-gray-800">Search Results</h2>
+                <div id="resultsContainer" class="space-y-4"></div>
+            </div>
+
+            <!-- Suggestions -->
+            <div id="suggestions" class="bg-white p-6 rounded-lg shadow-md hidden">
+                <h2 class="text-xl font-semibold mb-3 text-gray-800">Suggested Improvements</h2>
+                <ul id="suggestionsList" class="list-disc list-inside text-gray-600 space-y-2"></ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function performSearch() {
+            const query = document.getElementById('searchInput').value;
+            if (!query.trim()) return;
+
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: query })
+                });
+
+                const data = await response.json();
+                
+                // Update Analysis
+                const analysisDiv = document.getElementById('analysis');
+                const analysisText = document.getElementById('analysisText');
+                analysisText.textContent = data.analysis;
+                analysisDiv.classList.remove('hidden');
+
+                // Update Results
+                const resultsDiv = document.getElementById('results');
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = '';
+                data.results.results.forEach(result => {
+                    const resultElement = document.createElement('div');
+                    resultElement.className = 'border-b border-gray-200 pb-3';
+                    resultElement.innerHTML = `
+                        <a href="${result.url}" class="text-blue-500 hover:text-blue-700 font-medium">
+                            ${result.title}
+                        </a>
+                    `;
+                    resultsContainer.appendChild(resultElement);
+                });
+                resultsDiv.classList.remove('hidden');
+
+                // Update Suggestions
+                const suggestionsDiv = document.getElementById('suggestions');
+                const suggestionsList = document.getElementById('suggestionsList');
+                suggestionsList.innerHTML = '';
+                data.suggestions.forEach(suggestion => {
+                    const li = document.createElement('li');
+                    li.textContent = suggestion;
+                    suggestionsList.appendChild(li);
+                });
+                suggestionsDiv.classList.remove('hidden');
+
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Add Enter key support
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html> 
