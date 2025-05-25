@@ -14,7 +14,7 @@ def line_as_dict(line: str) -> dict:
         "goal_state": line_split[3],
     }
 
-def line_plot(paths: list[tuple[str]], reps: int=100):
+def line_plot(paths: list[tuple[str]], figname: str, reps: int=100):
     fig, ax = plt.subplots(figsize=(6,6))
     for path, colour, linestyle, label in paths:
         ns = []
@@ -47,11 +47,12 @@ def line_plot(paths: list[tuple[str]], reps: int=100):
     PLOT_PATH = os.path.join(CWD, "plots")
     if not os.path.isdir(PLOT_PATH):
         os.makedirs(PLOT_PATH)
-    fig_path = os.path.join(PLOT_PATH, "full_condition_learnability")
+    fig_path = os.path.join(PLOT_PATH, figname)
     plt.savefig(fig_path)
 
 def main():
     reduced = input("Plotting reduced results (y/n): ") == "y"
+    figname = input("Figure filename: ")
     paths = [
         ("b_test_N20_reps100.txt", "tab:blue", "solid", "Bubble (no mem)"),
         ("q_test_N20_reps100.txt", "tab:orange", "solid", "Quick (no mem)"),
@@ -60,11 +61,20 @@ def main():
         ("b_test_N20_reps100_memy_longy.txt", "tab:blue", "dotted", "Bubble (with long mem)"),
         ("q_test_N20_reps100_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
     ]
+    partial_paths = [
+        ("bp_test_N20_reps100_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
+        ("qp_test_N20_reps100_memn_longn.txt", "tab:orange", "solid", "Quick (no mem)"),
+        ("bp_test_N20_reps100_memy_longn.txt", "tab:blue", "dashed", "Bubble (with mem)"),
+        ("qp_test_N20_reps100_memy_longn.txt", "tab:orange", "dashed", "Quick (with mem)"),
+        ("bp_test_N20_reps100_memy_longy.txt", "tab:blue", "dotted", "Bubble (with long mem)"),
+        # ("q_test_N20_reps100_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
+    ]
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
     reduced_suffix = ".reduced" if reduced else ""
     paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in paths ]
-    line_plot(paths)
+    partial_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in partial_paths ]
+    line_plot(partial_paths, figname)
 
 if __name__ == "__main__":
     main()

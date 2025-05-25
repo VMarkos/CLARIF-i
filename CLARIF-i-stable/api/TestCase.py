@@ -7,17 +7,23 @@ from .Rule import Rule
 from typing import Callable
 
 class TestCase:
-    def __init__(self, start_state: State, goal_state: State, target_rules: Callable[[State], Rule], learner: Learner | None=None) -> None:
+    def __init__(self, start_state: State, goal_state: State, target_rules: Callable[[State], Rule], learner: Learner | None=None, full_reporting: bool = True) -> None:
         self.start_state: State = start_state
+        with open("log.txt", "a") as file:
+            print(f"{self.start_state}", file=file)
         self.goal_state: State = goal_state
         self.learner: Learner = learner if learner != None else Learner()
         self.coach: Coach = Coach(target_rules)
+        self.full_reporting: bool = full_reporting
         self._steps: int = 0
 
     def run(self) -> None:
         path = self.learner.search_path(self.start_state, self.goal_state)
-        while (advice := self.coach.evaluate_inference(self.start_state, self.goal_state, path[1])) != ( True, []):
-            # print(f">>> Advice[0] == {advice[1]}")
+        print(f"Initial path: {path}")
+        while (advice := self.coach.evaluate_inference(self.start_state, self.goal_state, path[1])) != ( True, [] ):
+            print(f">>> Advice[1] == {advice[1]}")
+            print(f">>> Advice[0] == {advice[0]}")
+            print(f"path[0]: {path[0]}")
             # print(f"Hypothesis: {self.learner.hypothesis}", f"Advice: {advice}", sep="\n")
             self.learner.update_hypothesis(advice[1])
             path = self.learner.search_path(self.start_state, self.goal_state)
@@ -30,12 +36,16 @@ class TestCase:
 
     def report(self) -> dict:
         return {
-            "start_state": str(self.start_state),
-            "goal_state": str(self.goal_state),
-            "learned_hypothesis": "; ".join(map(str, self.learner.hypothesis)),
+            "start_state": str(self.start_state) if self.full_reporting else "s",
+            "goal_state": str(self.goal_state) if self.full_reporting else "g",
+            "learned_hypothesis": "; ".join(map(str, self.learner.hypothesis)) if self.full_reporting else "p",
             "steps": self._steps,
         }
 
     def __str__(self) -> str:
-        attrs = [self._steps, self.start_state, self.goal_state, self.learner.hypothesis]
+        if self.full_reporting:
+            attrs = [self._steps, self.start_state, self.goal_state, self.learner.hypothesis]
+        else:
+            attrs = [self._steps, "s", "g", "p"]
         return "; ".join(map(str, attrs))
+

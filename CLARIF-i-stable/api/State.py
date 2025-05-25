@@ -63,3 +63,11 @@ class State:
         except KeyError:
             return False
         return keys_match
+
+    def __len__(self) -> int:
+        return len(self.state)
+
+    @classmethod
+    def from_str(cls, tc_str: str) -> "State":
+        kv_dict = { x[0]: int(x[1]) for x in map(lambda s: s.split("="), tc_str.split(",")) }
+        return cls(kv_dict)

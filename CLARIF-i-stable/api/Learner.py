@@ -81,8 +81,8 @@ class Learner:
         # If we found any traces, return success
         traces = [ (state, path) for state, paths in partial_traces_dict.items() for path in paths ]
         if traces:
-            # print("RETURNING FULL TRACES")
-            # print(f"\tLEARNER TRACES{[str(t[0]) for t in traces]}")
+            print("RETURNING FULL TRACES")
+            print(f"\tLEARNER TRACES{[str(t[0]) for t in traces]}")
             return True, traces
         
         # If no complete paths found, return partial paths
