@@ -67,7 +67,7 @@ def main():
         ("bp_test_N20_reps100_memy_longn.txt", "tab:blue", "dashed", "Bubble (with mem)"),
         ("qp_test_N20_reps100_memy_longn.txt", "tab:orange", "dashed", "Quick (with mem)"),
         ("bp_test_N20_reps100_memy_longy.txt", "tab:blue", "dotted", "Bubble (with long mem)"),
-        # ("q_test_N20_reps100_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
+        ("qp_test_N20_reps100_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
     ]
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
