@@ -6,15 +6,17 @@ Rule representation for the coachable search framework.
 
 from .State import State
 from .Action import Action
+from .Predicate import Predicate
 from copy import deepcopy
 
 class Rule:
-    def __init__(self, name: str, condition: State, action: Action, priority: int = 1, explanation: str = "") -> None:
+    def __init__(self, name: str, condition: State | Predicate, action: Action, priority: int = 1, explanation: str = "") -> None:
         self.name: str = name
-        self.condition: State = condition
+        self.condition: State | Predicate = condition
         self.action: Action = action
         self.priority: int = priority
         self.explanation: str = explanation
+        self._relational: bool = isinstance(self.condition, Predicate)
 
     def __key(self) -> tuple:
         """Compute rule key by body and head"""
@@ -48,6 +50,8 @@ class Rule:
 
     def applies(self, state: State) -> bool:
         """Checks if a rule can be applied to a state, which is whenever the rule's body is covered by the `state`."""
+        if self._relational:
+            return self.condition.evaluate(state)
         return self.condition <= state
     
     def apply(self, state: State) -> State:
