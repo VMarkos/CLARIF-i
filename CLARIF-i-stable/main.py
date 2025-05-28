@@ -47,7 +47,7 @@ def main():
                 results_file.write(f"{n}; {test}\n")
             if report_traces:
                 with open(trace_file_name, "a") as trace_file:
-                    trace_file.write(f"{n}; {i};\n{learner.get_traces_str()}")
+                    trace_file.write(f"{n}; {i}\n{test.get_traces_str()}\n")
 
 if __name__ == "__main__":
     main()

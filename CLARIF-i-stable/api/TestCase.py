@@ -45,7 +45,7 @@ class TestCase:
         }
 
     def get_traces_str(self) -> str:
-        return "\n".join((", ".join(str(s) for s in t) for t in self._learner_traces))
+        return "\n".join(("; ".join(str(s) for s in t) for t in self._learner_traces))
 
     def __str__(self) -> str:
         if self.full_reporting:
