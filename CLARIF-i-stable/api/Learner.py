@@ -22,6 +22,7 @@ class Learner:
     def __init__(self, initial_rules: List[Rule] = []):
         """Initialize the learner with initial rules."""
         self.hypothesis: list[Rule] = sorted(initial_rules, reverse=True)
+        self._trace: list[State] = [] # list of traces in the form of States the learner passes through
     
     def search_path(self, start_state: Dict[str, str], goal_state: Dict[str, str]) -> Tuple[bool, List[List[Tuple[State, Optional[Rule]]]]]:
         """
@@ -37,6 +38,8 @@ class Learner:
             - traces is a list of reasoning traces, each trace being a list of (state, rule) pairs
         """        
         # Check if start state already matches goal state
+        self._trace = [start_state]
+
         if start_state == goal_state:
             # If they match, return the start state as a trace
             # with no rules applied
@@ -56,7 +59,7 @@ class Learner:
                 continue
                 
             visited.add(current_state)
-            
+            self._trace.append(current_state)
             # Check if current state matches goal state
             if current_state == goal_state:
                 if current_state in partial_traces_dict:
@@ -67,19 +70,6 @@ class Learner:
             
             # Try to apply rules to current state
             top_rule = self._find_top_rule(current_state)
-            # for rule in self.hypothesis:
-            #     if rule.applies(current_state):
-            #         # Apply the rule to get the new state
-            #         print("\tapplies:", rule)
-            #         new_state = rule.apply(current_state)
-            #         print("\tnew_state:", new_state)
-            #         new_path = path + [(new_state, rule)]
-            #         # Append the new state and path to the queue
-            #         queue.append((new_state, new_path))
-            #         if new_state in partial_traces_dict:
-            #             partial_traces_dict[new_state].add( tuple(new_path) )
-            #         else:
-            #             partial_traces_dict[new_state] = { tuple(new_path) }
             if top_rule != None:
                 new_state = top_rule.apply(current_state)
                 new_path = path + [(new_state, top_rule)]
