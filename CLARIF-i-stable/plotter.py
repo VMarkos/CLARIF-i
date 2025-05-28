@@ -53,21 +53,23 @@ def line_plot(paths: list[tuple[str]], figname: str, reps: int=100):
 def main():
     reduced = input("Plotting reduced results (y/n): ") == "y"
     figname = input("Figure filename: ")
+    N = int(input("N: "))
+    reps = int(input("Repetitions: "))
     paths = [
-        ("b_test_N20_reps100.txt", "tab:blue", "solid", "Bubble (no mem)"),
-        ("q_test_N20_reps100.txt", "tab:orange", "solid", "Quick (no mem)"),
-        ("b_test_N20_reps100_memy.txt", "tab:blue", "dashed", "Bubble (with mem)"),
-        ("q_test_N20_reps100_memy.txt", "tab:orange", "dashed", "Quick (with mem)"),
-        ("b_test_N20_reps100_memy_longy.txt", "tab:blue", "dotted", "Bubble (with long mem)"),
-        ("q_test_N20_reps100_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
+        (f"b_test_N{N}_reps{reps}.txt", "tab:blue", "solid", "Bubble (no mem)"),
+        (f"q_test_N{N}_reps{reps}.txt", "tab:orange", "solid", "Quick (no mem)"),
+        (f"b_test_N{N}_reps{reps}_memy.txt", "tab:blue", "dashed", "Bubble (with mem)"),
+        (f"q_test_N{N}_reps{reps}_memy.txt", "tab:orange", "dashed", "Quick (with mem)"),
+        (f"b_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (with long mem)"),
+        (f"q_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
     ]
     partial_paths = [
-        ("bp_test_N20_reps100_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
-        ("qp_test_N20_reps100_memn_longn.txt", "tab:orange", "solid", "Quick (no mem)"),
-        ("bp_test_N20_reps100_memy_longn.txt", "tab:blue", "dashed", "Bubble (with mem)"),
-        ("qp_test_N20_reps100_memy_longn.txt", "tab:orange", "dashed", "Quick (with mem)"),
-        ("bp_test_N20_reps100_memy_longy.txt", "tab:blue", "dotted", "Bubble (with long mem)"),
-        ("qp_test_N20_reps100_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
+        (f"bp_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
+        (f"qp_test_N{N}_reps{reps}_memn_longn.txt", "tab:orange", "solid", "Quick (no mem)"),
+        (f"bp_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "dashed", "Bubble (with mem)"),
+        (f"qp_test_N{N}_reps{reps}_memy_longn.txt", "tab:orange", "dashed", "Quick (with mem)"),
+        (f"bp_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (with long mem)"),
+        (f"qp_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
     ]
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
