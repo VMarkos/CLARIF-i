@@ -22,6 +22,17 @@ class State:
         self.state[k1] = self.state.get(k2)
         self.state[k2] = temp
 
+    def difference(self, other) -> set[str]:
+        """ Computes the keys in which two states differ, including states that are not the same in each state """
+        if not isinstance(other, State):
+            raise TypeError(f"Cannot check differences between {type(other)} and 'State'.")
+        self_keys = set(self.state.keys)
+        other_keys = set(other.state.keys)
+        sym_diff = self_keys.symmetric_difference(other_keys)
+        cut = self_keys.cut(other.keys)
+        diff = { k for k in cut if self.state[k] != other.state[k] }.union(sym_diff)
+        return diff
+
     def __bool__(self) -> bool:
         return len(self.state) != 0
 
