@@ -132,19 +132,19 @@ def find_bubble_partial_swap_action(state: State, keys: list[str]) -> tuple[Stat
             return swap_state, swap_action, n - i
     return State(), Action(), 0 # Maybe this should return the full state?
     
-def generate_bubble_sort_partial_test_case(n: int, learner: Learner | None=None, full_reporting: bool = True, start_state: State = None, goal_state: State = None):
-    return generate_sorting_test_case(n, find_bubble_partial_swap_action, learner, full_reporting, start_state, goal_state)
+def generate_bubble_sort_partial_test_case(n: int, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None):
+    return generate_sorting_test_case(n, find_bubble_partial_swap_action, learner, full_reporting, report_traces, start_state, goal_state)
 
-def generate_quick_sort_partial_test_case(n: int, learner: Learner | None=None, full_reporting: bool = True, start_state: State = None, goal_state: State = None):
-    return generate_sorting_test_case(n, find_quick_partial_swap_action, learner, full_reporting, start_state, goal_state)
+def generate_quick_sort_partial_test_case(n: int, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None):
+    return generate_sorting_test_case(n, find_quick_partial_swap_action, learner, full_reporting, report_traces, start_state, goal_state)
 
-def generate_bubble_sort_test_case(n: int, learner: Learner | None=None, full_reporting: bool = True, start_state: State = None, goal_state: State = None):
-    return generate_sorting_test_case(n, find_bubble_swap_action, learner, full_reporting, start_state, goal_state)
+def generate_bubble_sort_test_case(n: int, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None):
+    return generate_sorting_test_case(n, find_bubble_swap_action, learner, full_reporting, report_traces, start_state, goal_state)
 
-def generate_quick_sort_test_case(n: int, learner: Learner | None=None, full_reporting: bool = True, start_state: State = None, goal_state: State = None):
-    return generate_sorting_test_case(n, find_quick_swap_action, learner, full_reporting, start_state, goal_state)
+def generate_quick_sort_test_case(n: int, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None):
+    return generate_sorting_test_case(n, find_quick_swap_action, learner, full_reporting, report_traces, start_state, goal_state)
 
-def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], learner: Learner | None=None, full_reporting: bool = True, start_state: State = None, goal_state: State = None) -> TestCase:
+def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None) -> TestCase:
     # Generate start and goal states
     digit_count = lambda n: 1 if 0 else int(math.log10(abs(n))) + 1
     pad_num = lambda n, p: '0' * (p - len((s := str(n)))) + s
@@ -169,6 +169,6 @@ def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], S
             explanation=swap_action.name, # maybe something more explicit
         )
     # print("\n".join(map(str, target_rules)))
-    test_case: TestCase = TestCase(start_state, goal_state, get_triggered_rule, learner, full_reporting)
+    test_case: TestCase = TestCase(start_state, goal_state, get_triggered_rule, learner, full_reporting, report_traces)
     return test_case
         
