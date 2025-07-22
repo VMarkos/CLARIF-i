@@ -13,8 +13,8 @@ Implementation notes about CLARIF-i development and, mostly, any experiments con
 ### Major Steps
 
 - [x] Implement two sorting algorithms with different worst case complexities to demonstrate learnability. **Done! Implemented Bubble and Quick Sort(s).**
-- [ ] Add memory to learners so as to measure the effect of coaching on proactively catching future cases.
-- [ ] As a sub-objective of the above, first implement rules that have partial states as conditions in the cases of Bubble and Quick Sorts.
+- [x] Add memory to learners so as to measure the effect of coaching on proactively catching future cases.
+- [x] As a sub-objective of the above, first implement rules that have partial states as conditions in the cases of Bubble and Quick Sorts.
 - [x] Create a `plotter.py` to create plots of various kinds needed for the cases above.
 
 ### Minor Steps / Bug Fixes
@@ -23,7 +23,7 @@ Implementation notes about CLARIF-i development and, mostly, any experiments con
 - [x] Add min-max or **+- std buffer** in line plots.
 - [x] Change `line_plot` to accept a list of paths and plot all plots in one single plot.
 - [x] Further extend `line_plot` to show a plot title and other aesthetics (**grid lines, ticks, titles, labels, legend**).
-- [ ] Bubble sort + mem: Run again `reps=100` experiments for `N=19,20` and append them to the corresponding file to create full plots.
+- [x] Bubble sort + mem: Run again `reps=100` experiments for `N=19,20` and append them to the corresponding file to create full plots.
 - [ ] 
  
 ## Considerations
