@@ -3,12 +3,13 @@ import os
 import math
 from tqdm import tqdm
 
-from utils import generate_bubble_sort_test_case, generate_quick_sort_test_case, generate_bubble_sort_partial_test_case, generate_quick_sort_partial_test_case
+from utils import generate_bubble_sort_test_case, generate_quick_sort_test_case, generate_bubble_sort_partial_test_case, generate_quick_sort_partial_test_case, generate_approximate_partial_test_case
 from api.Learner import Learner
 
 ALGORITHMS = {
     'b': generate_bubble_sort_test_case,
     'q': generate_quick_sort_test_case,
+    'ap': generate_approximate_partial_test_case,
     'bp': generate_bubble_sort_partial_test_case,
     'qp': generate_quick_sort_partial_test_case,
 }
@@ -16,7 +17,7 @@ ALGORITHMS = {
 def main():
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
-    algorithm = input("Enter algorithm ({q}uicksort, {b}ubblesort, append {p}artial): ")
+    algorithm = input("Enter algorithm ({q}uicksort, {b}ubblesort, {a}pproximate, append {p}artial): ")
     N = int(input("Enter N: "))
     reps = int(input("Enter # of repetitions: "))
     memory = input("Remember advice (y/n): ")

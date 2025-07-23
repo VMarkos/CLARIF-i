@@ -1,7 +1,9 @@
 # utils.py
 
+import os
 import random
 import math
+import json
 import itertools as it
 from copy import deepcopy
 from typing import Callable
@@ -13,7 +15,11 @@ from api.Action import Action
 from api.State import State
 
 # To speed things up in all cases we need some sort of memory, e.g., remember some parameters for each algorithm to save up time in rule generation
-# These should not be kept into the state itself but maybe some of the agents (learner? coach? TestCase? `target_rules` itself?)
+# Theseshould not be kept into the state itself but maybe some of the agents (learner? coach? TestCase? `target_rules` itself?)
+
+# Local Lambdas
+digit_count = lambda n: 1 if n == 0 else int(math.log10(abs(n))) + 1
+pad_num = lambda n, p: '0' * (p - len((s := str(n)))) + s
 
 def find_quick_swap_action(state: State, keys: list[str]) -> tuple[State, Action, int]:
     # print(f"State: {state}")
@@ -43,10 +49,7 @@ def find_quick_swap_action(state: State, keys: list[str]) -> tuple[State, Action
                 return j
             left_key = keys[i]
             right_key = keys[j]
-            def swap_callback(state: State):
-                swapped_state = deepcopy(state)
-                swapped_state.swap(left_key, right_key)
-                return swapped_state
+            swap_callback = get_swap_callback(let_key, right_key)
             swap_action = Action(swap_callback, f"swap({left_key}, {right_key})")
             # print("\tswap action", swap_action)
             return swap_action
@@ -91,10 +94,7 @@ def find_quick_partial_swap_action(state: State, keys: list[str]) -> tuple[State
                 return j
             left_key = keys[i]
             right_key = keys[j]
-            def swap_callback(state: State):
-                swapped_state = deepcopy(state)
-                swapped_state.swap(left_key, right_key)
-                return swapped_state
+            swap_callback = get_swap_callback(left_key, right_key)
             swap_action = Action(swap_callback, f"swap({left_key}, {right_key})")
             # print("\tswap action", swap_action)
             priority -= 1
@@ -108,10 +108,7 @@ def find_bubble_swap_action(state: State, keys: list[str]) -> tuple[State, Actio
     for i in range(len(keys) - 1):
         cur_key, next_key = keys[i], keys[i + 1]
         if state.get(cur_key) > state.get(next_key):
-            def swap_callback(state: State):
-                swapped_state = deepcopy(state)
-                swapped_state.swap(cur_key, next_key)
-                return swapped_state
+            swap_callback = get_swap_callback(cur_key, next_key)
             swap_action = Action(swap_callback, f"swap({cur_key}, {next_key})")
             return state, swap_action, 0
     return state, Action(), 0
@@ -123,15 +120,61 @@ def find_bubble_partial_swap_action(state: State, keys: list[str]) -> tuple[Stat
         cur_val = state.get(cur_key)
         next_val = state.get(next_key)
         if cur_val > next_val:
-            def swap_callback(state: State):
-                swapped_state = deepcopy(state)
-                swapped_state.swap(cur_key, next_key)
-                return swapped_state
+            swap_callback = get_swap_callback(cur_key, next_key)
             swap_state = State({ cur_key: cur_val, next_key: next_val })
             swap_action = Action(swap_callback, f"swap({cur_key}, {next_key})")
             return swap_state, swap_action, n - i
-    return State(), Action(), 0 # Maybe this should return the full state?
-    
+    return State(), Action(), 0
+
+def _generate_targets(N: int=20) -> None:
+    targets = dict()
+    d = digit_count(N)
+    for n in range(1, N + 1):
+        targets[n] = { pad_num(k, d): v for k, v in enumerate(random.sample(range(1, n + 1), k=n)) }
+    CWD = os.path.abspath(os.path.dirname(__file__))
+    targets_path = os.path.join(CWD, 'targets.json')
+    with open(targets_path, 'w') as file:
+        json.dump(targets, file, indent=2)
+
+def _load_targets() -> dict[int, dict[str, int]]:
+    CWD = os.path.abspath(os.path.dirname(__file__))
+    targets_path = os.path.join(CWD, 'targets.json')
+    with open(targets_path, 'r') as file:
+        targets = json.load(file)
+    return targets
+
+TARGETS = _load_targets()
+
+def find_approximate_partial_swap_action(state: State, keys: list[str]) -> tuple[State, Action, int]:
+    target = State(TARGETS[str(len(state))])
+    state_keys = state.state.keys()
+    threshold = 0.7
+    current_kendall_tau = target.kendall_tau(state)
+    if current_kendall_tau > threshold:
+        return State(), Action(), int(1000 * current_kendall_tau)
+    for l, r in it.product(state_keys, state_keys):
+        if l >= r:
+            continue
+        copy_state = deepcopy(state)
+        copy_state.swap(l, r)
+        new_kendall_tau = target.kendall_tau(copy_state)
+        if new_kendall_tau > current_kendall_tau:
+            swap_callback = get_swap_callback(l, r)
+            swap_state = State({ l: state.get(l), r: state.get(r) })
+            swap_action = Action(swap_callback, f"swap({l}, {r})")
+            return swap_state, swap_action, int(1000 * new_kendall_tau)
+    return State(), Action(), 1000 # Typically, this should never be reached except for ill-defined settings
+   
+def get_swap_callback(left, right) -> Callable:
+    def swap_callback(state: State):
+        swapped_state = deepcopy(state)
+        swapped_state.swap(left, right)
+        return swapped_state
+    return swap_callback
+
+def generate_approximate_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool=True, report_traces: bool=True, start_state: State | None=None, goal_state: State | None=None):
+    return generate_sorting_test_case(n, find_approximate_partial_swap_action, N, learner, full_reporting, report_traces, start_state, goal_state)
+
 def generate_bubble_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None):
     return generate_sorting_test_case(n, find_bubble_partial_swap_action, N, learner, full_reporting, report_traces, start_state, goal_state)
 
@@ -146,8 +189,6 @@ def generate_quick_sort_test_case(n: int, N: int=20, learner: Learner | None=Non
 
 def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None) -> TestCase:
     # Generate start and goal states
-    digit_count = lambda n: 1 if n == 0 else int(math.log10(abs(n))) + 1
-    pad_num = lambda n, p: '0' * (p - len((s := str(n)))) + s
     d = digit_count(N)
     keys = [ f"k{pad_num(i, d)}" for i in range(n) ]
     start_values = [ x for x in range(n) ]

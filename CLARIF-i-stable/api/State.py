@@ -1,6 +1,7 @@
 # api/State.py
 
 from typing import Any
+from scipy.stats import kendalltau
 
 class State:
     def __init__(self, state: dict[str, Any] = dict()) -> None:
@@ -21,6 +22,11 @@ class State:
         temp: str = self.state.get(k1)
         self.state[k1] = self.state.get(k2)
         self.state[k2] = temp
+
+    def kendall_tau(self, other: "State") -> float:
+        self_values = [ self.state[k] for k in sorted(self.state.keys()) ]
+        other_values = [ other.state[k] for k in sorted(other.state.keys()) ]
+        return kendalltau(self_values, other_values).statistic
 
     def __bool__(self) -> bool:
         return len(self.state) != 0

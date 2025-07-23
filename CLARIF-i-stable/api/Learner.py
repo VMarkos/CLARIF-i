@@ -21,7 +21,6 @@ class Learner:
     
     def __init__(self, initial_rules: List[Rule] = []):
         """Initialize the learner with initial rules."""
-        # self.hypothesis: list[Rule] = initial_rules
         p_key = lambda r: -r.priority # a bit sub-optimal
         grouped_rules = { p: set(rs) for p, rs in it.groupby(sorted(initial_rules, key=p_key), p_key) }
         self.hypothesis: AvlTree = AvlTree[int, Rule](grouped_rules)

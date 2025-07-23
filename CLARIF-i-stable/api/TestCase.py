@@ -9,13 +9,13 @@ from .Rule import Rule
 from typing import Callable
 
 class TestCase:
-    def __init__(self, start_state: State, goal_state: State, target_rules: Callable[[State], Rule], learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = False) -> None:
+    def __init__(self, start_state: State, goal_state: State, target_rules: Callable[[State], Rule], learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = False, is_goal: Callable | None=None) -> None:
         self.start_state: State = start_state
         # with open("log.txt", "a") as file:
         #     print(f"{self.start_state}", file=file)
         self.goal_state: State = goal_state
         self.learner: Learner = learner if learner != None else Learner()
-        self.coach: Coach = Coach(target_rules)
+        self.coach: Coach = Coach(target_rules, is_goal)
         self.full_reporting: bool = full_reporting
         self._steps: int = 0
         self.report_traces: bool = self.full_reporting or report_traces
@@ -27,6 +27,7 @@ class TestCase:
             self._learner_traces.append(self.learner._trace)
         previous_advice = None
         while (advice := self.coach.evaluate_inference(self.start_state, self.goal_state, path[1])) != ( True, [] ):
+            print(advice)
             if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
                 raise ValueError(f"Duplicate advice:\n\t{advice}")
             self.learner.update_hypothesis(advice[1])

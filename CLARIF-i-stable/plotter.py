@@ -34,9 +34,9 @@ def line_plot(paths: list[tuple[str]], figname: str, reps: int=100):
                     one_std_interval[1].append(partial_mean + partial_std)
                     partial_steps = []
                     ns.append(results["n"])
-    # print(f"ns: {ns}")
-    ax.plot(ns, steps, color=colour, linestyle=linestyle, label=label)
-    ax.fill_between(ns, *one_std_interval, color=colour, alpha=0.1)
+        # print(f"ns: {ns}")
+        ax.plot(ns, steps, color=colour, linestyle=linestyle, label=label)
+        ax.fill_between(ns, *one_std_interval, color=colour, alpha=0.1)
     plt.xticks(ticks=ns)
     plt.xlabel("n")
     plt.ylabel("Coaching Steps")
@@ -57,27 +57,27 @@ def main():
     reps = int(input("Repetitions: "))
     is_partial = input("Partial results (y/n): ") == "y"
     paths = [
-        (f"b_test_N{N}_reps{reps}.txt", "tab:blue", "solid", "Bubble (no mem)"),
-        (f"q_test_N{N}_reps{reps}.txt", "tab:orange", "solid", "Quick (no mem)"),
-        (f"b_test_N{N}_reps{reps}_memy.txt", "tab:blue", "dashed", "Bubble (with mem)"),
-        (f"q_test_N{N}_reps{reps}_memy.txt", "tab:orange", "dashed", "Quick (with mem)"),
-        (f"b_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (with long mem)"),
-        (f"q_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
+        (f"b_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
+        (f"q_test_N{N}_reps{reps}_memn_longn.txt", "tab:orange", "solid", "Quick (no mem)"),
+        (f"b_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "dashed", "Bubble (short mem)"),
+        (f"q_test_N{N}_reps{reps}_memy_longn.txt", "tab:orange", "dashed", "Quick (short mem)"),
+        (f"b_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (long mem)"),
+        (f"q_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (long mem)"),
     ]
     partial_paths = [
         (f"bp_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
         (f"qp_test_N{N}_reps{reps}_memn_longn.txt", "tab:orange", "solid", "Quick (no mem)"),
-        (f"bp_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "dashed", "Bubble (with mem)"),
-        (f"qp_test_N{N}_reps{reps}_memy_longn.txt", "tab:orange", "dashed", "Quick (with mem)"),
-        (f"bp_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (with long mem)"),
-        (f"qp_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (with long mem)"),
+        (f"bp_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "dashed", "Bubble (short mem)"),
+        (f"qp_test_N{N}_reps{reps}_memy_longn.txt", "tab:orange", "dashed", "Quick (short mem)"),
+        (f"bp_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (long mem)"),
+        (f"qp_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (long mem)"),
     ]
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
     reduced_suffix = ".reduced" if reduced else ""
     paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in paths ]
     partial_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in partial_paths ]
-    line_plot(paths, figname)
+    line_plot(partial_paths if is_partial else paths, figname)
 
 if __name__ == "__main__":
     main()
