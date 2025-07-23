@@ -4,9 +4,9 @@
 Learner implementation for the coachable search framework.
 """
 
-from functools import reduce
-
+import itertools as it
 from typing import Dict, List, Tuple, Set, Optional
+from avltree import AvlTree
 
 from .Rule import Rule
 from .State import State
@@ -21,7 +21,11 @@ class Learner:
     
     def __init__(self, initial_rules: List[Rule] = []):
         """Initialize the learner with initial rules."""
-        self.hypothesis: list[Rule] = initial_rules
+        # self.hypothesis: list[Rule] = initial_rules
+        p_key = lambda r: -r.priority # a bit sub-optimal
+        grouped_rules = { p: set(rs) for p, rs in it.groupby(sorted(initial_rules, key=p_key), p_key) }
+        self.hypothesis: AvlTree = AvlTree[int, Rule](grouped_rules)
+        # print(self.hypothesis)
         self._trace: list[State] = [] # list of traces in the form of States the learner passes through
     
     def search_path(self, start_state: Dict[str, str], goal_state: Dict[str, str]) -> Tuple[bool, List[List[Tuple[State, Optional[Rule]]]]]:
@@ -64,6 +68,7 @@ class Learner:
                     partial_traces_dict[current_state] = { tuple(new_path) }
                 continue
             top_rule = self._find_top_rule(current_state)
+            # print(f"top rule: {top_rule}")
             if top_rule != None:
                 new_state = top_rule.apply(current_state)
                 new_path = path + [(new_state, top_rule)]
@@ -85,14 +90,17 @@ class Learner:
   
     def _find_top_rule(self, state: State) -> Rule | None:
         try:
-            max_priority = -1
-            max_rule =None 
-            for r in self.hypothesis:
-                if r.applies(state) and r.priority > max_priority:
-                    max_priority = r.priority
-                    max_rule = r
-            return max_rule
-        except TypeError:
+            # max_priority = -1
+            # max_rule =None 
+            for rp in self.hypothesis:
+                rules = self.hypothesis[rp]
+                for r in rules:
+                    if r.applies(state):# and r.priority > max_priority:
+                        return r
+                        # max_priority = r.priority
+                        # max_rule = r
+            return None
+        except (TypeError, ValueError):
             return None
 
     def update_hypothesis(self, feedback_rules: List[Rule]):
@@ -105,9 +113,14 @@ class Learner:
         # print("feedback_rules:", feedback_rules)
         # Add new rules to hypothesis
         for rule in feedback_rules:
-            if rule not in self.hypothesis:
-                self.hypothesis.append(rule)
-        
+            rp = -rule.priority
+            # print(f"rule in hypothesis: {rule} in {self.hypothesis}")
+            if rp not in self.hypothesis:
+                self.hypothesis[rp] = set([rule])
+                # self.hypothesis.append(rule)
+            else:
+                self.hypothesis[rp].add(rule)
+        # print(f"Updated: {self.hypothesis}")
         # Sort rules by priority
         """
         self.hypothesis.sort(reverse=True)

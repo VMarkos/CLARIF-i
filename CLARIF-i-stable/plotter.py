@@ -34,9 +34,9 @@ def line_plot(paths: list[tuple[str]], figname: str, reps: int=100):
                     one_std_interval[1].append(partial_mean + partial_std)
                     partial_steps = []
                     ns.append(results["n"])
-        # print(f"ns: {ns}")
-        ax.plot(ns, steps, color=colour, linestyle=linestyle, label=label)
-        ax.fill_between(ns, *one_std_interval, color=colour, alpha=0.1)
+    # print(f"ns: {ns}")
+    ax.plot(ns, steps, color=colour, linestyle=linestyle, label=label)
+    ax.fill_between(ns, *one_std_interval, color=colour, alpha=0.1)
     plt.xticks(ticks=ns)
     plt.xlabel("n")
     plt.ylabel("Coaching Steps")
@@ -55,7 +55,7 @@ def main():
     figname = input("Figure filename: ")
     N = int(input("N: "))
     reps = int(input("Repetitions: "))
-    is_partial = input("Partial results (y/n):") == "y"
+    is_partial = input("Partial results (y/n): ") == "y"
     paths = [
         (f"b_test_N{N}_reps{reps}.txt", "tab:blue", "solid", "Bubble (no mem)"),
         (f"q_test_N{N}_reps{reps}.txt", "tab:orange", "solid", "Quick (no mem)"),
@@ -74,11 +74,10 @@ def main():
     ]
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
-    PATHS = paths if not is_partial else partial_paths
     reduced_suffix = ".reduced" if reduced else ""
-    paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in PATHS ]
+    paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in paths ]
     partial_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in partial_paths ]
-    line_plot(partial_paths, figname)
+    line_plot(paths, figname)
 
 if __name__ == "__main__":
     main()
