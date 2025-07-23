@@ -1,6 +1,7 @@
 # main.py
 import os
 import math
+from tqdm import tqdm
 
 from utils import generate_bubble_sort_test_case, generate_quick_sort_test_case, generate_bubble_sort_partial_test_case, generate_quick_sort_partial_test_case
 from api.Learner import Learner
@@ -37,11 +38,11 @@ def main():
     digit_count = lambda n: 1 if n == 0 else int(math.log10(n)) + 1
     trailing_spaces = " " * digit_count(N)
     for n in range(1, N + 1):
+        print(f"Running test for n={n}")
         if long_memory == "n":
             learner = Learner() if memory == "y" else None
-        for i in range(reps):
-            print(f"Running test n={n}, rep={i}", end=f"{trailing_spaces}\r")
-            test = ALGORITHMS[algorithm](n, learner, full_reporting, report_traces)
+        for i in tqdm(range(reps)):
+            test = ALGORITHMS[algorithm](n, N, learner, full_reporting, report_traces)
             test.run()
             with open(res_file_name, "a") as results_file:
                 results_file.write(f"{n}; {test}\n")

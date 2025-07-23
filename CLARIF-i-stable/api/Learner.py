@@ -21,7 +21,7 @@ class Learner:
     
     def __init__(self, initial_rules: List[Rule] = []):
         """Initialize the learner with initial rules."""
-        self.hypothesis: list[Rule] = sorted(initial_rules, reverse=True)
+        self.hypothesis: list[Rule] = initial_rules
         self._trace: list[State] = [] # list of traces in the form of States the learner passes through
     
     def search_path(self, start_state: Dict[str, str], goal_state: Dict[str, str]) -> Tuple[bool, List[List[Tuple[State, Optional[Rule]]]]]:
@@ -53,22 +53,16 @@ class Learner:
         
         while queue:
             current_state, path = queue.pop(0)
-            # state_key = self._state_to_key(current_state)
-            
             if current_state in visited:
                 continue
-                
             visited.add(current_state)
             self._trace.append(current_state)
-            # Check if current state matches goal state
             if current_state == goal_state:
                 if current_state in partial_traces_dict:
                     partial_traces_dict[current_state].add( tuple(new_path) )
                 else:
                     partial_traces_dict[current_state] = { tuple(new_path) }
                 continue
-            
-            # Try to apply rules to current state
             top_rule = self._find_top_rule(current_state)
             if top_rule != None:
                 new_state = top_rule.apply(current_state)
@@ -88,10 +82,16 @@ class Learner:
         
         # print("RETURNING PARTIAL TRACES")  
         return False, traces
-   
+  
     def _find_top_rule(self, state: State) -> Rule | None:
         try:
-            return reduce(lambda x, y: x if x.priority > y.priority else y, filter(lambda r: r.applies(state), self.hypothesis))
+            max_priority = -1
+            max_rule =None 
+            for r in self.hypothesis:
+                if r.applies(state) and r.priority > max_priority:
+                    max_priority = r.priority
+                    max_rule = r
+            return max_rule
         except TypeError:
             return None
 
@@ -109,10 +109,12 @@ class Learner:
                 self.hypothesis.append(rule)
         
         # Sort rules by priority
+        """
         self.hypothesis.sort(reverse=True)
         
         # Remove duplicate rules (keeping highest priority)
         # TODO : Implement a more efficient way to remove duplicates
+        
         seen_conditions = set()
         unique_rules = []
         for rule in self.hypothesis:
@@ -122,3 +124,4 @@ class Learner:
                 unique_rules.append(rule)
         # print("unique_rules", unique_rules)
         self.hypothesis = unique_rules
+        """

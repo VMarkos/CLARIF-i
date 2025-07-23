@@ -2,7 +2,7 @@
 \documentclass[a4paper, 10pt]{article}
 \usepackage[utf8]{inputenc}
 \usepackage[inline]{enumitem}
-\usepackage{amsmath, xcolor}
+\usepackage{amsmath, graphicx, subcaption, xcolor}
 
 \title{Some Title}
 \author{Authors}
@@ -37,7 +37,7 @@
 	%
 	\section{Experimental Setup}\label{sec:experimental-setup}
 	%
-	Two experimental procedures, one aiming to assess the efficacy and scalability of the coaching process and one to explore a more realistic and open--ended environment.\ednote{Add a few words about how coaching happens in the context of searching, i.e., how from a past sub--optimal state the coach provides a piece of advice according to their (implicit / explicit) policy that improves the state towards a(n implicit / explicit) goal.}
+	In this Section we empirically explore coachable searching as an approach to preference elicitation, by having a machine learner iteratively seek advice by a proxy coach, as in \cite{}, with the aim of iteratively improving its search capacity, as per the coach's explicit or implicit search policy. Two experimental procedures, one aiming to assess the efficacy and scalability of the coaching process and one to explore a more realistic and open--ended environment.\ednote{Add a few words about how coaching happens in the context of searching, i.e., how from a past sub--optimal state the coach provides a piece of advice according to their (implicit / explicit) policy that improves the state towards a(n implicit / explicit) goal.}
 	%
 	%
 	%
@@ -54,6 +54,28 @@
 		\item \emph{short memory} across different iterations for the same state size, $n$, i.e., coaching sessions across different values of $n$ are independent but not within the same value for $n$, and;
 		\item \emph{long memory} across all values of state size, $n$, so all coaching sessions are correlated, building on knowledge from previous test cases.
 	\end{enumerate*}
+	In Figures~\ref{fig:full and partial sorting coaching results}.
+	
+	\begin{figure}[!tb]
+		\centering%
+		\hfill%
+		\begin{subfigure}[t]{0.47\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{../CLARIF-i-stable/plots/full_condition_learnability.png}
+			\caption{\tbc}
+			\label{fig:full sorting coaching results}
+		\end{subfigure}%
+		\hfill%
+		\begin{subfigure}[t]{0.47\textwidth}
+			\centering
+			\includegraphics[width=\linewidth]{../CLARIF-i-stable/plots/partial_condition_learnability.png}
+			\caption{\tbc}
+			\label{fig:partial sorting coaching results}
+		\end{subfigure}%
+		\hfill%
+		\caption{\tbc}
+		\label{fig:full and partial sorting coaching results}
+	\end{figure}
 	%
 	%
 	%

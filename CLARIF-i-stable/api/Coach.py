@@ -1,6 +1,7 @@
 # api/Coach.py
 
 from typing import Callable
+from functools import cache
 
 from .State import State
 from .Rule import Rule
@@ -33,8 +34,7 @@ class Coach:
         # print("traces[-1]", traces[-1][0], [ (str(s), str(r)) for s, r in traces[-1][1] ])
         return False, self._generate_goal_rules(traces[-1][0])
         
-    # TODO Recall that for full states, priorities do not actually matter - just for partial states
-
+    @cache
     def _generate_goal_rules(self, current_state: State) -> list[Rule]:
         feedback_rules: list[Rule] = []
         # print(f"Current state: {current_state}")

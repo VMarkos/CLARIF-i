@@ -48,13 +48,14 @@ def line_plot(paths: list[tuple[str]], figname: str, reps: int=100):
     if not os.path.isdir(PLOT_PATH):
         os.makedirs(PLOT_PATH)
     fig_path = os.path.join(PLOT_PATH, figname)
-    plt.savefig(fig_path)
+    plt.savefig(fig_path + ".pdf")
 
 def main():
     reduced = input("Plotting reduced results (y/n): ") == "y"
     figname = input("Figure filename: ")
     N = int(input("N: "))
     reps = int(input("Repetitions: "))
+    is_partial = input("Partial results (y/n):") == "y"
     paths = [
         (f"b_test_N{N}_reps{reps}.txt", "tab:blue", "solid", "Bubble (no mem)"),
         (f"q_test_N{N}_reps{reps}.txt", "tab:orange", "solid", "Quick (no mem)"),
@@ -73,8 +74,9 @@ def main():
     ]
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
+    PATHS = paths if not is_partial else partial_paths
     reduced_suffix = ".reduced" if reduced else ""
-    paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in paths ]
+    paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in PATHS ]
     partial_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in partial_paths ]
     line_plot(partial_paths, figname)
 

@@ -33,7 +33,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV /home/bill/Documents/Projects/CLARIF-i/CLARIF-i-stable/CLARIF-i-venv
+set -gx VIRTUAL_ENV /home/bill/Documents/Projects/search-coaching/CLARIF-i-stable/CLARIF-i-venv
 
 set -gx _OLD_VIRTUAL_PATH $PATH
 set -gx PATH "$VIRTUAL_ENV/"bin $PATH

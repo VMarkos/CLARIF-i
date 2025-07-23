@@ -49,7 +49,7 @@ class Rule:
     #     }
 
     def applies(self, state: State) -> bool:
-        """Checks if a rule can be applied to a state, which is whenever the rule's body is covered by the `state`."""
+        """Checks if a rule can be applied to a state, which is whenever the rule's body is covered by `state`."""
         if self._relational:
             return self.condition.evaluate(state)
         return self.condition <= state
