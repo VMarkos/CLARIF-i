@@ -5,7 +5,7 @@ Learner implementation for the coachable search framework.
 """
 
 import itertools as it
-from typing import Dict, List, Tuple, Set, Optional
+from typing import Dict, List, Tuple, Set, Optional, Callable
 from avltree import AvlTree
 
 from .Rule import Rule
@@ -27,7 +27,7 @@ class Learner:
         # print(self.hypothesis)
         self._trace: list[State] = [] # list of traces in the form of States the learner passes through
     
-    def search_path(self, start_state: Dict[str, str], goal_state: Dict[str, str]) -> Tuple[bool, List[List[Tuple[State, Optional[Rule]]]]]:
+    def search_path(self, start_state: State, is_goal: Callable[State, bool]) -> Tuple[bool, List[List[Tuple[State, Optional[Rule]]]]]:
         """
         Search for paths from start state to goal state using current rules.
         
@@ -42,10 +42,9 @@ class Learner:
         """        
         # Check if start state already matches goal state
         self._trace = [start_state]
-
-        if start_state == goal_state:
-            # If they match, return the start state as a trace
-            # with no rules applied
+        
+        # Maybe, conceptually, this check should have been outside the learner, as the is_goal function is not known to it.
+        if is_goal(start_state):
             traces = [(start_state, None)]
             return True, traces
         
@@ -60,7 +59,7 @@ class Learner:
                 continue
             visited.add(current_state)
             self._trace.append(current_state)
-            if current_state == goal_state:
+            if is_goal(current_state):
                 if current_state in partial_traces_dict:
                     partial_traces_dict[current_state].add( tuple(new_path) )
                 else:

@@ -9,11 +9,11 @@ from .Rule import Rule
 from typing import Callable
 
 class TestCase:
-    def __init__(self, start_state: State, goal_state: State, target_rules: Callable[[State], Rule], learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = False, is_goal: Callable | None=None) -> None:
+    def __init__(self, start_state: State, is_goal: Callable[State, bool], target_rules: Callable[[State], Rule], learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = False) -> None:
         self.start_state: State = start_state
         # with open("log.txt", "a") as file:
         #     print(f"{self.start_state}", file=file)
-        self.goal_state: State = goal_state
+        self.is_goal: State = is_goal
         self.learner: Learner = learner if learner != None else Learner()
         self.coach: Coach = Coach(target_rules, is_goal)
         self.full_reporting: bool = full_reporting
@@ -22,16 +22,16 @@ class TestCase:
         self._learner_traces: list[list[State]] = []
 
     def run(self) -> None:
-        path = self.learner.search_path(self.start_state, self.goal_state)
+        path = self.learner.search_path(self.start_state, self.is_goal)
         if self.report_traces:
             self._learner_traces.append(self.learner._trace)
         previous_advice = None
-        while (advice := self.coach.evaluate_inference(self.start_state, self.goal_state, path[1])) != ( True, [] ):
+        while (advice := self.coach.evaluate_inference(self.start_state, path[1])) != ( True, [] ):
             print(advice)
             if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
                 raise ValueError(f"Duplicate advice:\n\t{advice}")
             self.learner.update_hypothesis(advice[1])
-            path = self.learner.search_path(self.start_state, self.goal_state)
+            path = self.learner.search_path(self.start_state, self.is_goal)
             if self.report_traces:
                 self._learner_traces.append(self.learner._trace)
             previous_advice = deepcopy(advice[1])
@@ -40,7 +40,6 @@ class TestCase:
     def report(self) -> dict:
         return {
             "start_state": str(self.start_state) if self.full_reporting else "s",
-            "goal_state": str(self.goal_state) if self.full_reporting else "g",
             "learned_hypothesis": "; ".join(map(str, self.learner.hypothesis)) if self.full_reporting else "p",
             "steps": self._steps,
         }
@@ -50,8 +49,8 @@ class TestCase:
 
     def __str__(self) -> str:
         if self.full_reporting:
-            attrs = [self._steps, self.start_state, self.goal_state, self.learner.hypothesis]
+            attrs = [self._steps, self.start_state, self.learner.hypothesis]
         else:
-            attrs = [self._steps, "s", "g", "p"]
+            attrs = [self._steps, "s", "p"]
         return "; ".join(map(str, attrs))
 

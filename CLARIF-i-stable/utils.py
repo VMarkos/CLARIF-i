@@ -172,33 +172,38 @@ def get_swap_callback(left, right) -> Callable:
         return swapped_state
     return swap_callback
 
-def generate_approximate_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool=True, report_traces: bool=True, start_state: State | None=None, goal_state: State | None=None):
-    return generate_sorting_test_case(n, find_approximate_partial_swap_action, N, learner, full_reporting, report_traces, start_state, goal_state)
+def generate_approximate_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool=True, report_traces: bool=True):
+    return generate_sorting_test_case(n, find_approximate_partial_swap_action, N, learner, full_reporting, report_traces)
 
-def generate_bubble_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None):
-    return generate_sorting_test_case(n, find_bubble_partial_swap_action, N, learner, full_reporting, report_traces, start_state, goal_state)
+def generate_bubble_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True):
+    return generate_sorting_test_case(n, find_bubble_partial_swap_action, N, learner, full_reporting, report_traces)
 
-def generate_quick_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None):
-    return generate_sorting_test_case(n, find_quick_partial_swap_action, N, learner, full_reporting, report_traces, start_state, goal_state)
+def generate_quick_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True):
+    return generate_sorting_test_case(n, find_quick_partial_swap_action, N, learner, full_reporting, report_traces)
 
-def generate_bubble_sort_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None):
-    return generate_sorting_test_case(n, find_bubble_swap_action, N, learner, full_reporting, report_traces, start_state, goal_state)
+def generate_bubble_sort_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True):
+    return generate_sorting_test_case(n, find_bubble_swap_action, N, learner, full_reporting, report_traces)
 
-def generate_quick_sort_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None):
-    return generate_sorting_test_case(n, find_quick_swap_action, N, learner, full_reporting, report_traces, start_state, goal_state)
+def generate_quick_sort_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True):
+    return generate_sorting_test_case(n, find_quick_swap_action, N, learner, full_reporting, report_traces)
 
-def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, start_state: State = None, goal_state: State = None) -> TestCase:
+def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, is_approx: bool=False) -> TestCase:
     # Generate start and goal states
     d = digit_count(N)
     keys = [ f"k{pad_num(i, d)}" for i in range(n) ]
     start_values = [ x for x in range(n) ]
     random.shuffle(start_values)
-    start_state = State(dict(zip(keys, start_values))) if start_state == None else start_state
-    goal_state = State(dict(zip(keys, [ x for x in range(n) ]))) if goal_state == None else goal_state
+    start_state = State(dict(zip(keys, start_values)))
+    is_goal = None
+    if is_approx:
+        goal_state = State(TARGETS[str(n)])
+        is_goal = lambda s: goal_state.kendall_tau(s) > 0.7
+    else:
+        goal_state = State(dict(zip(keys, [ x for x in range(n) ])))
+        is_goal = lambda s: goal_state == s
     # print(f"Start: {start_state}\nGoal: {goal_state}")
     # Generate rules
     # states = ( State(dict(zip(keys, p))) for p in it.permutations(map(str, range(n))) )
-    # TODO Rules need not be generated all at once, just a generator, or a something like that, since we have factorially many rules
     def get_triggered_rule(state: State) -> Rule:
         action_state, swap_action, priority = action_fn(state, keys)
         # print(swap_action)
@@ -210,6 +215,6 @@ def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], S
             explanation=swap_action.name, # maybe something more explicit
         )
     # print("\n".join(map(str, target_rules)))
-    test_case: TestCase = TestCase(start_state, goal_state, get_triggered_rule, learner, full_reporting, report_traces)
+    test_case: TestCase = TestCase(start_state, is_goal, get_triggered_rule, learner, full_reporting, report_traces)
     return test_case
         

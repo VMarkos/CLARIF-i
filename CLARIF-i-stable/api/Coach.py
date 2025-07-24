@@ -15,19 +15,18 @@ class Coach:
         target_rules: List of rules that represent the desired behavior
     """
 
-    def __init__(self, target_rules: Callable[[State], Rule]) -> None:
+    def __init__(self, target_rules: Callable[[State], Rule], is_goal: Callable[State, bool]) -> None:
         """ Initialise the coach with target rules """
         # self.target_rules: dict[State, Rule] = { rule.condition: rule for rule in sorted(target_rules, reverse=True) }
         self.target_rules = target_rules
+        self.is_goal = is_goal
+        self._is_open_ended = is_goal is not None
     
-    def evaluate_inference(self, start_state: State, goal_state: State,
-                           traces: list[list[tuple[State, Rule | None]]]) -> tuple[bool, list[Rule]]:
-        
+    def evaluate_inference(self, start_state: State, traces: list[list[tuple[State, Rule | None]]]) -> tuple[bool, list[Rule]]:
         # print("Traces:", len(traces))
         if not traces:
             return False, self._generate_goal_rules(start_state)
-        
-        if goal_state in ( trace[0] for trace in traces ):
+        if any(self.is_goal(trace[0]) for trace in traces):
             return True, []
         
         # print("traces[-1]", traces[-1][0], [ (str(s), str(r)) for s, r in traces[-1][1] ])
