@@ -30,6 +30,7 @@ class Rule:
         """Boolean equality based on body and head"""
         if not isinstance(other, Rule):
             return False
+        # return self.condition == other.condition # temporary change
         return self.__key() == other.__key()
 
     def __str__(self):

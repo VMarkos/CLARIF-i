@@ -55,7 +55,7 @@ def main():
     figname = input("Figure filename: ")
     N = int(input("N: "))
     reps = int(input("Repetitions: "))
-    is_partial = input("Partial results (y/n): ") == "y"
+    res_type = input("Results type ({f}ull, {p}artial, {a}pproximate): ")
     paths = [
         (f"b_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
         (f"q_test_N{N}_reps{reps}_memn_longn.txt", "tab:orange", "solid", "Quick (no mem)"),
@@ -72,12 +72,23 @@ def main():
         (f"bp_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (long mem)"),
         (f"qp_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (long mem)"),
     ]
+    approx_paths = [
+        (f"ap_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
+        (f"ap_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "dashed", "Bubble (short mem)"),
+        (f"ap_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (long mem)"),
+    ]
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
     reduced_suffix = ".reduced" if reduced else ""
     paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in paths ]
     partial_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in partial_paths ]
-    line_plot(partial_paths if is_partial else paths, figname)
+    approx_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in approx_paths ]
+    PATHS = {
+        'f': paths,
+        'p': partial_paths,
+        'a': approx_paths,
+    }
+    line_plot(PATHS[res_type], figname, reps)
 
 if __name__ == "__main__":
     main()

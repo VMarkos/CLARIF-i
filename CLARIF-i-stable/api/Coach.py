@@ -25,11 +25,14 @@ class Coach:
     def evaluate_inference(self, start_state: State, traces: list[list[tuple[State, Rule | None]]]) -> tuple[bool, list[Rule]]:
         # print("Traces:", len(traces))
         if not traces:
+            # print('\tNo goal no traces')
             return False, self._generate_goal_rules(start_state)
         if any(self.is_goal(trace[0]) for trace in traces):
+            # print('\tGOAL')
             return True, []
         
-        # print("traces[-1]", traces[-1][0], [ (str(s), str(r)) for s, r in traces[-1][1] ])
+        # print("\ttraces[-1]", traces[-1][0], [ (str(s), str(r)) for s, r in traces[-1][1] ])
+        # print('\tNO goal but traces')
         return False, self._generate_goal_rules(traces[-1][0])
         
     def _generate_goal_rules(self, current_state: State) -> list[Rule]:
@@ -38,7 +41,7 @@ class Coach:
         # print("Target rules:","\n".join(map(str, self.target_rules.keys())))
         # print(current_state in self.target_rules)
         advised_rule = self.target_rules(current_state)
-        # print(f"{advised_rule}")
+        # print(f"\t>>> Advised rule: {advised_rule}")
         advised_action = advised_rule.action
         
         # FIXME This needs to be revised for multiple rule output (e.g., partial condition states)
@@ -52,3 +55,16 @@ class Coach:
             feedback_rules.append(advised_rule)
         
         return feedback_rules
+
+class ReflexiveCoach(Coach):
+    def __init__(self) -> None:
+        super().__init__(self, target_rules: Callable[[State], Rule], is_goal: Callable[State, bool])
+
+    # a reflexive agent receives feedback, picks a random deviating point in the learner's traces and
+    # provides a piece of advice for that stage.
+    # So, the coach should maintain a way of solving the task at hand in beforehand, to speed things
+    # up a bit
+    # So this can be precomputed during initialisation.
+    # Which means that the start state should be known during initialisation, so maybe 
+    # pass it as an argument from `api.TestCase.run()`
+

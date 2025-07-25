@@ -1,12 +1,8 @@
 % !TeX spellcheck = en_US
-\documentclass[a4paper, 10pt]{article}
+\documentclass{ecai}
 \usepackage[utf8]{inputenc}
 \usepackage[inline]{enumitem}
 \usepackage{amsmath, graphicx, subcaption, xcolor}
-
-\title{Some Title}
-\author{Authors}
-\date{\today}
 
 %%%% Local definitions %%%%
 \newcommand{\bubblecoach}{\ensuremath{\mathcal{C}_{\rm bubble}}}
@@ -21,7 +17,43 @@
 
 \begin{document}
 	%
-	\maketitle
+	\begin{frontmatter}
+		
+		%%% Use this command to specify your submission number.
+		%%% In doubleblind mode, it will be printed on the first page.
+		
+		\paperid{123} 
+		
+		%%% Use this command to specify the title of your paper.
+		
+		\title{Guidelines for Preparing a Paper for the \\
+			European Conference on Artificial Intelligence}
+		
+		%%% Use this combinations of commands to specify all authors of your 
+		%%% paper. Use \fnms{} and \snm{} to indicate everyone's first names 
+		%%% and surname. This will help the publisher with indexing the 
+		%%% proceedings. Please use a reasonable approximation in case your 
+		%%% name does not neatly split into "first names" and "surname".
+		%%% Specifying your ORCID digital identifier is optional. 
+		%%% Use the \thanks{} command to indicate one or more corresponding 
+		%%% authors and their email address(es). If so desired, you can specify
+		%%% author contributions using the \footnote{} command.
+		
+		\author[A]{\fnms{First}~\snm{Author}\orcid{....-....-....-....}\thanks{Corresponding Author. Email: somename@university.edu.}\footnote{Equal contribution.}}
+		\author[B]{\fnms{Second}~\snm{Author}\orcid{....-....-....-....}\footnotemark}
+		\author[B,C]{\fnms{Third}~\snm{Author}\orcid{....-....-....-....}} 
+		
+		\address[A]{Short Affiliation of First Author}
+		\address[B]{Short Affiliation of Second Author and Third Author}
+		\address[C]{Short Alternate Affiliation of Third Author}
+		
+		%%% Use this environment to include an abstract of your paper.
+		
+		\begin{abstract}
+			\tbc
+		\end{abstract}
+		
+	\end{frontmatter}
 	%
 	\section{Introduction}\label{sec:introduction}
 	%
@@ -29,19 +61,19 @@
 	%
 	%
 	%
-	\section{Related Literature}\label{sec:related-literature}
+	\section{Related literature}\label{sec:related-literature}
 	%
 	\tbc
 	%
 	%
 	%
-	\section{Experimental Setup}\label{sec:experimental-setup}
+	\section{Experimental setup}\label{sec:experimental-setup}
 	%
 	In this Section we empirically explore coachable searching as an approach to preference elicitation, by having a machine learner iteratively seek advice by a proxy coach, as in \cite{}, with the aim of iteratively improving its search capacity, as per the coach's explicit or implicit search policy. Two experimental procedures, one aiming to assess the efficacy and scalability of the coaching process and one to explore a more realistic and open--ended environment.\ednote{Add a few words about how coaching happens in the context of searching, i.e., how from a past sub--optimal state the coach provides a piece of advice according to their (implicit / explicit) policy that improves the state towards a(n implicit / explicit) goal.}
 	%
 	%
 	%
-	\subsection{Sorting Coaching}\label{subsec:sorting-coaching}
+	\subsection{Sorting coaching}\label{subsec:sorting-coaching}
 	%
 	In this series of coaching sessions we have implemented two variants of a machine coach, aiming to explain to an initial ignorant agent about how to sort a list of numbers, as a rough equivalent to linear preference elicitation. The first coach, \bubblecoach, uses bubble sort as its underlying policy while the second one, \quickcoach, uses quicksort to provide advice from. We explored different state sizes, $n$, ranging from $1$ to $20$, running $m=100$ iterations for each value of $n$. We have also explored two different types of advice for each coach:
 	\begin{enumerate*}[label=(A\arabic*)]
@@ -54,28 +86,29 @@
 		\item \emph{short memory} across different iterations for the same state size, $n$, i.e., coaching sessions across different values of $n$ are independent but not within the same value for $n$, and;
 		\item \emph{long memory} across all values of state size, $n$, so all coaching sessions are correlated, building on knowledge from previous test cases.
 	\end{enumerate*}
-	In Figures~\ref{fig:full and partial sorting coaching results}.
 	
-	\begin{figure}[!tb]
+	\begin{figure*}[!tb]
 		\centering%
 		\hfill%
 		\begin{subfigure}[t]{0.47\textwidth}
 			\centering
-			\includegraphics[width=\linewidth]{../CLARIF-i-stable/plots/full_condition_learnability.png}
+			\includegraphics[width=\linewidth]{../CLARIF-i-stable/plots/full_condition_learnability.pdf}
 			\caption{\tbc}
 			\label{fig:full sorting coaching results}
 		\end{subfigure}%
 		\hfill%
 		\begin{subfigure}[t]{0.47\textwidth}
 			\centering
-			\includegraphics[width=\linewidth]{../CLARIF-i-stable/plots/partial_condition_learnability.png}
+			\includegraphics[width=\linewidth]{../CLARIF-i-stable/plots/partial_condition_learnability.pdf}
 			\caption{\tbc}
 			\label{fig:partial sorting coaching results}
 		\end{subfigure}%
 		\hfill%
 		\caption{\tbc}
 		\label{fig:full and partial sorting coaching results}
-	\end{figure}
+	\end{figure*}
+
+	In Figures~\ref{fig:full and partial sorting coaching results} we present the number of coaching interactions required to reach the goal state in each case as a function of the state size, $n$. Regarding the full advice condition (Fig.~\ref{fig:full sorting coaching results}), the utilization of either short of long term memory does not appear to have any particular effect on the number of coaching interactions, which was expected given the overspecific nature of provided advice, being fully tailored to the state it triggered the learner to seek for that piece of advice. On the contrary, partial advice (Fig.~\ref{fig:partial sorting coaching results}) offer a significant advantage to the learner, in both short and long memory conditions. As for the short memory case, 
 	%
 	%
 	%
@@ -85,10 +118,11 @@
 	%
 	%
 	%
-	\section{Conclusions and Future Work}\label{sec:conclusions-and-future-work}
+	\section{Conclusions and future work}\label{sec:conclusions-and-future-work}
 	%
 	\tbc
 	%
 	%
 	%
+	\bibliography{references}
 \end{document}

@@ -127,10 +127,11 @@ def find_bubble_partial_swap_action(state: State, keys: list[str]) -> tuple[Stat
     return State(), Action(), 0
 
 def _generate_targets(N: int=20) -> None:
+    random.seed(42)
     targets = dict()
     d = digit_count(N)
     for n in range(1, N + 1):
-        targets[n] = { pad_num(k, d): v for k, v in enumerate(random.sample(range(1, n + 1), k=n)) }
+        targets[n] = { f"k{pad_num(k, d)}": v for k, v in enumerate(random.sample(range(n), k=n)) }
     CWD = os.path.abspath(os.path.dirname(__file__))
     targets_path = os.path.join(CWD, 'targets.json')
     with open(targets_path, 'w') as file:
@@ -146,15 +147,17 @@ def _load_targets() -> dict[int, dict[str, int]]:
 TARGETS = _load_targets()
 
 def find_approximate_partial_swap_action(state: State, keys: list[str]) -> tuple[State, Action, int]:
-    target = State(TARGETS[str(len(state))])
-    state_keys = state.state.keys()
+    n = len(state)
+    target = State({ pad_num(i, 2): i for i in range(n) })
     threshold = 0.7
     current_kendall_tau = target.kendall_tau(state)
+    # print(f'\ttarget: {target}, state: {state}, kt: {current_kendall_tau}')
     if current_kendall_tau > threshold:
-        return State(), Action(), int(1000 * current_kendall_tau)
-    for l, r in it.product(state_keys, state_keys):
+        return State(), Action(), int(1000 * current_kendall_tau) + 1000 * (n - 1)
+    for l, r in it.product(keys, keys):
         if l >= r:
             continue
+        # print(f'\t{l} <--> {r}')
         copy_state = deepcopy(state)
         copy_state.swap(l, r)
         new_kendall_tau = target.kendall_tau(copy_state)
@@ -162,8 +165,8 @@ def find_approximate_partial_swap_action(state: State, keys: list[str]) -> tuple
             swap_callback = get_swap_callback(l, r)
             swap_state = State({ l: state.get(l), r: state.get(r) })
             swap_action = Action(swap_callback, f"swap({l}, {r})")
-            return swap_state, swap_action, int(1000 * new_kendall_tau)
-    return State(), Action(), 1000 # Typically, this should never be reached except for ill-defined settings
+            return swap_state, swap_action, int(1000 * new_kendall_tau) + 1000 * (n - 1)
+    return State(), Action(), np.inf # Typically, this should never be reached except for ill-defined settings
    
 def get_swap_callback(left, right) -> Callable:
     def swap_callback(state: State):
@@ -173,7 +176,7 @@ def get_swap_callback(left, right) -> Callable:
     return swap_callback
 
 def generate_approximate_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool=True, report_traces: bool=True):
-    return generate_sorting_test_case(n, find_approximate_partial_swap_action, N, learner, full_reporting, report_traces)
+    return generate_sorting_test_case(n, find_approximate_partial_swap_action, N, learner, full_reporting, report_traces, is_approx=True)
 
 def generate_bubble_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True):
     return generate_sorting_test_case(n, find_bubble_partial_swap_action, N, learner, full_reporting, report_traces)
@@ -196,7 +199,9 @@ def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], S
     start_state = State(dict(zip(keys, start_values)))
     is_goal = None
     if is_approx:
-        goal_state = State(TARGETS[str(n)])
+        # goal_state = State(TARGETS[str(n)])
+        # print('Is approximate')
+        goal_state = State(dict(zip(keys, [ x for x in range(n) ])))
         is_goal = lambda s: goal_state.kendall_tau(s) > 0.7
     else:
         goal_state = State(dict(zip(keys, [ x for x in range(n) ])))

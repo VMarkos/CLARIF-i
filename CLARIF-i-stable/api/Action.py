@@ -13,7 +13,7 @@ class Action:
         return self.callback(state)
 
     def __key(self) -> int:
-        return (self.callback)
+        return (self.name)
 
     def __hash__(self) -> int:
         return hash(self.__key())

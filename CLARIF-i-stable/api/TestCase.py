@@ -22,12 +22,14 @@ class TestCase:
         self._learner_traces: list[list[State]] = []
 
     def run(self) -> None:
+        # print(f"Start state: {self.start_state}")
         path = self.learner.search_path(self.start_state, self.is_goal)
         if self.report_traces:
             self._learner_traces.append(self.learner._trace)
         previous_advice = None
         while (advice := self.coach.evaluate_inference(self.start_state, path[1])) != ( True, [] ):
-            print(advice)
+            # print(f"\t{[ str(s) for s in path[1] ]}")
+            # print(f"\t{advice}")
             if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
                 raise ValueError(f"Duplicate advice:\n\t{advice}")
             self.learner.update_hypothesis(advice[1])

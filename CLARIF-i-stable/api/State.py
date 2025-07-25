@@ -24,6 +24,10 @@ class State:
         self.state[k2] = temp
 
     def kendall_tau(self, other: "State") -> float:
+        if len(self) != len(other):
+            raise ValueError("States of different length: {self}, {other}")
+        if len(self) == 1:
+            return 1.0
         self_values = [ self.state[k] for k in sorted(self.state.keys()) ]
         other_values = [ other.state[k] for k in sorted(other.state.keys()) ]
         return kendalltau(self_values, other_values).statistic

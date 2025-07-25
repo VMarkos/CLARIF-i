@@ -44,7 +44,9 @@ class Learner:
         self._trace = [start_state]
         
         # Maybe, conceptually, this check should have been outside the learner, as the is_goal function is not known to it.
+        # print(f"\t>>>{is_goal(start_state)}")
         if is_goal(start_state):
+            # print(f"\tIs goal state: {start_state}")
             traces = [(start_state, None)]
             return True, traces
         
@@ -87,18 +89,24 @@ class Learner:
         return False, traces
   
     def _find_top_rule(self, state: State) -> Rule | None:
+        # print('Looking for top rule')
         try:
             # max_priority = -1
             # max_rule =None 
+            # print(f'\t{self.hypothesis}')
             for rp in self.hypothesis:
                 rules = self.hypothesis[rp]
                 for r in rules:
+                    # print(f'\t{r}')
                     if r.applies(state):# and r.priority > max_priority:
+                        # print('\tapplies')
                         return r
                         # max_priority = r.priority
                         # max_rule = r
+            # print('\tReturning none')
             return None
         except (TypeError, ValueError):
+            # print('\tError!')
             return None
 
     def update_hypothesis(self, feedback_rules: List[Rule]):
