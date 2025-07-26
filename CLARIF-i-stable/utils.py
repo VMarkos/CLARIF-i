@@ -10,6 +10,7 @@ from typing import Callable
 
 from api.TestCase import TestCase
 from api.Learner import Learner
+from api.Coach import Coach
 from api.Rule import Rule
 from api.Action import Action
 from api.State import State
@@ -175,22 +176,22 @@ def get_swap_callback(left, right) -> Callable:
         return swapped_state
     return swap_callback
 
-def generate_approximate_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool=True, report_traces: bool=True):
-    return generate_sorting_test_case(n, find_approximate_partial_swap_action, N, learner, full_reporting, report_traces, is_approx=True)
+def generate_approximate_partial_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool=True, report_traces: bool=True):
+    return generate_sorting_test_case(n, find_approximate_partial_swap_action, N, learner, coach_class, full_reporting, report_traces, is_approx=True)
 
-def generate_bubble_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True):
-    return generate_sorting_test_case(n, find_bubble_partial_swap_action, N, learner, full_reporting, report_traces)
+def generate_bubble_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True):
+    return generate_sorting_test_case(n, find_bubble_partial_swap_action, N, learner, coach_class, full_reporting, report_traces)
 
-def generate_quick_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True):
-    return generate_sorting_test_case(n, find_quick_partial_swap_action, N, learner, full_reporting, report_traces)
+def generate_quick_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True):
+    return generate_sorting_test_case(n, find_quick_partial_swap_action, N, learner, coach_class, full_reporting, report_traces)
 
-def generate_bubble_sort_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True):
-    return generate_sorting_test_case(n, find_bubble_swap_action, N, learner, full_reporting, report_traces)
+def generate_bubble_sort_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True):
+    return generate_sorting_test_case(n, find_bubble_swap_action, N, learner, coach_class, full_reporting, report_traces)
 
-def generate_quick_sort_test_case(n: int, N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True):
-    return generate_sorting_test_case(n, find_quick_swap_action, N, learner, full_reporting, report_traces)
+def generate_quick_sort_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True):
+    return generate_sorting_test_case(n, find_quick_swap_action, N, learner, coach_class, full_reporting, report_traces)
 
-def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], N: int=20, learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = True, is_approx: bool=False) -> TestCase:
+def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True, is_approx: bool=False) -> TestCase:
     # Generate start and goal states
     d = digit_count(N)
     keys = [ f"k{pad_num(i, d)}" for i in range(n) ]
@@ -220,6 +221,6 @@ def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], S
             explanation=swap_action.name, # maybe something more explicit
         )
     # print("\n".join(map(str, target_rules)))
-    test_case: TestCase = TestCase(start_state, is_goal, get_triggered_rule, learner, full_reporting, report_traces)
+    test_case: TestCase = TestCase(start_state, is_goal, get_triggered_rule, learner, coach_class, full_reporting, report_traces)
     return test_case
         

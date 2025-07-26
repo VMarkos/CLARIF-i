@@ -4,18 +4,18 @@ from copy import deepcopy
 
 from .State import State
 from .Learner import Learner
-from .Coach import Coach
+from .Coach import Coach, ReflexiveCoach
 from .Rule import Rule
 from typing import Callable
 
 class TestCase:
-    def __init__(self, start_state: State, is_goal: Callable[State, bool], target_rules: Callable[[State], Rule], learner: Learner | None=None, full_reporting: bool = True, report_traces: bool = False) -> None:
+    def __init__(self, start_state: State, is_goal: Callable[State, bool], target_rules: Callable[[State], Rule], learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = False) -> None:
         self.start_state: State = start_state
         # with open("log.txt", "a") as file:
         #     print(f"{self.start_state}", file=file)
         self.is_goal: State = is_goal
         self.learner: Learner = learner if learner != None else Learner()
-        self.coach: Coach = Coach(target_rules, is_goal)
+        self.coach: Coach = coach_class(target_rules, is_goal, start_state)
         self.full_reporting: bool = full_reporting
         self._steps: int = 0
         self.report_traces: bool = self.full_reporting or report_traces
@@ -27,10 +27,11 @@ class TestCase:
         if self.report_traces:
             self._learner_traces.append(self.learner._trace)
         previous_advice = None
-        while (advice := self.coach.evaluate_inference(self.start_state, path[1])) != ( True, [] ):
+        while (advice := self.coach.evaluate_inference(path[1])) != ( True, [] ):
             # print(f"\t{[ str(s) for s in path[1] ]}")
-            # print(f"\t{advice}")
+            # print(f"\tArdvice {advice}")
             if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
+                print(f"\tLearner hypothesis: {self.learner.hypothesis}")
                 raise ValueError(f"Duplicate advice:\n\t{advice}")
             self.learner.update_hypothesis(advice[1])
             path = self.learner.search_path(self.start_state, self.is_goal)

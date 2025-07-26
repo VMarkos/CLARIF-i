@@ -7,6 +7,7 @@ Learner implementation for the coachable search framework.
 import itertools as it
 from typing import Dict, List, Tuple, Set, Optional, Callable
 from avltree import AvlTree
+from ordered_set import OrderedSet
 
 from .Rule import Rule
 from .State import State
@@ -22,9 +23,9 @@ class Learner:
     def __init__(self, initial_rules: List[Rule] = []):
         """Initialize the learner with initial rules."""
         p_key = lambda r: -r.priority # a bit sub-optimal
-        grouped_rules = { p: set(rs) for p, rs in it.groupby(sorted(initial_rules, key=p_key), p_key) }
+        grouped_rules = { (1, p): set(rs) for p, rs in it.groupby(sorted(initial_rules, key=p_key), p_key) }
         self.hypothesis: AvlTree = AvlTree[int, Rule](grouped_rules)
-        # print(self.hypothesis)
+        self._time = 0
         self._trace: list[State] = [] # list of traces in the form of States the learner passes through
     
     def search_path(self, start_state: State, is_goal: Callable[State, bool]) -> Tuple[bool, List[List[Tuple[State, Optional[Rule]]]]]:
@@ -53,7 +54,7 @@ class Learner:
         # Try to find paths using current rules
         visited = set()
         queue = [(start_state, [])]
-        partial_traces_dict = { start_state: set() }
+        partial_traces_dict = { start_state: OrderedSet([]) }
         
         while queue:
             current_state, path = queue.pop(0)
@@ -65,7 +66,7 @@ class Learner:
                 if current_state in partial_traces_dict:
                     partial_traces_dict[current_state].add( tuple(new_path) )
                 else:
-                    partial_traces_dict[current_state] = { tuple(new_path) }
+                    partial_traces_dict[current_state] = OrderedSet( [tuple(new_path)] )
                 continue
             top_rule = self._find_top_rule(current_state)
             # print(f"top rule: {top_rule}")
@@ -76,7 +77,7 @@ class Learner:
                 if new_state in partial_traces_dict:
                     partial_traces_dict[new_state].add( tuple(new_path) )
                 else:
-                    partial_traces_dict[new_state] = { tuple(new_path) }
+                    partial_traces_dict[new_state] = OrderedSet( [tuple(new_path)] )
         
         # If we found any traces, return success
         traces = [ (state, path) for state, paths in partial_traces_dict.items() for path in paths ]
@@ -119,28 +120,12 @@ class Learner:
         # print("feedback_rules:", feedback_rules)
         # Add new rules to hypothesis
         for rule in feedback_rules:
-            rp = -rule.priority
+            rp = ( -self._time, -rule.priority )
             # print(f"rule in hypothesis: {rule} in {self.hypothesis}")
             if rp not in self.hypothesis:
                 self.hypothesis[rp] = set([rule])
                 # self.hypothesis.append(rule)
             else:
                 self.hypothesis[rp].add(rule)
+        self._time += 1
         # print(f"Updated: {self.hypothesis}")
-        # Sort rules by priority
-        """
-        self.hypothesis.sort(reverse=True)
-        
-        # Remove duplicate rules (keeping highest priority)
-        # TODO : Implement a more efficient way to remove duplicates
-        
-        seen_conditions = set()
-        unique_rules = []
-        for rule in self.hypothesis:
-            condition = rule.condition
-            if condition not in seen_conditions:
-                seen_conditions.add(condition)
-                unique_rules.append(rule)
-        # print("unique_rules", unique_rules)
-        self.hypothesis = unique_rules
-        """

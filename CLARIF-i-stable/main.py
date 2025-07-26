@@ -5,6 +5,7 @@ from tqdm import tqdm
 
 from utils import generate_bubble_sort_test_case, generate_quick_sort_test_case, generate_bubble_sort_partial_test_case, generate_quick_sort_partial_test_case, generate_approximate_partial_test_case
 from api.Learner import Learner
+from api.Coach import Coach, ReflexiveCoach
 
 ALGORITHMS = {
     'b': generate_bubble_sort_test_case,
@@ -14,10 +15,17 @@ ALGORITHMS = {
     'qp': generate_quick_sort_partial_test_case,
 }
 
+COACHES = {
+    'a': Coach,
+    'f': ReflexiveCoach,
+}
+
 def main():
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
     algorithm = input("Enter algorithm ({q}uicksort, {b}ubblesort, {a}pproximate, append {p}artial): ")
+    coach_type = input("Enter coach type (re{a}ctive, re{f}lexive): ")
+    coach_class = COACHES[coach_type]
     N = int(input("Enter N: "))
     reps = int(input("Enter # of repetitions: "))
     memory = input("Remember advice (y/n): ")
@@ -28,7 +36,7 @@ def main():
     report_traces = False
     if not full_reporting:
         report_traces = input("Report traces (y/n): ") == "y"
-    res_file_name = os.path.join(RESULTS_PATH, f"{algorithm}_test_N{N}_reps{reps}_mem{memory}_long{long_memory}.txt")
+    res_file_name = os.path.join(RESULTS_PATH, f"{algorithm}_{coach_type}_test_N{N}_reps{reps}_mem{memory}_long{long_memory}.txt")
     trace_file_name = os.path.join(RESULTS_PATH, f"{algorithm}_test_N{N}_reps{reps}_mem{memory}_long{long_memory}.trace")
     with open(res_file_name, "w") as results_file:
         results_file.write("")
@@ -43,7 +51,7 @@ def main():
         if long_memory == "n":
             learner = Learner() if memory == "y" else None
         for i in tqdm(range(reps)):
-            test = ALGORITHMS[algorithm](n, N, learner, full_reporting, report_traces)
+            test = ALGORITHMS[algorithm](n, N, learner, coach_class, full_reporting, report_traces)
             test.run()
             with open(res_file_name, "a") as results_file:
                 results_file.write(f"{n}; {test}\n")
