@@ -55,7 +55,7 @@ def main():
     figname = input("Figure filename: ")
     N = int(input("N: "))
     reps = int(input("Repetitions: "))
-    res_type = input("Results type ({f}ull, {p}artial, {a}pproximate): ")
+    res_type = input("Results type ({f}ull, {p}artial, prepend {p}roactive): ")
     paths = [
         (f"b_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
         (f"q_test_N{N}_reps{reps}_memn_longn.txt", "tab:orange", "solid", "Quick (no mem)"),
@@ -72,21 +72,34 @@ def main():
         (f"bp_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (long mem)"),
         (f"qp_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (long mem)"),
     ]
-    approx_paths = [
-        (f"ap_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
-        (f"ap_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "dashed", "Bubble (short mem)"),
-        (f"ap_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (long mem)"),
+    proactive_partial_paths = [
+        (f"bp_p_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
+        (f"qp_p_test_N{N}_reps{reps}_memn_longn.txt", "tab:orange", "solid", "Quick (no mem)"),
+        (f"bp_p_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "dashed", "Bubble (short mem)"),
+        (f"qp_p_test_N{N}_reps{reps}_memy_longn.txt", "tab:orange", "dashed", "Quick (short mem)"),
+        (f"bp_p_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (long mem)"),
+        (f"qp_p_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (long mem)"),
+    ]
+    proactive_full_paths = [
+        (f"b_p_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
+        (f"q_p_test_N{N}_reps{reps}_memn_longn.txt", "tab:orange", "solid", "Quick (no mem)"),
+        (f"b_p_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "dashed", "Bubble (short mem)"),
+        (f"q_p_test_N{N}_reps{reps}_memy_longn.txt", "tab:orange", "dashed", "Quick (short mem)"),
+        (f"b_p_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (long mem)"),
+        (f"q_p_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (long mem)"),
     ]
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
     reduced_suffix = ".reduced" if reduced else ""
     paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in paths ]
     partial_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in partial_paths ]
-    approx_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in approx_paths ]
+    proactive_partial_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in proactive_partial_paths ]
+    proactive_full_paths = [ (os.path.join(RESULTS_PATH, t[0] + reduced_suffix), ) + t[1:] for t in proactive_full_paths ]
     PATHS = {
         'f': paths,
         'p': partial_paths,
-        'a': approx_paths,
+        'pp': proactive_partial_paths,
+        'pf': proactive_full_paths,
     }
     line_plot(PATHS[res_type], figname, reps)
 

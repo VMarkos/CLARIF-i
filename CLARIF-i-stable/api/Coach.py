@@ -36,9 +36,9 @@ class Coach:
         
         # print("\ttraces[-1]", traces[-1][0], [ (str(s), str(r)) for s, r in traces[-1][1] ])
         # print('\tNO goal but traces')
-        return False, self._generate_goal_rules(self._pick_deviation_state(traces))
+        return False, self._generate_goal_rules(self._pick_deviating_state(traces))
         
-    def _pick_deviation_state(self, traces) -> State:
+    def _pick_deviating_state(self, traces) -> State:
         return traces[-1][0]
 
     def _generate_goal_rules(self, current_state: State | None=None) -> list[Rule]:
@@ -90,6 +90,7 @@ class ReflexiveCoach(Coach):
             state_actions[current_state] = current_rule
             current_state = current_rule.apply(current_state)
         self._action_cache = state_actions
+        # print(">>> Action cache: ", [ " -> ".join([str(s), str(r.name)]) for s, r in self._action_cache.items() ])
         # self.target_rules = lambda s: self._action_cache[s] # since things are cached, we need not run the algorithm again
         self.target_rules = self._cache_target_rules(target_rules)
 
@@ -102,7 +103,7 @@ class ReflexiveCoach(Coach):
                 return self._action_cache[state]
         return cached_tr
 
-    def _pick_deviation_state(self, traces) -> State:
+    def _pick_deviating_state(self, traces) -> State:
         last_path = traces[-1][1]
         # print(f"last path: {last_path}")
         if len(last_path) == 0:
@@ -118,6 +119,28 @@ class ReflexiveCoach(Coach):
         if deviating_choices:
             # print(f"Deviations: {deviating_choices}")
             return random.choice(deviating_choices)
+        # If there are no deviating choices, just ask for more advice
+        # print(f"Last wrong state: {traces[-1][0]}")
+        return traces[-1][0]
+
+class ProactiveCoach(ReflexiveCoach):
+    def __init__(self, target_rules: Callable[[State], Rule], is_goal: Callable[State, bool], start_state: State) -> None:
+        super().__init__(target_rules, is_goal, start_state)
+
+    def _pick_deviating_state(self, traces) -> State:
+        last_path = traces[-1][1]
+        if len(last_path) == 0:
+            return self.start_state
+        deviating_choices = OrderedSet([])
+        previous_state = self.start_state
+        # print(f"last path: {last_path}")
+        for state, rule in last_path:
+            if previous_state not in self._action_cache.keys() or self._action_cache[previous_state] != rule:
+                deviating_choices.add(previous_state)
+            previous_state = state
+        if deviating_choices:
+            # print(f"\t>>> Deviations: {[str(c) for c in deviating_choices]}")
+            return deviating_choices[0]
         # If there are no deviating choices, just ask for more advice
         # print(f"Last wrong state: {traces[-1][0]}")
         return traces[-1][0]

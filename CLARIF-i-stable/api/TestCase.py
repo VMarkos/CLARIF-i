@@ -29,9 +29,9 @@ class TestCase:
         previous_advice = None
         while (advice := self.coach.evaluate_inference(path[1])) != ( True, [] ):
             # print(f"\t{[ str(s) for s in path[1] ]}")
-            # print(f"\tArdvice {advice}")
+            # print(f"\tAdvice {advice}")
             if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
-                print(f"\tLearner hypothesis: {self.learner.hypothesis}")
+                # print(f"\tLearner hypothesis: {self.learner.hypothesis}")
                 raise ValueError(f"Duplicate advice:\n\t{advice}")
             self.learner.update_hypothesis(advice[1])
             path = self.learner.search_path(self.start_state, self.is_goal)

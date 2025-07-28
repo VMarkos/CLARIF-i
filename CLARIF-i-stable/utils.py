@@ -50,7 +50,7 @@ def find_quick_swap_action(state: State, keys: list[str]) -> tuple[State, Action
                 return j
             left_key = keys[i]
             right_key = keys[j]
-            swap_callback = get_swap_callback(let_key, right_key)
+            swap_callback = get_swap_callback(left_key, right_key)
             swap_action = Action(swap_callback, f"swap({left_key}, {right_key})")
             # print("\tswap action", swap_action)
             return swap_action
@@ -147,37 +147,12 @@ def _load_targets() -> dict[int, dict[str, int]]:
 
 TARGETS = _load_targets()
 
-def find_approximate_partial_swap_action(state: State, keys: list[str]) -> tuple[State, Action, int]:
-    n = len(state)
-    target = State({ pad_num(i, 2): i for i in range(n) })
-    threshold = 0.7
-    current_kendall_tau = target.kendall_tau(state)
-    # print(f'\ttarget: {target}, state: {state}, kt: {current_kendall_tau}')
-    if current_kendall_tau > threshold:
-        return State(), Action(), int(1000 * current_kendall_tau) + 1000 * (n - 1)
-    for l, r in it.product(keys, keys):
-        if l >= r:
-            continue
-        # print(f'\t{l} <--> {r}')
-        copy_state = deepcopy(state)
-        copy_state.swap(l, r)
-        new_kendall_tau = target.kendall_tau(copy_state)
-        if new_kendall_tau > current_kendall_tau:
-            swap_callback = get_swap_callback(l, r)
-            swap_state = State({ l: state.get(l), r: state.get(r) })
-            swap_action = Action(swap_callback, f"swap({l}, {r})")
-            return swap_state, swap_action, int(1000 * new_kendall_tau) + 1000 * (n - 1)
-    return State(), Action(), np.inf # Typically, this should never be reached except for ill-defined settings
-   
 def get_swap_callback(left, right) -> Callable:
     def swap_callback(state: State):
         swapped_state = deepcopy(state)
         swapped_state.swap(left, right)
         return swapped_state
     return swap_callback
-
-def generate_approximate_partial_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool=True, report_traces: bool=True):
-    return generate_sorting_test_case(n, find_approximate_partial_swap_action, N, learner, coach_class, full_reporting, report_traces, is_approx=True)
 
 def generate_bubble_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True):
     return generate_sorting_test_case(n, find_bubble_partial_swap_action, N, learner, coach_class, full_reporting, report_traces)

@@ -92,8 +92,6 @@ class Learner:
     def _find_top_rule(self, state: State) -> Rule | None:
         # print('Looking for top rule')
         try:
-            # max_priority = -1
-            # max_rule =None 
             # print(f'\t{self.hypothesis}')
             for rp in self.hypothesis:
                 rules = self.hypothesis[rp]
@@ -102,8 +100,6 @@ class Learner:
                     if r.applies(state):# and r.priority > max_priority:
                         # print('\tapplies')
                         return r
-                        # max_priority = r.priority
-                        # max_rule = r
             # print('\tReturning none')
             return None
         except (TypeError, ValueError):
@@ -120,7 +116,7 @@ class Learner:
         # print("feedback_rules:", feedback_rules)
         # Add new rules to hypothesis
         for rule in feedback_rules:
-            rp = ( -self._time, -rule.priority )
+            rp = ( -self._time, -rule.priority, )
             # print(f"rule in hypothesis: {rule} in {self.hypothesis}")
             if rp not in self.hypothesis:
                 self.hypothesis[rp] = set([rule])
