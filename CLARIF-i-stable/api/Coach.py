@@ -32,7 +32,7 @@ class Coach:
             return False, self._generate_goal_rules()
         if any(self.is_goal(trace[0]) for trace in traces):
             # print('\tGOAL')
-            return True, []
+            return True, tuple()
         
         # print("\ttraces[-1]", traces[-1][0], [ (str(s), str(r)) for s, r in traces[-1][1] ])
         # print('\tNO goal but traces')
@@ -41,7 +41,7 @@ class Coach:
     def _pick_deviating_state(self, traces) -> State:
         return traces[-1][0]
 
-    def _generate_goal_rules(self, current_state: State | None=None) -> list[Rule]:
+    def _generate_goal_rules(self, current_state: State | None=None) -> tuple[Rule]:
         if current_state == None:
             current_state = self.start_state
         feedback_rules: list[Rule] = []
@@ -62,7 +62,7 @@ class Coach:
         if advised_action:
             feedback_rules.append(advised_rule)
         
-        return feedback_rules
+        return tuple(feedback_rules)
 
 class ReflexiveCoach(Coach):
     def __init__(self, target_rules: Callable[[State], Rule], is_goal: Callable[State, bool], start_state: State) -> None:
@@ -86,6 +86,7 @@ class ReflexiveCoach(Coach):
         state_actions = dict()
         current_state = self.start_state
         while not self.is_goal(current_state):
+            print(f"current_state: {current_state}")
             current_rule = self.target_rules(current_state)
             state_actions[current_state] = current_rule
             current_state = current_rule.apply(current_state)
@@ -113,7 +114,7 @@ class ReflexiveCoach(Coach):
         previous_state = self.start_state
         # print(f"last path: {last_path}")
         for state, rule in last_path:
-            if previous_state not in self._action_cache.keys() or self._action_cache[previous_state] != rule:
+            if self.target_rules(previous_state) != rule:
                 deviating_choices.add(previous_state)
             previous_state = state
         if deviating_choices:

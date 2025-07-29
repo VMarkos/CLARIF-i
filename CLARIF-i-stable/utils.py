@@ -7,6 +7,7 @@ import json
 import itertools as it
 from copy import deepcopy
 from typing import Callable
+from bidict import bidict
 
 from api.TestCase import TestCase
 from api.Learner import Learner
@@ -101,7 +102,7 @@ def find_quick_partial_swap_action(state: State, keys: list[str]) -> tuple[State
             priority -= 1
             return swap_action, left_key, right_key, priority
     action, left_key, right_key, priority = quicksort(state) or (Action(), None, None, 0)
-    swap_state = State({ left_key: state.get(left_key), right_key: state.get(right_key) }) if action != None else State()
+    swap_state = State({ left_key: state.get(left_key), right_key: state.get(right_key) }) if action else State()
     priority -= 1
     return swap_state, action, priority
 
@@ -154,39 +155,42 @@ def get_swap_callback(left, right) -> Callable:
         return swapped_state
     return swap_callback
 
-def generate_bubble_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True):
-    return generate_sorting_test_case(n, find_bubble_partial_swap_action, N, learner, coach_class, full_reporting, report_traces)
+def generate_bubble_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True, randomize_target: bool=False):
+    return generate_sorting_test_case(n, find_bubble_partial_swap_action, N, learner, coach_class, full_reporting, report_traces, randomize_target)
 
-def generate_quick_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True):
-    return generate_sorting_test_case(n, find_quick_partial_swap_action, N, learner, coach_class, full_reporting, report_traces)
+def generate_quick_sort_partial_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True, randomize_target: bool=False):
+    return generate_sorting_test_case(n, find_quick_partial_swap_action, N, learner, coach_class, full_reporting, report_traces, randomize_target)
 
-def generate_bubble_sort_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True):
-    return generate_sorting_test_case(n, find_bubble_swap_action, N, learner, coach_class, full_reporting, report_traces)
+def generate_bubble_sort_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True, randomize_target: bool=False):
+    return generate_sorting_test_case(n, find_bubble_swap_action, N, learner, coach_class, full_reporting, report_traces, randomize_target)
 
-def generate_quick_sort_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True):
-    return generate_sorting_test_case(n, find_quick_swap_action, N, learner, coach_class, full_reporting, report_traces)
+def generate_quick_sort_test_case(n: int, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True, randomize_target: bool=False):
+    return generate_sorting_test_case(n, find_quick_swap_action, N, learner, coach_class, full_reporting, report_traces, randomize_target)
 
-def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True, is_approx: bool=False) -> TestCase:
+def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], State], N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = True, randomize_targets: bool=False) -> TestCase:
     # Generate start and goal states
     d = digit_count(N)
     keys = [ f"k{pad_num(i, d)}" for i in range(n) ]
     start_values = [ x for x in range(n) ]
     random.shuffle(start_values)
     start_state = State(dict(zip(keys, start_values)))
-    is_goal = None
-    if is_approx:
-        # goal_state = State(TARGETS[str(n)])
-        # print('Is approximate')
-        goal_state = State(dict(zip(keys, [ x for x in range(n) ])))
-        is_goal = lambda s: goal_state.kendall_tau(s) > 0.7
+    permutation = None
+    goal_state = None
+    if randomize_targets:
+        goal_state = State(TARGETS[str(n)])
+        permutation = bidict(dict(enumerate(goal_state.state.values())))
     else:
         goal_state = State(dict(zip(keys, [ x for x in range(n) ])))
-        is_goal = lambda s: goal_state == s
-    # print(f"Start: {start_state}\nGoal: {goal_state}")
+    is_goal = lambda s: goal_state == s
+    print(f"Start: {start_state}\nGoal: {goal_state}")
     # Generate rules
     # states = ( State(dict(zip(keys, p))) for p in it.permutations(map(str, range(n))) )
     def get_triggered_rule(state: State) -> Rule:
+        if randomize_targets:
+            state.permute(permutation.inverse)
         action_state, swap_action, priority = action_fn(state, keys)
+        if randomize_targets:
+            action_state.permute(permutation)
         # print(swap_action)
         return Rule(
             f"R({swap_action.name})",

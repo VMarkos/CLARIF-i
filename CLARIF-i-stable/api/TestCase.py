@@ -2,6 +2,7 @@
 
 from copy import deepcopy
 
+from loggers import logger
 from .State import State
 from .Learner import Learner
 from .Coach import Coach, ReflexiveCoach
@@ -26,18 +27,30 @@ class TestCase:
         path = self.learner.search_path(self.start_state, self.is_goal)
         if self.report_traces:
             self._learner_traces.append(self.learner._trace)
-        previous_advice = None
-        while (advice := self.coach.evaluate_inference(path[1])) != ( True, [] ):
+        advice_log = set()
+        while (advice := self.coach.evaluate_inference(path[1])) != ( True, () ):
             # print(f"\t{[ str(s) for s in path[1] ]}")
-            # print(f"\tAdvice {advice}")
-            if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
+            print(f"\tAdvice {advice}")
+            if advice[1] in advice_log:
+                print(f"Advice log: {advice_log}")
+            # if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
                 # print(f"\tLearner hypothesis: {self.learner.hypothesis}")
+                logger.info("Duplicate advice: %s\n\tStart state: %s\n\tPath: %s\n\tSteps: %s\n\tHypothesis: %s\n\tAdvice log: %s",
+                            str(advice),
+                            str(self.start_state),
+                            "\n\t-> ".join(f"{s} <{r.name}>" for s, r in path[1][-1][1]),
+                            str(self._steps),
+                            str(self.learner.hypothesis),
+                            str(advice_log))
+                self._steps = -1
+                print('dup')
                 raise ValueError(f"Duplicate advice:\n\t{advice}")
             self.learner.update_hypothesis(advice[1])
             path = self.learner.search_path(self.start_state, self.is_goal)
             if self.report_traces:
                 self._learner_traces.append(self.learner._trace)
-            previous_advice = deepcopy(advice[1])
+            # previous_advice = deepcopy(advice[1])
+            advice_log.add(deepcopy(advice[1]))
             self._steps += 1
 
     def report(self) -> dict:

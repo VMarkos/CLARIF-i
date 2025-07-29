@@ -185,3 +185,6 @@ cython_debug/
 
 # Local venv
 CLARIF-i-stable/CLARIF-i-venv/
+
+# Log files
+CLARIF-i-stable/logs/

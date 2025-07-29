@@ -24,7 +24,7 @@ class Learner:
         """Initialize the learner with initial rules."""
         p_key = lambda r: -r.priority # a bit sub-optimal
         grouped_rules = { (1, p): set(rs) for p, rs in it.groupby(sorted(initial_rules, key=p_key), p_key) }
-        self.hypothesis: AvlTree = AvlTree[int, Rule](grouped_rules)
+        self.hypothesis: AvlTree = AvlTree[tuple[int, int], Rule](grouped_rules)
         self._time = 0
         self._trace: list[State] = [] # list of traces in the form of States the learner passes through
     
