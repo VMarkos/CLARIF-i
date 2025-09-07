@@ -30,3 +30,7 @@ Implementation notes about CLARIF-i development and, mostly, any experiments con
 
 1. Regarding partial states as conditions, in the case of Quick Sort, which is a top-down algorithm, how is it possible to ignore the rest of the state? Also, what about the pivot? (e.g., in our case, where we implement Hoare's two-index approach).
 2. With full states and memory things take up a lot of time...
+
+## Classification as Searching
+
+Essentially, in a classification problem, the agent searches throughout the possible classifications and asks the coach for feedback. On those cases, the coach transfers their knowledge by explicating a minimal action, e.g., moving a single element from one class to the other.
