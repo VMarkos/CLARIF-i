@@ -29,10 +29,13 @@ class TestCase:
             self._learner_traces.append(self.learner._trace)
         advice_log = set()
         while (advice := self.coach.evaluate_inference(path[1])) != ( True, () ):
-            print(f"\t{[ str(s) for s in path[1] ]}")
-            print(f"\tAdvice {advice}")
+<<<<<<< HEAD
+=======
+            # print(f"\t{[ str(s) for s in path[1] ]}")
+            # print(f"\tAdvice {advice}")
+>>>>>>> 034a2a6 (New test results)
             if advice[1] in advice_log:
-                print(f"Advice log: {advice_log}")
+                # print(f"Advice log: {advice_log}")
             # if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
                 # print(f"\tLearner hypothesis: {self.learner.hypothesis}")
                 logger.info("Duplicate advice: %s\n\tStart state: %s\n\tPath: %s\n\tSteps: %s\n\tHypothesis: %s\n\tAdvice log: %s",
@@ -43,7 +46,7 @@ class TestCase:
                             str(self.learner.hypothesis),
                             str(advice_log))
                 self._steps = -1
-                print('dup')
+                # print('dup')
                 raise ValueError(f"Duplicate advice:\n\t{advice}")
             self.learner.update_hypothesis(advice[1])
             path = self.learner.search_path(self.start_state, self.is_goal)

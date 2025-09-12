@@ -33,7 +33,7 @@ class State:
         return kendalltau(self_values, other_values).statistic
 
     def permute(self, permutation: "bidict") -> None:
-        self.state = { k: permutation[v] for k, v in self.state.items() }
+        self.state = { k: permutation[v] if v in permutation else v for k, v in self.state.items() }
 
     def __bool__(self) -> bool:
         return len(self.state) != 0

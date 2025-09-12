@@ -23,7 +23,6 @@ class Coach:
         self.target_rules = target_rules
         self.is_goal = is_goal
         self.start_state = start_state
-        self._is_open_ended = is_goal is not None
     
     def evaluate_inference(self, traces: list[list[tuple[State, Rule | None]]]) -> tuple[bool, list[Rule]]:
         # print("Traces:", len(traces))
@@ -86,8 +85,9 @@ class ReflexiveCoach(Coach):
         state_actions = dict()
         current_state = self.start_state
         while not self.is_goal(current_state):
-            print(f"current_state: {current_state}")
+            # print(f"current_state: {current_state}")
             current_rule = self.target_rules(current_state)
+            # print(f"current_rule: {current_rule}")
             state_actions[current_state] = current_rule
             current_state = current_rule.apply(current_state)
         self._action_cache = state_actions
@@ -132,16 +132,12 @@ class ProactiveCoach(ReflexiveCoach):
         last_path = traces[-1][1]
         if len(last_path) == 0:
             return self.start_state
-        deviating_choices = OrderedSet([])
         previous_state = self.start_state
-        # print(f"last path: {last_path}")
+        print(f"last path: {last_path}")
         for state, rule in last_path:
-            if previous_state not in self._action_cache.keys() or self._action_cache[previous_state] != rule:
-                deviating_choices.add(previous_state)
+            if self.target_rules(previous_state) != rule:
+                return previous_state
             previous_state = state
-        if deviating_choices:
-            # print(f"\t>>> Deviations: {[str(c) for c in deviating_choices]}")
-            return deviating_choices[0]
         # If there are no deviating choices, just ask for more advice
         # print(f"Last wrong state: {traces[-1][0]}")
         return traces[-1][0]

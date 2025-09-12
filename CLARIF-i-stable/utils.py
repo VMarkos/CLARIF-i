@@ -182,7 +182,7 @@ def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], S
     else:
         goal_state = State(dict(zip(keys, [ x for x in range(n) ])))
     is_goal = lambda s: goal_state == s
-    print(f"Start: {start_state}\nGoal: {goal_state}")
+    # print(f"Start: {start_state}\nGoal: {goal_state}")
     # Generate rules
     # states = ( State(dict(zip(keys, p))) for p in it.permutations(map(str, range(n))) )
     def get_triggered_rule(state: State) -> Rule:
@@ -191,6 +191,7 @@ def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], S
         action_state, swap_action, priority = action_fn(state, keys)
         if randomize_targets:
             action_state.permute(permutation)
+            swap_action.callback = lambda s: s.permute(permutation)
         # print(swap_action)
         return Rule(
             f"R({swap_action.name})",
