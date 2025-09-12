@@ -14,7 +14,7 @@ class TestCase:
         self.start_state: State = start_state
         # with open("log.txt", "a") as file:
         #     print(f"{self.start_state}", file=file)
-        self.is_goal: State = is_goal
+        self.is_goal = is_goal
         self.learner: Learner = learner if learner != None else Learner()
         self.coach: Coach = coach_class(target_rules, is_goal, start_state)
         self.full_reporting: bool = full_reporting
@@ -29,7 +29,7 @@ class TestCase:
             self._learner_traces.append(self.learner._trace)
         advice_log = set()
         while (advice := self.coach.evaluate_inference(path[1])) != ( True, () ):
-            # print(f"\t{[ str(s) for s in path[1] ]}")
+            print(f"\t{[ str(s) for s in path[1] ]}")
             print(f"\tAdvice {advice}")
             if advice[1] in advice_log:
                 print(f"Advice log: {advice_log}")
