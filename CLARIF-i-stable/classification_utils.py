@@ -1,6 +1,5 @@
 # classification_utils.py
 
-import random
 import numpy as np
 from copy import deepcopy
 from dataclasses import dataclass
@@ -26,6 +25,9 @@ class Point:
     def dist(self, other: "Point") -> float:
         return sqrt(self.dist_sq(other))
 
+    def __str__(self) -> str:
+        return f"({self.x},{self.y})"
+
 class Partition:
     def __init__(self, points: set[Point], k: int=5) -> None:
         self.points = deepcopy(points)
@@ -36,8 +38,14 @@ class Partition:
 
     def _initialise_parts(self) -> set[set[Point]]:
         points_list = list(self.points)
-        random.shuffle(points_list)
+        RNG.shuffle(points_list)
         return [ set(points_list[i::self.k]) for i in range(self.k) ]
+
+    def update(self, other: "Partition") -> "Partition":
+        # HACK: Is this really needed?
+        self.points = other.points
+        self.k = other.k
+        self.parts = other.parts
 
     def get_part(self, p: Point) -> set[Point]:
         for i, part in enumerate(self.parts):
@@ -71,6 +79,13 @@ class Partition:
 
     def __hash__(self) -> int:
         return hash(self.__key())
+
+    def __le__(self, other: "Partition") -> bool:
+        if not isinstance(other, Partition):
+            return False
+        # other_parts = set(other.parts)
+        return all(p in other.parts for p in self.parts)
+
 
     def __str__(self) -> str:
         parts_str = ', '.join(str(i) + ": " + ', '.join(map(str, part)) for i, part in enumerate(self.parts))
@@ -114,7 +129,7 @@ def get_points(n: int) -> set[Point]:
             points.add(p)
     return points
 
-def generate_classification_test_case(n: int, action_fn: Callable, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool=True, report_traces: bool=True) -> TestCase:
+def generate_classification_test_case(n: int, action_fn: Callable, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool=True, report_traces: bool=True, keep_advice_track: bool=False) -> TestCase:
     points = get_points(n)
     start_partition = Partition(points, k=4)
     is_goal = lambda p: all(p.get_part(x) == p.find_best_fit(x) for x in p.points)
@@ -127,5 +142,6 @@ def generate_classification_test_case(n: int, action_fn: Callable, N: int=20, le
         coach_class,
         full_reporting,
         report_traces,
+        keep_advice_track,
     )
     return test_case

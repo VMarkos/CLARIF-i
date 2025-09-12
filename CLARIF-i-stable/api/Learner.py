@@ -69,6 +69,7 @@ class Learner:
                     partial_traces_dict[current_state] = OrderedSet( [tuple(new_path)] )
                 continue
             top_rule = self._find_top_rule(current_state)
+            # print(f"current_state: {hash(current_state)}")
             # print(f"top rule: {top_rule}")
             if top_rule != None:
                 new_state = top_rule.apply(current_state)
@@ -102,7 +103,8 @@ class Learner:
                         return r
             # print('\tReturning none')
             return None
-        except (TypeError, ValueError):
+        except (TypeError, ValueError) as e:
+            # print(f'\t{e}')
             # print('\tError!')
             return None
 

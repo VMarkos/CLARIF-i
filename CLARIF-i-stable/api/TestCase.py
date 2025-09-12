@@ -1,5 +1,7 @@
 # api/TestCase
 
+import warnings
+
 from copy import deepcopy
 
 from loggers import logger
@@ -10,7 +12,7 @@ from .Rule import Rule
 from typing import Callable
 
 class TestCase:
-    def __init__(self, start_state: State, is_goal: Callable[State, bool], target_rules: Callable[[State], Rule], learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = False) -> None:
+    def __init__(self, start_state: State, is_goal: Callable[State, bool], target_rules: Callable[[State], Rule], learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool = True, report_traces: bool = False, keep_advice_track: bool=False) -> None:
         self.start_state: State = start_state
         # with open("log.txt", "a") as file:
         #     print(f"{self.start_state}", file=file)
@@ -20,6 +22,8 @@ class TestCase:
         self.full_reporting: bool = full_reporting
         self._steps: int = 0
         self.report_traces: bool = self.full_reporting or report_traces
+        self.keep_advice_track = self.full_reporting or keep_advice_track
+        self._advice_track = []
         self._learner_traces: list[list[State]] = []
 
     def run(self) -> None:
@@ -29,15 +33,14 @@ class TestCase:
             self._learner_traces.append(self.learner._trace)
         advice_log = set()
         while (advice := self.coach.evaluate_inference(path[1])) != ( True, () ):
-<<<<<<< HEAD
-=======
             # print(f"\t{[ str(s) for s in path[1] ]}")
             # print(f"\tAdvice {advice}")
->>>>>>> 034a2a6 (New test results)
+            if self.keep_advice_track:
+                self._advice_track.append((path[1], advice[1]))
             if advice[1] in advice_log:
                 # print(f"Advice log: {advice_log}")
             # if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
-                # print(f"\tLearner hypothesis: {self.learner.hypothesis}")
+                print(f"\tLearner hypothesis: {self.learner.hypothesis}")
                 logger.info("Duplicate advice: %s\n\tStart state: %s\n\tPath: %s\n\tSteps: %s\n\tHypothesis: %s\n\tAdvice log: %s",
                             str(advice),
                             str(self.start_state),
@@ -65,6 +68,16 @@ class TestCase:
 
     def get_traces_str(self) -> str:
         return "\n".join(("; ".join(str(s) for s in t) for t in self._learner_traces))
+
+    @property
+    def advice_track(self) -> list:
+        if not self.keep_advice_track:
+            warnings.warn("Advice track not kept, returning '[]'. Re-instantiate with 'keep_advice_track=True'.")
+        return self._advice_track
+
+    @advice_track.setter
+    def advice_track(self, value) -> None:
+        self._advice_track = value
 
     def __str__(self) -> str:
         if self.full_reporting:
