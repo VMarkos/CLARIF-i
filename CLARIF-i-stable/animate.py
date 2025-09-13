@@ -5,8 +5,9 @@ import sys
 import itertools as it
 
 from matplotlib import pyplot as plt
-
 from matplotlib import animation as animation
+
+from classification_utils import Point, Partition
 
 class SortingAnimator:
     def __init__(self, traces_path: str, interval: int = 400) -> None:
@@ -66,6 +67,29 @@ class SortingAnimator:
     def save(self, path: str) -> None:
         """ Assuming that `path` corresponds to a PillowWriter valid extension (.gif, .apng, .webp) """
         self.anim.save(path, writer="pillow")
+
+class ClusteringAnimator:
+    def __init__(self) -> None:
+        self.n
+        self.k
+        pass
+
+    def _parse_advice(self, advice) -> tuple[Point, int, int]:
+        pass
+
+    # TODO: Add a from_str factory method in partition that initialises the partition from a string value.
+
+    def generate(self) -> None:
+        artists = []
+        fig, ax = plt.subplots()
+        plt.suptitle(f"Clustering Coaching: n={self.n}, k={self.k}")
+        plt.title(f"With{'' if self._mem else 'out'} Memory; {'' if self._long else 'Not'} Long", fontsize=10)
+        for partition in self.partitions:
+            for part in partition:
+                ax.scatter(*part)
+            container = ax
+            artists.append(container)
+
 
 def main():
     CWD = os.path.abspath(os.path.dirname(__file__))
