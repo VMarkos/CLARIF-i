@@ -1,6 +1,7 @@
 # classification_utils.py
 
 import numpy as np
+import functools as ft
 from copy import deepcopy
 from dataclasses import dataclass
 from typing import Callable
@@ -25,11 +26,24 @@ class Point:
     def dist(self, other: "Point") -> float:
         return sqrt(self.dist_sq(other))
 
+    @classmethod
+    def from_str(cls, point_str) -> "Point":
+        x, y = map(float, point_str.strip()[1:-1].split(","))
+        return cls(x, y)
+
     def __str__(self) -> str:
         return f"({self.x},{self.y})"
 
+    def __iter__(self) -> iter:
+        return iter((self.x, self.y))
+
 class Partition:
-    def __init__(self, points: set[Point], k: int=5) -> None:
+    def __init__(self, points: set[Point]=set(), k: int=5) -> None:
+        if points == set():
+            self.points = set()
+            self.k = 0
+            self.parts = []
+            return
         self.points = deepcopy(points)
         self.k = k
         if k > len(self.points):
@@ -46,6 +60,16 @@ class Partition:
         self.points = other.points
         self.k = other.k
         self.parts = other.parts
+
+    @classmethod
+    def from_str(cls, partition_str: str) -> "Partition":
+        part_strs = [ p[:-3].strip().split(", ") for p in partition_str.split(":")[1:] ]
+        parts = [ { Point.from_str(p) for p in ps } for ps in part_strs ]
+        partition = cls.__new__(cls)
+        partition.parts = parts
+        partition.k = len(parts)
+        partition.points = ft.reduce(lambda x, y: x.union(y), parts)
+        return partition
 
     def get_part(self, p: Point) -> set[Point]:
         for i, part in enumerate(self.parts):

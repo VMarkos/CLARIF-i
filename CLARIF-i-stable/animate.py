@@ -2,12 +2,20 @@
 
 import os
 import sys
+import json
 import itertools as it
+import functools as ft
 
+from copy import deepcopy
+from tqdm import tqdm
 from matplotlib import pyplot as plt
 from matplotlib import animation as animation
 
 from classification_utils import Point, Partition
+
+CWD = os.path.abspath(os.path.dirname(__file__))
+RESULTS_PATH = os.path.join(CWD, "raw_results")
+ANIMATIONS_PATH = os.path.join(CWD, "animations")
 
 class SortingAnimator:
     def __init__(self, traces_path: str, interval: int = 400) -> None:
@@ -69,38 +77,51 @@ class SortingAnimator:
         self.anim.save(path, writer="pillow")
 
 class ClusteringAnimator:
-    def __init__(self) -> None:
-        self.n
-        self.k
-        pass
+    def __init__(self, results: dict, interval: int=400) -> None:
+        self._start_partition = Partition.from_str(results['report']['start_state'])
+        self.n = len(self._start_partition.points)
+        self.k = len(self._start_partition.parts)
+        self.interval = interval
+        self._frames = self._get_frames(results['advice_track'][-1])
 
-    def _parse_advice(self, advice) -> tuple[Point, int, int]:
-        pass
+    def _get_frames(self, final_interaction) -> list[Partition]:
+        path = [ Partition.from_str(p) for p in final_interaction[0] ]
+        fp, ff, ft = self._parse_advice(final_interaction[1])
+        final_partition = deepcopy(path[-1])
+        final_partition.move(fp, ff, ft)
+        return [self._start_partition] + path + [final_partition]
 
-    # TODO: Add a from_str factory method in partition that initialises the partition from a string value.
+    def _parse_advice(self, advice_str: str) -> tuple[Point, int, int]:
+        advice_strs = advice_str[7:-2].split(", ")
+        pt, fr, to = Point.from_str(advice_strs[0]), int(advice_strs[1]), int(advice_strs[2]) 
+        return pt, fr, to
 
     def generate(self) -> None:
         artists = []
         fig, ax = plt.subplots()
-        plt.suptitle(f"Clustering Coaching: n={self.n}, k={self.k}")
-        plt.title(f"With{'' if self._mem else 'out'} Memory; {'' if self._long else 'Not'} Long", fontsize=10)
-        for partition in self.partitions:
-            for part in partition:
-                ax.scatter(*part)
-            container = ax
-            artists.append(container)
+        # plt.suptitle(f"Clustering Coaching: n={self.n}, k={self.k}")
+        # plt.title(f"With{'' if self._mem else 'out'} Memory; {'' if self._long else 'Not'} Long", fontsize=10)
+        COLORS = plt.rcParams['axes.prop_cycle'].by_key()['color']
+        def _update(frame):
+            n, f = frame
+            artists = []
+            ax.clear()
+            for i, p in enumerate(f.parts):
+                ax.scatter(*zip(*p), c=COLORS[i])
+            artist = ax.set_title(f"i={n}", fontsize=16)
+            artists.append(artist)
+            return artists
+        self.anim = animation.FuncAnimation(
+            fig=fig,
+            func=_update,
+            frames=tuple(enumerate(self._frames)),
+            interval=self.interval,
+        )
 
+    def save(self, path="") -> None:
+        self.anim.save(path, writer="pillow")
 
-def main():
-    CWD = os.path.abspath(os.path.dirname(__file__))
-    RESULTS_PATH = os.path.join(CWD, "raw_results")
-    ANIMATIONS_PATH = os.path.join(CWD, "animations")
-    if not os.path.isdir(ANIMATIONS_PATH):
-        os.mkdir(ANIMATIONS_PATH)
-    try:
-        input_path = sys.argv[1]
-    except IndexError:
-        raise Exception("Usage: python[3] animate.py <path_to_trace_file>")
+def sorting_animator(input_path: str):
     n = int(input("Enter n: "))
     i = int(input("Enter i: "))
     interval = int(int_str) if (int_str := input("Enter interval: ")) != "" else 400
@@ -112,6 +133,37 @@ def main():
     save_path = os.path.join(ANIMATIONS_PATH, input_path[:-6] + "_" + "_".join(map(str, key)) + ".gif")
     animator.save(save_path)
     print(f"Saved animation at: {save_path}")
+
+def clustering_animator(input_path):
+    file_path = os.path.join(RESULTS_PATH, input_path)
+    with open(file_path, 'r') as file:
+        results = json.load(file)
+    fname = input_path[:-5]
+    ANIM_DIR = os.path.join(ANIMATIONS_PATH, fname)
+    if not os.path.isdir(ANIM_DIR):
+        os.mkdir(ANIM_DIR)
+    def animate(res_id, result):
+        animator = ClusteringAnimator(result, interval=400)
+        animator.generate()
+        save_path = os.path.join(ANIM_DIR, fname + res_id + ".gif")
+        animator.save(save_path)
+    for res_id, result in tqdm(results.items()):
+        animate(res_id, result)
+
+def main():
+    if not os.path.isdir(ANIMATIONS_PATH):
+        os.mkdir(ANIMATIONS_PATH)
+    try:
+        input_path = sys.argv[1]
+    except IndexError:
+        raise Exception("Usage: python[3] animate.py <path_to_trace_file>")
+    anim_type = input('Animate {s}orting or {c}lustering? ').lower()
+    if anim_type == 's':
+        sorting_animator(input_path)
+    elif anim_type == 'c':
+        clustering_animator(input_path)
+    else:
+        raise ValueError(f"Expected 's' or 'c', not {anim_type}.")
 
 if __name__ == "__main__":
     main()
