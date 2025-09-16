@@ -63,7 +63,7 @@ class Partition:
 
     @classmethod
     def from_str(cls, partition_str: str) -> "Partition":
-        part_strs = [ p[:-3].strip().split(", ") for p in partition_str.split(":")[1:] ]
+        part_strs = [ p[:p.rfind(',', -5)].strip().split(", ") for p in partition_str.split(":")[1:] ] # HACK: Find a more robust solution using regex
         parts = [ { Point.from_str(p) for p in ps } for ps in part_strs ]
         partition = cls.__new__(cls)
         partition.parts = parts
