@@ -6,6 +6,7 @@ from tqdm import tqdm
 
 from loggers import logger
 from utils import generate_bubble_sort_test_case, generate_quick_sort_test_case, generate_bubble_sort_partial_test_case, generate_quick_sort_partial_test_case
+from classification_utils import generate_inertia_test_case
 from api.Learner import Learner
 from api.Coach import Coach, ReflexiveCoach, ProactiveCoach
 
@@ -14,6 +15,7 @@ ALGORITHMS = {
     'q': generate_quick_sort_test_case,
     'bp': generate_bubble_sort_partial_test_case,
     'qp': generate_quick_sort_partial_test_case,
+    'i': generate_inertia_test_case,
 }
 
 COACHES = {
@@ -30,7 +32,7 @@ def main():
         os.mkdir(RESULTS_PATH)
     if not os.path.isdir(LOGS_PATH):
         os.mkdir(LOGS_PATH)
-    algorithm = input("Enter algorithm ({q}uicksort, {b}ubblesort, append {p}artial): ")
+    algorithm = input("Enter algorithm ({q}uicksort, {b}ubblesort, append {p}artial, {i}nertia clustering): ")
     coach_type = input("Enter coach type (re{a}ctive, re{f}lexive, {p}roactive): ")
     coach_class = COACHES[coach_type]
     randomize_targets = input("Randomize targets (y/n): ") == 'y'
@@ -65,7 +67,8 @@ def main():
                 f"\tshort memory: {memory}\n"
                 f"\tlong memory: {long_memory}\n"
             )
-    for n in range(1, N + 1):
+    n_range = range(5, N + 1, 5) if algorithm == "i" else range(1, N + 1)
+    for n in n_range:
         print(f"Running test for n={n}")
         logger.info(f"Running test for n={n}")
         if long_memory == "n":

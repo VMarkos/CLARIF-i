@@ -38,14 +38,16 @@ class Point:
         return iter((self.x, self.y))
 
 class Partition:
-    def __init__(self, points: set[Point]=set(), k: int=5) -> None:
+    def __init__(self, points: set[Point]=set(), k: int=5, tol: float=0.0) -> None:
         if points == set():
             self.points = set()
             self.k = 0
             self.parts = []
+            self._tol = tol
             return
         self.points = deepcopy(points)
         self.k = k
+        self._tol = tol # Used to quantify equality
         if k > len(self.points):
             raise ValueError(f"More partition classes than points: '{k} > {len(self.points)}'.")
         self.parts = self._initialise_parts()
@@ -97,6 +99,9 @@ class Partition:
         return tuple(tuple(p) for p in self.parts)
 
     def __eq__(self, other) -> bool:
+        # TODO: this should be generalised to allow for comparisons in case of self._tol>0
+        """ Two partitions are considered equal if their corresponding parts are 
+        up to a factor of self._tol. """
         if not isinstance(other, Partition):
             return False
         return self.__key() == other.__key()
@@ -152,6 +157,9 @@ def get_points(n: int) -> set[Point]:
         if p not in points:
             points.add(p)
     return points
+
+def generate_inertia_test_case(n: int, N: int=-1, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool=True, report_traces: bool=True, randomize_target: bool=False):
+    return generate_classification_test_case(n, find_classification_inertia_action, N, learner, coach_class, full_reporting, report_traces)
 
 def generate_classification_test_case(n: int, action_fn: Callable, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool=True, report_traces: bool=True, keep_advice_track: bool=False) -> TestCase:
     points = get_points(n)
