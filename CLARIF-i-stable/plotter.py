@@ -66,7 +66,7 @@ def main():
     figname = input("Figure filename: ")
     N = int(input("N: "))
     reps = int(input("Repetitions: "))
-    res_type = input("Results type ({f}ull, {p}artial, prepend {p}roactive): ")
+    res_type = input("Results type ({f}ull, {p}artial, {i}nertia, prepend {p}roactive): ")
     all_paths = {
         'paths': [
             (f"b_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Bubble (no mem)"),
@@ -116,7 +116,11 @@ def main():
             (f"b_f_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "dotted", "Bubble (long mem)"),
             (f"q_f_test_N{N}_reps{reps}_memy_longy.txt", "tab:orange", "dotted", "Quick (long mem)"),
         ],
-        'proactive_inertia_paths': [],
+        'proactive_inertia_paths': [
+            (f"i_a_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Inertia (no mem)"),
+            (f"i_a_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "solid", "Inertia (no mem)"),
+            (f"i_a_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "solid", "Inertia (no mem)"),
+        ],
     }
     CWD = os.path.abspath(os.path.dirname(__file__))
     RESULTS_PATH = os.path.join(CWD, "raw_results")
@@ -132,6 +136,7 @@ def main():
     PATHS = {
         'f': 'paths',
         'p': 'partial_paths',
+        'pi': 'proactive_inertia_paths',
         'pp': 'proactive_partial_paths',
         'pf': 'proactive_full_paths',
         'fp': 'reflexive_partial_paths',

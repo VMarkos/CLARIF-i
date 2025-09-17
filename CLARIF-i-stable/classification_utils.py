@@ -24,7 +24,7 @@ class Point:
         return (self.x - other.x) ** 2 + (self.y - other.y) ** 2
 
     def dist(self, other: "Point") -> float:
-        return sqrt(self.dist_sq(other))
+        return np.sqrt(self.dist_sq(other))
 
     @classmethod
     def from_str(cls, point_str) -> "Point":
@@ -113,8 +113,8 @@ class Partition:
         if not isinstance(other, Partition):
             return False
         # other_parts = set(other.parts)
-        # return all(d < self._tol for d in (min(hausdorff_distance(sp, op) for op in other.parts) for sp in self.parts))
-        return all(p in other.parts for p in self.parts)
+        return all(d <= self._tol for d in (min(hausdorff_distance(sp, op) for op in other.parts) for sp in self.parts))
+        # return all(p in other.parts for p in self.parts)
 
 
     def __str__(self) -> str:

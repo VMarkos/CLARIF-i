@@ -49,12 +49,22 @@
 \section{Introduction}\label{sec:introduction}
 %
 \tbc
+\begin{itemize}
+	\item We present ``search coaching'' as a way to instill knowledge faithfully to a learner;
+	\item We compare this to our own and others' previous works;
+	\item We maybe discuss a bit about LLMs. (?)
+\end{itemize}
 %
 %
 %
 \section{Related literature}\label{sec:related-literature}
 %
 \tbc
+\begin{itemize}
+	\item Related works as in the proxy coaching paper;
+	\item A brief update on what is the current state of the art;
+	\item Maybe some works that draw links to the 
+\end{itemize}
 %
 %
 %
@@ -119,6 +129,15 @@ In Figures~\ref{fig:full and partial sorting coaching results} we present the nu
 \section{Results}\label{sec:results}
 %
 \tbc
+\begin{itemize}
+	\item Find a metric to quantify learner's fidelity (brainstorming follows):
+	\begin{itemize}
+		\item Maybe the number of advice itself is an indicator, at least in terms of efficacy -- it still might be the case that the learner achieves the same result through another path;
+		\item Different coaching styles (reactive, reflexive, proactive) should affect faithfulness / fidelity, so this metric should capture it.
+		\item The absolute (or relative?) frequency of differences between the learner's and the coach's paths on a given benchmark set could be the most fine grained metric. So, for instance, if the learner goes $s\to a\to b\to c\to g$ while the coach would go $s\to a\to b\to d\to g$, we have an absolute (relative) difference of $1$ ($0.33$, counting only intermediate nodes).
+		\item In the above, we might also count the goal node in the relative frequency case. Also, we should somehow measure distances among paths of different length.
+	\end{itemize}
+\end{itemize}
 %
 %
 %
