@@ -118,8 +118,8 @@ def main():
         ],
         'proactive_inertia_paths': [
             (f"i_a_test_N{N}_reps{reps}_memn_longn.txt", "tab:blue", "solid", "Inertia (no mem)"),
-            (f"i_a_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "solid", "Inertia (no mem)"),
-            (f"i_a_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "solid", "Inertia (no mem)"),
+            (f"i_a_test_N{N}_reps{reps}_memy_longn.txt", "tab:blue", "solid", "Inertia (short mem)"),
+            (f"i_a_test_N{N}_reps{reps}_memy_longy.txt", "tab:blue", "solid", "Inertia (long mem)"),
         ],
     }
     CWD = os.path.abspath(os.path.dirname(__file__))

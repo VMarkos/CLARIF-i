@@ -80,8 +80,16 @@ class Partition:
         return -1
 
     def move(self, p: Point, from_part: int, to_part: int) -> None:
+        if p not in self.parts[from_part]:
+            p = self._find_closest_neighbour(p, self.parts[from_part])
         self.parts[from_part].remove(p)
         self.parts[to_part].add(p)
+
+    def _find_closest_neighbour(self, p: Point, s: set) -> Point:
+        for point in s:
+            if p.dist(point) <= self._tol:
+                return point
+        raise ValueError(f"Point '{p}' has no neighbour within range 'self._tol'.")
 
     def _compute_inertia(self, p: Point, partition: set[Point]) -> float:
         return sum(p.dist_sq(x) for x in partition)
@@ -169,7 +177,7 @@ def generate_inertia_test_case(n: int, N: int=-1, learner: Learner | None=None, 
 
 def generate_classification_test_case(n: int, action_fn: Callable, N: int=20, learner: Learner | None=None, coach_class: Coach=Coach, full_reporting: bool=True, report_traces: bool=True, keep_advice_track: bool=False) -> TestCase:
     points = get_points(n)
-    start_partition = Partition(points, k=4)
+    start_partition = Partition(points, k=4, tol=1e-1)
     is_goal = lambda p: all(p.get_part(x) == p.find_best_fit(x) for x in p.points)
     rule_selector = get_rule_selector(action_fn)
     test_case = TestCase(
