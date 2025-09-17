@@ -113,12 +113,18 @@ class Partition:
         if not isinstance(other, Partition):
             return False
         # other_parts = set(other.parts)
+        # return all(d < self._tol for d in (min(hausdorff_distance(sp, op) for op in other.parts) for sp in self.parts))
         return all(p in other.parts for p in self.parts)
 
 
     def __str__(self) -> str:
         parts_str = ', '.join(str(i) + ": " + ', '.join(map(str, part)) for i, part in enumerate(self.parts))
         return f"( {parts_str} )"
+
+def hausdorff_distance(xs, ys) -> float:
+    d_x = max(min(y.dist(x) for y in ys) for x in xs)
+    d_y = max(min(y.dist(x) for x in xs) for y in ys)
+    return max(d_x, d_y)
 
 def get_move_callback(partition: Partition, point: Point, from_part: int, to_part: int) -> Callable:
     def move_callback(partition: Partition):
