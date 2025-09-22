@@ -8,4 +8,4 @@ from .core.coach import Coach
 from .utils.interface import CoachingInterface
 from .utils.convergence import ConvergenceTracker
 
-__all__ = ['Rule', 'Learner', 'Coach', 'CoachingInterface', 'ConvergenceTracker'] 
+__all__ = ["Rule", "Learner", "Coach", "CoachingInterface", "ConvergenceTracker"]

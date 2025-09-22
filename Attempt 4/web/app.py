@@ -24,31 +24,32 @@ search_engine = SearchEngine(config)
 coach = Coach(config)
 logger = setup_logger()
 
-@app.route('/')
+
+@app.route("/")
 def index():
     """Serve the main page."""
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/api/search', methods=['POST'])
+
+@app.route("/api/search", methods=["POST"])
 def search():
     """Handle search requests."""
     data = request.get_json()
-    query = data.get('query', '')
-    
+    query = data.get("query", "")
+
     # Get coach's analysis
     analysis = coach.analyze_query(query)
-    
+
     # Get search results
     results = search_engine.search(query)
-    
+
     # Get improvement suggestions
     suggestions = coach.suggest_improvements(query)
-    
-    return jsonify({
-        'analysis': analysis,
-        'results': results,
-        'suggestions': suggestions
-    })
 
-if __name__ == '__main__':
-    app.run(debug=True, port=5000) 
+    return jsonify(
+        {"analysis": analysis, "results": results, "suggestions": suggestions}
+    )
+
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)

@@ -7,43 +7,61 @@ from argparse import ArgumentParser
 from loggers import logger
 from tqdm import tqdm
 
-from utils import generate_bubble_sort_test_case, generate_quick_sort_test_case, generate_bubble_sort_partial_test_case, generate_quick_sort_partial_test_case
+from utils import (
+    generate_bubble_sort_test_case,
+    generate_quick_sort_test_case,
+    generate_bubble_sort_partial_test_case,
+    generate_quick_sort_partial_test_case,
+)
 
 from api.TestCase import TestCase
 from api.Coach import Coach, ReflexiveCoach, ProactiveCoach
 from api.Learner import Learner
 
+
 def prepare_parser() -> ArgumentParser:
     parser = ArgumentParser()
     parser.add_argument(
-        '-N',
+        "-N",
         type=int,
         default=20,
         help=f"Maximum state size, N, for which the tests should be run. Default value: 20.",
     )
     parser.add_argument(
-        '-r',
+        "-r",
         type=int,
         default=20,
         help=f"Number of test condition repetitions for each value of 'n'. Default value: 20.",
     )
     parser.add_argument(
-        '-s',
+        "-s",
         type=int,
         default=5,
         help=f"Step value for 'n'. Default value: 5",
     )
     return parser
 
-def single_run(algorithm, N, n_range, reps, memory, long_memory, coach_class, res_file_name, trace_file_name) -> None:
+
+def single_run(
+    algorithm,
+    N,
+    n_range,
+    reps,
+    memory,
+    long_memory,
+    coach_class,
+    res_file_name,
+    trace_file_name,
+) -> None:
     learner = Learner() if long_memory else None
-    logger.info("Starting new series of experiments with configuration:\n"
-                f"\talgorithm: {algorithm.__name__}\n"
-                f"\tcoach type: {coach_class.__name__}\n"
-                f"\tN: {N}\n"
-                f"\treps: {reps}\n"
-                f"\tshort memory: {memory}\n"
-                f"\tlong memory: {long_memory}\n"
+    logger.info(
+        "Starting new series of experiments with configuration:\n"
+        f"\talgorithm: {algorithm.__name__}\n"
+        f"\tcoach type: {coach_class.__name__}\n"
+        f"\tN: {N}\n"
+        f"\treps: {reps}\n"
+        f"\tshort memory: {memory}\n"
+        f"\tlong memory: {long_memory}\n"
     )
     for n in tqdm(n_range):
         logger.info(f"Running test for n={n}.")
@@ -61,6 +79,7 @@ def single_run(algorithm, N, n_range, reps, memory, long_memory, coach_class, re
                 trace_file.write(f"{n}; {i}\n{test.get_traces_str()}\n")
         logger.info("===== Iteration over! ======")
     logger.info(f"{'=' * 10} TEST OVER {'=' * 10}")
+
 
 def main():
     # Initialize global paths
@@ -83,7 +102,10 @@ def main():
         ReflexiveCoach,
         ProactiveCoach,
     )
-    configs = filter(lambda c: c[0] or not c[1], it.product( (True, False), (True, False), ALGORITHMS, COACHES[1:] ))
+    configs = filter(
+        lambda c: c[0] or not c[1],
+        it.product((True, False), (True, False), ALGORITHMS, COACHES[1:]),
+    )
     # Create argument parser
     parser = prepare_parser()
     args = vars(parser.parse_args())
@@ -103,8 +125,21 @@ def main():
     with open(trace_file_name, "w") as trace_file:
         trace_file.write("")
     for short, long, algorithm, coach_class in configs:
-        print(f"Running configuration: short memory: {short}, long memory: {long}, algorithm: {algorithm.__name__}")
-        single_run(algorithm, N, n_range, r, short, long, coach_class, res_file_name, trace_file_name)
+        print(
+            f"Running configuration: short memory: {short}, long memory: {long}, algorithm: {algorithm.__name__}"
+        )
+        single_run(
+            algorithm,
+            N,
+            n_range,
+            r,
+            short,
+            long,
+            coach_class,
+            res_file_name,
+            trace_file_name,
+        )
+
 
 if __name__ == "__main__":
     main()

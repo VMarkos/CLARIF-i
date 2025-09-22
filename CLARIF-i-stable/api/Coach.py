@@ -9,22 +9,30 @@ from .Rule import Rule
 from copy import deepcopy
 from ordered_set import OrderedSet
 
+
 class Coach:
     """
     The coach maintains target rules and provides feedback to the learner.
-    
+
     Attributes:
         target_rules: List of rules that represent the desired behavior
     """
 
-    def __init__(self, target_rules: Callable[[State], Rule], is_goal: Callable[State, bool], start_state: State) -> None:
-        """ Initialise the coach with target rules """
+    def __init__(
+        self,
+        target_rules: Callable[[State], Rule],
+        is_goal: Callable[State, bool],
+        start_state: State,
+    ) -> None:
+        """Initialise the coach with target rules"""
         # self.target_rules: dict[State, Rule] = { rule.condition: rule for rule in sorted(target_rules, reverse=True) }
         self.target_rules = target_rules
         self.is_goal = is_goal
         self.start_state = start_state
-    
-    def evaluate_inference(self, traces: list[list[tuple[State, Rule | None]]]) -> tuple[bool, list[Rule]]:
+
+    def evaluate_inference(
+        self, traces: list[list[tuple[State, Rule | None]]]
+    ) -> tuple[bool, list[Rule]]:
         # print("Traces:", len(traces))
         if not traces:
             # print('\tNo goal no traces')
@@ -32,15 +40,15 @@ class Coach:
         if any(self.is_goal(trace[0]) for trace in traces):
             # print('\tGOAL')
             return True, tuple()
-        
+
         # print("\ttraces[-1]", traces[-1][0], [ (str(s), str(r)) for s, r in traces[-1][1] ])
         # print('\tNO goal but traces')
         return False, self._generate_goal_rules(self._pick_deviating_state(traces))
-        
+
     def _pick_deviating_state(self, traces) -> State:
         return traces[-1][0]
 
-    def _generate_goal_rules(self, current_state: State | None=None) -> tuple[Rule]:
+    def _generate_goal_rules(self, current_state: State | None = None) -> tuple[Rule]:
         if current_state == None:
             current_state = self.start_state
         feedback_rules: list[Rule] = []
@@ -50,7 +58,7 @@ class Coach:
         advised_rule = self.target_rules(current_state)
         # print(f"\t>>> Advised rule: {advised_rule}")
         advised_action = advised_rule.action
-        
+
         # FIXME This needs to be revised for multiple rule output (e.g., partial condition states)
         # for key, goal_value in advised_action:
         #     current_value = current_state.get(key)
@@ -60,11 +68,17 @@ class Coach:
         # print("Action state:", action_state)
         if advised_action:
             feedback_rules.append(advised_rule)
-        
+
         return tuple(feedback_rules)
 
+
 class ReflexiveCoach(Coach):
-    def __init__(self, target_rules: Callable[[State], Rule], is_goal: Callable[State, bool], start_state: State) -> None:
+    def __init__(
+        self,
+        target_rules: Callable[[State], Rule],
+        is_goal: Callable[State, bool],
+        start_state: State,
+    ) -> None:
         super().__init__(target_rules, is_goal, start_state)
         self._cache_advice(target_rules)
 
@@ -73,12 +87,12 @@ class ReflexiveCoach(Coach):
     # So, the coach should maintain a way of solving the task at hand in beforehand, to speed things
     # up a bit
     # So this can be precomputed during initialisation.
-    # Which means that the start state should be known during initialisation, so maybe 
+    # Which means that the start state should be known during initialisation, so maybe
     # pass it as an argument from `api.TestCase.run()`
     # The only difference lies in how the next rule is chosen, i.e., in line 37:
     # return False, self._generate_goal_rules(traces[-1][0])
     #                                         ^^^^^^^^^^^^^
-    # This should be changed for each coach accordingly, so each class inherits the base class `Coach` and picks this 
+    # This should be changed for each coach accordingly, so each class inherits the base class `Coach` and picks this
     # using a separate `pick_advice()` method.
 
     def _cache_advice(self, target_rules) -> None:
@@ -102,6 +116,7 @@ class ReflexiveCoach(Coach):
             except KeyError:
                 self._action_cache[state] = target_rules(state)
                 return self._action_cache[state]
+
         return cached_tr
 
     def _pick_deviating_state(self, traces) -> State:
@@ -124,8 +139,14 @@ class ReflexiveCoach(Coach):
         # print(f"Last wrong state: {traces[-1][0]}")
         return traces[-1][0]
 
+
 class ProactiveCoach(ReflexiveCoach):
-    def __init__(self, target_rules: Callable[[State], Rule], is_goal: Callable[State, bool], start_state: State) -> None:
+    def __init__(
+        self,
+        target_rules: Callable[[State], Rule],
+        is_goal: Callable[State, bool],
+        start_state: State,
+    ) -> None:
         super().__init__(target_rules, is_goal, start_state)
 
     def _pick_deviating_state(self, traces) -> State:

@@ -9,6 +9,7 @@ import math
 #                           Model Section                                #
 ##########################################################################
 
+
 class CPRule:
     def __init__(self, condition, ordering):
         """
@@ -30,8 +31,8 @@ class CPRule:
 
 class CPTable:
     def __init__(self, variable):
-        self.variable = variable   # The variable for which this table applies.
-        self.rules = []            # List of CPRule objects (initially empty).
+        self.variable = variable  # The variable for which this table applies.
+        self.rules = []  # List of CPRule objects (initially empty).
 
     def add_rule(self, condition, ordering):
         self.rules.append(CPRule(condition, ordering))
@@ -52,15 +53,17 @@ class CPTable:
             if rule.applies(outcome):
                 applied_rule = rule
         if applied_rule:
-            explanation = f"Rule: if {applied_rule.condition} then {applied_rule.ordering}."
+            explanation = (
+                f"Rule: if {applied_rule.condition} then {applied_rule.ordering}."
+            )
             idx = self.rules.index(applied_rule)
-            for higher in self.rules[idx+1:]:
+            for higher in self.rules[idx + 1 :]:
                 if not higher.applies(outcome):
                     explanation += f" (Higher rule {higher.condition} inactive)"
             return applied_rule.ordering[0], explanation
         else:
             return outcome[self.variable], "(No rule)"
-    
+
     def __repr__(self):
         deps = self.get_dependencies()
         deps_str = ", ".join(deps) if deps else "none"
@@ -84,16 +87,20 @@ class CPNet:
             s += repr(self.cpt[var]) + "\n"
         return s
 
+
 ##########################################################################
 #                      Reasoning and XML Functions                       #
 ##########################################################################
 
+
 def hamming_distance(t1, t2):
     return sum(1 for a, b in zip(t1, t2) if a != b)
+
 
 def outcome_to_tuple(outcome, variables):
     """Converts an outcome dict into a tuple in the order of variables."""
     return tuple(outcome[var] for var in variables)
+
 
 def parse_outcome(binary_str, variables):
     """
@@ -109,6 +116,7 @@ def parse_outcome(binary_str, variables):
         outcome[variables[i]] = ch
     return outcome
 
+
 def parse_conditions(cond_str):
     """
     Parses a string like "B=1, D=0" into a dictionary.
@@ -118,7 +126,7 @@ def parse_conditions(cond_str):
     if not cond_str:
         return {}
     cond = {}
-    for part in cond_str.split(','):
+    for part in cond_str.split(","):
         if "=" in part:
             var, val = part.split("=")
             var = var.strip()
@@ -126,6 +134,7 @@ def parse_conditions(cond_str):
             if val:
                 cond[var] = val
     return cond
+
 
 def is_flip_justified(cp_table, outcome):
     """
@@ -146,10 +155,11 @@ def is_flip_justified(cp_table, outcome):
         return False, f"Current value {current_val} ≠ preferred {preferred}."
     idx = cp_table.rules.index(applied_rule)
     inverse = "1" if preferred == "0" else "0"
-    for higher_rule in cp_table.rules[idx+1:]:
+    for higher_rule in cp_table.rules[idx + 1 :]:
         if higher_rule.applies(outcome) and (higher_rule.ordering[0] == inverse):
             return False, f"Higher rule {higher_rule.condition} favors {inverse}."
     return True, f"Justified by rule {applied_rule.condition}."
+
 
 def find_worsening_flipping_sequence(cpnet, source, target):
     """
@@ -194,6 +204,7 @@ def find_worsening_flipping_sequence(cpnet, source, target):
     seq.reverse()
     return seq, found
 
+
 def save_cpnet_to_xml(cpnet, filename):
     root = ET.Element("CPNet")
     vars_elem = ET.SubElement(root, "Variables")
@@ -212,6 +223,7 @@ def save_cpnet_to_xml(cpnet, filename):
             order_elem.text = f"{rule.ordering[0]}>{rule.ordering[1]}"
     tree = ET.ElementTree(root)
     tree.write(filename, encoding="utf-8", xml_declaration=True)
+
 
 def load_cpnet_from_xml(filename):
     tree = ET.parse(filename)
@@ -240,9 +252,11 @@ def load_cpnet_from_xml(filename):
                 table.add_rule(condition, ordering)
     return cpnet
 
+
 ##########################################################################
 #                           GUI Section                                  #
 ##########################################################################
+
 
 class CPNetGUI:
     def __init__(self, root):
@@ -250,7 +264,7 @@ class CPNetGUI:
         self.root.title("Ceteris Paribus Coaching")
         # Initialize with 3 variables: A, B, C.
         self.variable_count = 3
-        self.cpnet = CPNet([chr(65+i) for i in range(self.variable_count)])
+        self.cpnet = CPNet([chr(65 + i) for i in range(self.variable_count)])
         # For each variable, store a domain (default binary, but editable).
         self.domains = {v: ["1", "0"] for v in self.cpnet.variables}
         self.cpnet_filename = None
@@ -274,11 +288,16 @@ class CPNetGUI:
 
     # ---------------- File Menu Functions ----------------
     def new_cpnet(self):
-        num = simpledialog.askinteger("New CP-net", "Enter the number of variables:",
-                                      initialvalue=3, minvalue=1, maxvalue=10)
+        num = simpledialog.askinteger(
+            "New CP-net",
+            "Enter the number of variables:",
+            initialvalue=3,
+            minvalue=1,
+            maxvalue=10,
+        )
         if num is not None:
             self.variable_count = num
-            self.cpnet = CPNet([chr(65+i) for i in range(num)])
+            self.cpnet = CPNet([chr(65 + i) for i in range(num)])
             self.domains = {v: ["1", "0"] for v in self.cpnet.variables}
             self.cpnet_filename = None
             self.src_entry.delete(0, tk.END)
@@ -286,7 +305,9 @@ class CPNetGUI:
             self.update_all()
 
     def open_cpnet(self):
-        filename = filedialog.askopenfilename(title="Open CP-net", filetypes=[("XML Files", "*.xml")])
+        filename = filedialog.askopenfilename(
+            title="Open CP-net", filetypes=[("XML Files", "*.xml")]
+        )
         if filename:
             try:
                 self.cpnet = load_cpnet_from_xml(filename)
@@ -308,8 +329,11 @@ class CPNetGUI:
             self.save_cpnet_as()
 
     def save_cpnet_as(self):
-        filename = filedialog.asksaveasfilename(title="Save CP-net As", defaultextension=".xml",
-                                                  filetypes=[("XML Files", "*.xml")])
+        filename = filedialog.asksaveasfilename(
+            title="Save CP-net As",
+            defaultextension=".xml",
+            filetypes=[("XML Files", "*.xml")],
+        )
         if filename:
             try:
                 save_cpnet_to_xml(self.cpnet, filename)
@@ -323,7 +347,9 @@ class CPNetGUI:
         """Expects outcomes as a comma-separated list (one value per variable), matched against the domain."""
         tokens = [t.strip() for t in outcome_str.split(",")]
         if len(tokens) != len(self.cpnet.variables):
-            raise ValueError(f"Expected {len(self.cpnet.variables)} values; got {len(tokens)}.")
+            raise ValueError(
+                f"Expected {len(self.cpnet.variables)} values; got {len(tokens)}."
+            )
         outcome = {}
         for i, var in enumerate(self.cpnet.variables):
             domain = self.domains.get(var, [])
@@ -332,7 +358,9 @@ class CPNetGUI:
             if len(matches) == 1:
                 outcome[var] = matches[0]
             else:
-                raise ValueError(f"Value '{token}' for variable {var} not found in domain {domain}.")
+                raise ValueError(
+                    f"Value '{token}' for variable {var} not found in domain {domain}."
+                )
         return outcome
 
     def match_variable(self, var_str):
@@ -352,7 +380,9 @@ class CPNetGUI:
         Accepts tokens such as "B=1", "b1", or a lone value (e.g. "meat") if unambiguous.
         Returns a dict mapping variable to value.
         """
-        tokens = [t.strip() for t in advice_str.replace(";", ",").split(",") if t.strip()]
+        tokens = [
+            t.strip() for t in advice_str.replace(";", ",").split(",") if t.strip()
+        ]
         conditions = {}
         for token in tokens:
             if "=" in token:
@@ -362,7 +392,9 @@ class CPNetGUI:
                     raise ValueError(f"Ambiguous or unknown variable in '{var_part}'.")
                 val_candidate = self.match_value(var_candidate, val_part)
                 if not val_candidate:
-                    raise ValueError(f"Value '{val_part}' not found in domain of {var_candidate}.")
+                    raise ValueError(
+                        f"Value '{val_part}' not found in domain of {var_candidate}."
+                    )
                 conditions[var_candidate] = val_candidate
             else:
                 # Try to separate letters and digits.
@@ -399,9 +431,11 @@ class CPNetGUI:
     def edit_domain(self, variable):
         current_domain = self.domains.get(variable, [])
         current_str = ", ".join(current_domain)
-        new_str = simpledialog.askstring("Edit Domain",
-                                         f"Enter comma-separated values for {variable} (current: {current_str}):",
-                                         initialvalue=current_str)
+        new_str = simpledialog.askstring(
+            "Edit Domain",
+            f"Enter comma-separated values for {variable} (current: {current_str}):",
+            initialvalue=current_str,
+        )
         if new_str is not None:
             new_domain = [x.strip() for x in new_str.split(",") if x.strip()]
             if new_domain:
@@ -410,7 +444,11 @@ class CPNetGUI:
                 self.update_graph()
 
     def edit_name(self, variable):
-        new_name = simpledialog.askstring("Edit Name", f"Enter new name for variable {variable}:", initialvalue=variable)
+        new_name = simpledialog.askstring(
+            "Edit Name",
+            f"Enter new name for variable {variable}:",
+            initialvalue=variable,
+        )
         if new_name and new_name.strip():
             new_name = new_name.strip()
             idx = self.cpnet.variables.index(variable)
@@ -448,18 +486,56 @@ class CPNetGUI:
             frame.pack(fill="x", pady=3)
             btn_frame = tk.Frame(frame)
             btn_frame.grid(row=0, column=2, padx=5)
-            tk.Button(btn_frame, text="Edit Domain", command=lambda v=var: self.edit_domain(v)).pack(side=tk.TOP, pady=2)
-            tk.Button(btn_frame, text="Edit Name", command=lambda v=var: self.edit_name(v)).pack(side=tk.TOP, pady=2)
-            tk.Label(frame, text="if", font=("Helvetica", 10, "bold"), borderwidth=1, relief="solid", width=20).grid(row=0, column=0, padx=1, pady=1)
-            tk.Label(frame, text="then", font=("Helvetica", 10, "bold"), borderwidth=1, relief="solid", width=10).grid(row=0, column=1, padx=1, pady=1)
+            tk.Button(
+                btn_frame, text="Edit Domain", command=lambda v=var: self.edit_domain(v)
+            ).pack(side=tk.TOP, pady=2)
+            tk.Button(
+                btn_frame, text="Edit Name", command=lambda v=var: self.edit_name(v)
+            ).pack(side=tk.TOP, pady=2)
+            tk.Label(
+                frame,
+                text="if",
+                font=("Helvetica", 10, "bold"),
+                borderwidth=1,
+                relief="solid",
+                width=20,
+            ).grid(row=0, column=0, padx=1, pady=1)
+            tk.Label(
+                frame,
+                text="then",
+                font=("Helvetica", 10, "bold"),
+                borderwidth=1,
+                relief="solid",
+                width=10,
+            ).grid(row=0, column=1, padx=1, pady=1)
             if self.cpnet.cpt[var].rules:
                 for idx, rule in enumerate(self.cpnet.cpt[var].rules, start=1):
-                    cond_text = ", ".join(f"{k}={v}" for k, v in rule.condition.items()) if rule.condition else "Unconditional"
-                    tk.Label(frame, text=cond_text, borderwidth=1, relief="solid", anchor="w", width=20).grid(row=idx, column=0, padx=1, pady=1)
+                    cond_text = (
+                        ", ".join(f"{k}={v}" for k, v in rule.condition.items())
+                        if rule.condition
+                        else "Unconditional"
+                    )
+                    tk.Label(
+                        frame,
+                        text=cond_text,
+                        borderwidth=1,
+                        relief="solid",
+                        anchor="w",
+                        width=20,
+                    ).grid(row=idx, column=0, padx=1, pady=1)
                     order_text = f"{rule.ordering[0]}>{rule.ordering[1]}"
-                    tk.Label(frame, text=order_text, borderwidth=1, relief="solid", anchor="w", width=10).grid(row=idx, column=1, padx=1, pady=1)
+                    tk.Label(
+                        frame,
+                        text=order_text,
+                        borderwidth=1,
+                        relief="solid",
+                        anchor="w",
+                        width=10,
+                    ).grid(row=idx, column=1, padx=1, pady=1)
             else:
-                tk.Label(frame, text="No rules", anchor="w").grid(row=1, column=0, columnspan=2, padx=1, pady=1)
+                tk.Label(frame, text="No rules", anchor="w").grid(
+                    row=1, column=0, columnspan=2, padx=1, pady=1
+                )
             self.cpt_frames[var] = frame
 
     def update_graph(self):
@@ -477,8 +553,10 @@ class CPNetGUI:
             y = center_y + radius * math.sin(angle)
             self.node_positions[var] = (x, y)
             r = 12 * zoom
-            self.canvas.create_oval(x-r, y-r, x+r, y+r, fill="lightblue")
-            self.canvas.create_text(x, y, text=var, font=("Helvetica", int(8*zoom), "bold"))
+            self.canvas.create_oval(x - r, y - r, x + r, y + r, fill="lightblue")
+            self.canvas.create_text(
+                x, y, text=var, font=("Helvetica", int(8 * zoom), "bold")
+            )
         for head in self.cpnet.variables:
             deps = self.cpnet.cpt[head].get_dependencies()
             for dep in deps:
@@ -493,7 +571,9 @@ class CPNetGUI:
                     start_y = y1 + r_source * math.sin(angle)
                     end_x = x2 - r_target * math.cos(angle)
                     end_y = y2 - r_target * math.sin(angle)
-                    self.canvas.create_line(start_x, start_y, end_x, end_y, arrow=tk.LAST, width=2*zoom)
+                    self.canvas.create_line(
+                        start_x, start_y, end_x, end_y, arrow=tk.LAST, width=2 * zoom
+                    )
 
     def zoom_in(self):
         self.zoom_factor *= 1.2
@@ -519,13 +599,17 @@ class CPNetGUI:
         try:
             src = self.parse_outcome_gui(self.src_entry.get())
             src_str = ",".join(src[v] for v in self.cpnet.variables)
-            self.seq_tree.insert("", "end", values=(src_str, "Source"), tags=("source",))
+            self.seq_tree.insert(
+                "", "end", values=(src_str, "Source"), tags=("source",)
+            )
         except Exception:
             pass
         for step in sequence:
             var, justification, outcome_tuple = step
             outcome_str = ",".join(outcome_tuple)
-            self.seq_tree.insert("", "end", values=(outcome_str, f"{var}: {justification}"), tags=(var,))
+            self.seq_tree.insert(
+                "", "end", values=(outcome_str, f"{var}: {justification}"), tags=(var,)
+            )
         self.seq_tree.tag_configure("source", background="#d0ffd0")
 
     def on_sequence_select(self, event):
@@ -549,7 +633,9 @@ class CPNetGUI:
         head = self.head_var_adv.get()
         ordering = ["1", "0"] if self.ordering_adv.get() == "1>0" else ["0", "1"]
         self.cpnet.cpt[head].add_rule(conditions, ordering)
-        messagebox.showinfo("Advice Added", f"Rule added: if {conditions} then {ordering} for {head}")
+        messagebox.showinfo(
+            "Advice Added", f"Rule added: if {conditions} then {ordering} for {head}"
+        )
         self.update_cpt_display()
         self.update_graph()
         self.if_entry.delete(0, tk.END)
@@ -562,6 +648,7 @@ class CPNetGUI:
 
     def run(self):
         self.root.mainloop()
+
 
 if __name__ == "__main__":
     root = tk.Tk()

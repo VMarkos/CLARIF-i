@@ -3,6 +3,7 @@ import json
 from tkinter import filedialog, messagebox
 from engines import parse_assignment, parse_variable_domains, dfs_collect_traces
 
+
 class ControlMixin:
     def file_new(self):
         # Clear the state space entry and re-add its placeholder text (greyed-out)
@@ -30,10 +31,14 @@ class ControlMixin:
             "state_space": self.spec_panel.state_space_entry.get(),
             "initial_state": self.reasoning_panel.initial_state_entry.get(),
             "target_state": self.reasoning_panel.target_state_entry.get(),
-            "rules": [self.spec_panel.rules_tree.item(item)["values"] for item in self.spec_panel.rules_tree.get_children()]
+            "rules": [
+                self.spec_panel.rules_tree.item(item)["values"]
+                for item in self.spec_panel.rules_tree.get_children()
+            ],
         }
-        filename = filedialog.asksaveasfilename(defaultextension=".json",
-                                                filetypes=[("JSON files", "*.json")])
+        filename = filedialog.asksaveasfilename(
+            defaultextension=".json", filetypes=[("JSON files", "*.json")]
+        )
         if filename:
             with open(filename, "w") as f:
                 json.dump(data, f, indent=2)
@@ -45,7 +50,10 @@ class ControlMixin:
                 "state_space": self.spec_panel.state_space_entry.get(),
                 "initial_state": self.reasoning_panel.initial_state_entry.get(),
                 "target_state": self.reasoning_panel.target_state_entry.get(),
-                "rules": [self.spec_panel.rules_tree.item(item)["values"] for item in self.spec_panel.rules_tree.get_children()]
+                "rules": [
+                    self.spec_panel.rules_tree.item(item)["values"]
+                    for item in self.spec_panel.rules_tree.get_children()
+                ],
             }
             with open(self.current_filename, "w") as f:
                 json.dump(data, f, indent=2)
@@ -53,17 +61,22 @@ class ControlMixin:
             self.file_save_as()
 
     def file_load(self):
-        filename = filedialog.askopenfilename(defaultextension=".json",
-                                              filetypes=[("JSON files", "*.json")])
+        filename = filedialog.askopenfilename(
+            defaultextension=".json", filetypes=[("JSON files", "*.json")]
+        )
         if filename:
             with open(filename, "r") as f:
                 data = json.load(f)
             self.spec_panel.state_space_entry.delete(0, "end")
             self.spec_panel.state_space_entry.insert(0, data.get("state_space", ""))
             self.reasoning_panel.initial_state_entry.delete(0, "end")
-            self.reasoning_panel.initial_state_entry.insert(0, data.get("initial_state", ""))
+            self.reasoning_panel.initial_state_entry.insert(
+                0, data.get("initial_state", "")
+            )
             self.reasoning_panel.target_state_entry.delete(0, "end")
-            self.reasoning_panel.target_state_entry.insert(0, data.get("target_state", ""))
+            self.reasoning_panel.target_state_entry.insert(
+                0, data.get("target_state", "")
+            )
             for item in self.spec_panel.rules_tree.get_children():
                 self.spec_panel.rules_tree.delete(item)
             self.next_rule_priority = 1
@@ -100,7 +113,9 @@ class ControlMixin:
         self.add_rule_row("R2", "Size=small", "Color=blue")
         self.add_rule_row("R3", "Color=red", "Size=medium")
         self.reasoning_panel.initial_state_entry.delete(0, "end")
-        self.reasoning_panel.initial_state_entry.insert(0, "Color=red; Size=small; Shape=circle")
+        self.reasoning_panel.initial_state_entry.insert(
+            0, "Color=red; Size=small; Shape=circle"
+        )
         self.reasoning_panel.initial_state_entry.config(fg="black")
         self.reasoning_panel.target_state_entry.delete(0, "end")
         self.reasoning_panel.target_state_entry.insert(0, "Size=large")
@@ -121,7 +136,9 @@ class ControlMixin:
         self.add_rule_row("R6", "Time=morning", "Weather=sunny")
         self.add_rule_row("R7", "Weather=rainy", "Temperature=mild")
         self.reasoning_panel.initial_state_entry.delete(0, "end")
-        self.reasoning_panel.initial_state_entry.insert(0, "Weather=cloudy; Temperature=cold; Time=morning")
+        self.reasoning_panel.initial_state_entry.insert(
+            0, "Weather=cloudy; Temperature=cold; Time=morning"
+        )
         self.reasoning_panel.initial_state_entry.config(fg="black")
         self.reasoning_panel.target_state_entry.delete(0, "end")
         self.reasoning_panel.target_state_entry.insert(0, "Temperature=hot")
@@ -129,7 +146,11 @@ class ControlMixin:
         self.clear_outputs_on_update(None)
 
     def add_rule_row(self, rule_name, condition, preference):
-        self.spec_panel.rules_tree.insert("", "end", values=(str(self.next_rule_priority), rule_name, condition, preference))
+        self.spec_panel.rules_tree.insert(
+            "",
+            "end",
+            values=(str(self.next_rule_priority), rule_name, condition, preference),
+        )
         self.next_rule_priority += 1
 
     def clear_outputs_on_update(self, event):
@@ -163,12 +184,17 @@ class ControlMixin:
             condition = parse_assignment(condition_text)
             preference = parse_assignment(preference_text)
             if len(preference) != 1:
-                messagebox.showerror("Rule Error", f"Rule '{rule_name}' must assign exactly one variable in the preference.")
+                messagebox.showerror(
+                    "Rule Error",
+                    f"Rule '{rule_name}' must assign exactly one variable in the preference.",
+                )
                 return None
-            rules.append({
-                "rule_name": rule_name if rule_name else f"Rule {len(rules)+1}",
-                "condition": condition,
-                "preference": preference,
-                "priority": prio
-            })
+            rules.append(
+                {
+                    "rule_name": rule_name if rule_name else f"Rule {len(rules)+1}",
+                    "condition": condition,
+                    "preference": preference,
+                    "priority": prio,
+                }
+            )
         return rules

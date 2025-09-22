@@ -1,6 +1,7 @@
 # engines.py
 import copy
 
+
 def parse_assignment(text):
     assignments = {}
     text = text.strip()
@@ -12,6 +13,7 @@ def parse_assignment(text):
             var, val = part.split("=", 1)
             assignments[var.strip()] = val.strip()
     return assignments
+
 
 def parse_variable_domains(text):
     domains = {}
@@ -25,11 +27,13 @@ def parse_variable_domains(text):
             domains[var] = set(values)
     return domains
 
+
 def is_target_reached(current_state, target_state):
     for k, v in target_state.items():
         if current_state.get(k) != v:
             return False
     return True
+
 
 def rule_applicable(rule, state):
     for k, v in rule["condition"].items():
@@ -37,11 +41,13 @@ def rule_applicable(rule, state):
             return False
     return True
 
+
 def apply_rule(rule, state):
     new_state = copy.deepcopy(state)
     for k, v in rule["preference"].items():
         new_state[k] = v
     return new_state
+
 
 def dfs_collect_traces(current_state, target_state, rules, visited, trace, collected):
     score = sum(1 for k, v in target_state.items() if current_state.get(k) == v)
@@ -63,7 +69,10 @@ def dfs_collect_traces(current_state, target_state, rules, visited, trace, colle
                 continue
             if not rule_applicable(r2, current_state):
                 continue
-            if r2.get("priority", 0) > r.get("priority", 0) and r2["preference"][head_var] != rule_value:
+            if (
+                r2.get("priority", 0) > r.get("priority", 0)
+                and r2["preference"][head_var] != rule_value
+            ):
                 defeated = True
                 break
         if not defeated:
@@ -73,15 +82,23 @@ def dfs_collect_traces(current_state, target_state, rules, visited, trace, colle
     new_trace = trace + [(current_state, "No move")]
     if not accepted_found:
         collected.append((new_trace, score))
-    
+
     state_key = frozenset(current_state.items())
     if state_key in visited:
         return
     visited.add(state_key)
     for r in applicable:
         new_state = apply_rule(r, current_state)
-        dfs_collect_traces(new_state, target_state, rules, visited, trace + [(current_state, r["rule_name"])], collected)
+        dfs_collect_traces(
+            new_state,
+            target_state,
+            rules,
+            visited,
+            trace + [(current_state, r["rule_name"])],
+            collected,
+        )
     visited.remove(state_key)
+
 
 def compute_statuses(rules, trace):
     status_table = {}
@@ -104,7 +121,10 @@ def compute_statuses(rules, trace):
                         continue
                     if not rule_applicable(r2, state):
                         continue
-                    if r2.get("priority", 0) > r.get("priority", 0) and r2["preference"][head_var] != rule_value:
+                    if (
+                        r2.get("priority", 0) > r.get("priority", 0)
+                        and r2["preference"][head_var] != rule_value
+                    ):
                         defeated = True
                         break
                 if defeated:

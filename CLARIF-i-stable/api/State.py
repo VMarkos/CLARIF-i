@@ -3,6 +3,7 @@
 from typing import Any
 from scipy.stats import kendalltau
 
+
 class State:
     def __init__(self, state: dict[str, Any] = dict()) -> None:
         self.state: dict[str, Any] = state
@@ -14,10 +15,10 @@ class State:
         if key not in self.state.keys():
             raise KeyError(f"Variable '{key}' not found!")
         return self.state.get(key)
-    
+
     def set(self, key: str, val: Any) -> None:
         self.state[key] = val
-    
+
     def swap(self, k1: str, k2: str) -> None:
         temp: str = self.state.get(k1)
         self.state[k1] = self.state.get(k2)
@@ -28,18 +29,20 @@ class State:
             raise ValueError("States of different length: {self}, {other}")
         if len(self) == 1:
             return 1.0
-        self_values = [ self.state[k] for k in sorted(self.state.keys()) ]
-        other_values = [ other.state[k] for k in sorted(other.state.keys()) ]
+        self_values = [self.state[k] for k in sorted(self.state.keys())]
+        other_values = [other.state[k] for k in sorted(other.state.keys())]
         return kendalltau(self_values, other_values).statistic
 
     def permute(self, permutation: "bidict") -> None:
-        self.state = { k: permutation[v] if v in permutation else v for k, v in self.state.items() }
+        self.state = {
+            k: permutation[v] if v in permutation else v for k, v in self.state.items()
+        }
 
     def __bool__(self) -> bool:
         return len(self.state) != 0
 
     def __iter__(self) -> iter:
-        return iter(self.state.items()) # FIXME Maybe `iter()` is not needed here
+        return iter(self.state.items())  # FIXME Maybe `iter()` is not needed here
 
     def __deepcopy__(self, memo) -> "State":
         copycat: "State" = State(self.state.copy())
@@ -63,7 +66,7 @@ class State:
 
     def __str__(self) -> str:
         """String representation of state as a dictionary"""
-        return ','.join(f"{k}={v}" for k, v in sorted(self.state.items()))
+        return ",".join(f"{k}={v}" for k, v in sorted(self.state.items()))
 
     def __eq__(self, other: "State") -> bool:
         """Boolean equality based on dictionary equality"""
@@ -82,5 +85,7 @@ class State:
 
     @classmethod
     def from_str(cls, tc_str: str) -> "State":
-        kv_dict = { x[0]: int(x[1]) for x in map(lambda s: s.split("="), tc_str.split(",")) }
+        kv_dict = {
+            x[0]: int(x[1]) for x in map(lambda s: s.split("="), tc_str.split(","))
+        }
         return cls(kv_dict)

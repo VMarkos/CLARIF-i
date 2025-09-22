@@ -3,4 +3,4 @@
 import logging
 import os
 
-logger = logging.getLogger('main')
+logger = logging.getLogger("main")

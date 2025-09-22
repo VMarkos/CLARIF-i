@@ -11,13 +11,13 @@ from typing import Callable
 
 
 def run_specific_test_case(
-        n: int,
-        learner: Learner | None,
-        full_reporting: bool,
-        start_state: State,
-        goal_state: State,
-        fn: Callable
-    ) -> None:
+    n: int,
+    learner: Learner | None,
+    full_reporting: bool,
+    start_state: State,
+    goal_state: State,
+    fn: Callable,
+) -> None:
     test = fn(n, learner, full_reporting, start_state, goal_state)
     print("Running test...")
     test.run()
@@ -28,14 +28,15 @@ def run_specific_test_case(
     print(report["learned_hypothesis"].replace(";", "\n"))
     print("=" * 30)
 
+
 def run_multiple_test_cases(
-        n: int,
-        full_reporting: bool,
-        start_states: State,
-        goal_states: State,
-        fn: Callable,
-        with_mem: bool,
-    ) -> None:
+    n: int,
+    full_reporting: bool,
+    start_states: State,
+    goal_states: State,
+    fn: Callable,
+    with_mem: bool,
+) -> None:
     learner = None
     if with_mem:
         learner = Learner()
@@ -43,10 +44,14 @@ def run_multiple_test_cases(
         print(f"start state: {start_state}")
         run_specific_test_case(n, learner, full_reporting, start_state, goal_state, fn)
 
+
 def main():
     start_states: list[State] = []
     if len(sys.argv) > 2:
-        print("E: Usage: `python3 debug.py` or `python3 debug.py <states_file>`", file=sys.stderr)
+        print(
+            "E: Usage: `python3 debug.py` or `python3 debug.py <states_file>`",
+            file=sys.stderr,
+        )
     elif len(sys.argv) == 2:
         states_filename = sys.argv[1]
         with open(states_filename, "r") as states_file:
@@ -60,9 +65,17 @@ def main():
     n = len(start_states[0])
     with_mem = input("With memory (y/n): ") == "y"
     offset = int(input("Offset: "))
-    goal_state = State(dict(zip(start_states[0].state.keys(), [ x for x in range(n) ])))
+    goal_state = State(dict(zip(start_states[0].state.keys(), [x for x in range(n)])))
     goal_states = [goal_state] * len(start_states)
-    run_multiple_test_cases(n, True, start_states[offset:], goal_states[offset:], generate_quick_sort_partial_test_case, with_mem)
+    run_multiple_test_cases(
+        n,
+        True,
+        start_states[offset:],
+        goal_states[offset:],
+        generate_quick_sort_partial_test_case,
+        with_mem,
+    )
+
 
 if __name__ == "__main__":
     main()

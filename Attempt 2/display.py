@@ -1,8 +1,11 @@
 # display.py
 import tkinter as tk
 
+
 class PlaceholderEntry(tk.Entry):
-    def __init__(self, master=None, placeholder="PLACEHOLDER", color="grey", *args, **kwargs):
+    def __init__(
+        self, master=None, placeholder="PLACEHOLDER", color="grey", *args, **kwargs
+    ):
         kwargs.setdefault("borderwidth", 1)
         kwargs.setdefault("relief", "solid")
         super().__init__(master, *args, **kwargs)

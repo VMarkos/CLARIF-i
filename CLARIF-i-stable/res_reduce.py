@@ -2,9 +2,11 @@
 
 import os
 
+
 def reduce_line(line: str) -> str:
     n, steps, _, _, _ = line.split("; ")
     return "; ".join([n, steps, "s", "g", "p"])
+
 
 def main():
     CWD = os.path.abspath(os.path.dirname(__file__))
@@ -20,6 +22,7 @@ def main():
             for line in file:
                 with open(new_file_path, "a") as new_file:
                     new_file.write(f"{reduce_line(line)}\n")
+
 
 if __name__ == "__main__":
     main()

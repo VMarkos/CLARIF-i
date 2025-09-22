@@ -3,6 +3,7 @@
 from typing import Callable
 from .State import State
 
+
 class Predicate:
     def __init__(self, callback: Callable, *args, name: str = "predicate") -> None:
         self.callback = callback

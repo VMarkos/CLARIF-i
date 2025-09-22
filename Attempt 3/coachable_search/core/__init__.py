@@ -6,4 +6,4 @@ from .coach import Coach
 from .learner import Learner
 from .rule import Rule
 
-__all__ = ['Coach', 'Learner', 'Rule'] 
+__all__ = ["Coach", "Learner", "Rule"]

@@ -5,6 +5,7 @@ Rule representation for the coachable search framework.
 from dataclasses import dataclass
 from typing import Dict
 
+
 class Rule:
     def __init__(self, name: str, condition: dict, action: dict, priority: int = 1):
         self.name = name
@@ -21,20 +22,20 @@ class Rule:
     def to_dict(self) -> dict:
         """Convert the rule to a dictionary for serialization."""
         return {
-            'name': self.name,
-            'condition': self.condition,
-            'action': self.action,
-            'priority': self.priority
+            "name": self.name,
+            "condition": self.condition,
+            "action": self.action,
+            "priority": self.priority,
         }
 
     @classmethod
-    def from_dict(cls, data: dict) -> 'Rule':
+    def from_dict(cls, data: dict) -> "Rule":
         """Create a Rule instance from a dictionary."""
         return cls(
-            name=data['name'],
-            condition=data['condition'],
-            action=data['action'],
-            priority=data['priority']
+            name=data["name"],
+            condition=data["condition"],
+            action=data["action"],
+            priority=data["priority"],
         )
 
     def __lt__(self, other: "Rule"):
