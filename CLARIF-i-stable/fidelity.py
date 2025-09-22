@@ -89,10 +89,11 @@ def main():
     args = vars(parser.parse_args())
     N, r, s = args.values()
     # Result and trace files
-    res_file_name = os.path.join(RESULTS_PATH, f"fidelity_test_N{N}_reps{r}_step{s}.txt")
-    trace_file_name = os.path.join(RESULTS_PATH, f"fidelity_test_N{N}_reps{r}_step{s}.trace")
+    fname = f"fidelity_test_N{N}_reps{r}_step{s}_coaches{len(COACHES[1:])}"
+    res_file_name = os.path.join(RESULTS_PATH, f"{fname}.txt")
+    trace_file_name = os.path.join(RESULTS_PATH, f"{fname}.trace")
     FORMAT = "%(asctime)s :: %(message)s"
-    log_file_name = os.path.join(LOGS_PATH, f"fidelity_test_N{N}_reps{r}_step{s}.log")
+    log_file_name = os.path.join(LOGS_PATH, f"{fname}.log")
     logging.basicConfig(filename=log_file_name, format=FORMAT, level=logging.INFO)
     # Range of values for n
     n_range = range(s, N + s, s)
