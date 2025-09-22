@@ -203,4 +203,15 @@ def generate_sorting_test_case(n: int, action_fn: Callable[[State, list[str]], S
     # print("\n".join(map(str, target_rules)))
     test_case: TestCase = TestCase(start_state, is_goal, get_triggered_rule, learner, coach_class, full_reporting, report_traces)
     return test_case
-        
+       
+# Fidelity utilities
+
+def compute_fidelity(trace: list[State], coach_action_fn: Callable[State, State]) -> float:
+    if len(trace) == 0: # Case of start_state == goal_state
+        return 1.0
+    misses = 0
+    keys = tuple(trace[0].state.keys())
+    for current_state, next_state in zip(trace[1:-1], trace[1:]): # Skip first state, as it is always the start state duplicated
+        if coach_action_fn(current_state, keys)[0] != next_state:
+            misses += 1
+    return 1.0 - misses / (len(trace) - 1)
