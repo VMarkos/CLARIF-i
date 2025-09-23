@@ -23,6 +23,15 @@
 %%%% Local definitions %%%%
 \newcommand{\bubblecoach}{\ensuremath{\mathcal{C}_{\rm bubble}}}
 \newcommand{\quickcoach}{\ensuremath{\mathcal{C}_{\rm quick}}}
+\newcommand{\learner}{learner}
+\newcommand{\coach}{coach}
+\newcommand{\NULL}{{\rm\texttt{null}}}
+\newcommand{\searchpath}[2]{{search\_path(#1, #2)}}
+\newcommand{\evaluate}[3]{{evaluate(#1, #2, #3)}}
+\newcommand{\updatehypothesis}[1]{{update\_hypothesis(#1)}}
+
+%%%% algorithm2e macros
+\SetKwRepeat{Do}{do}{while}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%% Editor's commands %%%%
@@ -83,10 +92,14 @@ In this series of coaching sessions we have implemented two variants of a machin
 	\item \emph{partial advice}, where each piece of advice depends on the specific part of the state to be improved.
 \end{enumerate*}
 Moreover, for each advice type we have considered three learner configurations regarding advice memory:
-\begin{enumerate*}[label=(C\arabic*)]
+\begin{enumerate*}[label=(M\arabic*)]
 	\item \emph{no memory} across different iterations for the same state size, $n$, i.e., coaching sessions are pairwise independent;
 	\item \emph{short memory} across different iterations for the same state size, $n$, i.e., coaching sessions across different values of $n$ are independent but not within the same value for $n$, and;
 	\item \emph{long memory} across all values of state size, $n$, so all coaching sessions are correlated, building on knowledge from previous test cases.
+\end{enumerate*}
+At last, we also considered three types of coaching advice, depending on the occasion that triggers coaching advice:
+\begin{enumerate*}[label=(C\arabic*)]
+	\item temp
 \end{enumerate*}
 
 \begin{figure*}[!tb]
@@ -111,6 +124,19 @@ Moreover, for each advice type we have considered three learner configurations r
 \end{figure*}
 
 In Figures~\ref{fig:full and partial sorting coaching results} we present the number of coaching interactions required to reach the goal state in each case as a function of the state size, $n$. Regarding the full advice condition (Fig.~\ref{fig:full sorting coaching results}), the utilization of either short of long term memory does not appear to have any particular effect on the number of coaching interactions, which was expected given the overspecific nature of provided advice, being fully tailored to the state it triggered the learner to seek for that piece of advice. On the contrary, partial advice (Fig.~\ref{fig:partial sorting coaching results}) offer a significant advantage to the learner, in both short and long memory conditions. As for the short memory case, 
+
+\begin{algorithm}
+	\caption{Coaching process. $s$, $g$ denote the start and goal states respectively.}%
+	\label{alg:coaching process}
+	\KwData{$s$, $g$, $\learner$, $\coach$}
+	\KwResult{$\learner$ with updated searching policy.}
+	$advice\gets\NULL$\;
+	\Do{advice is not \NULL}{%
+		$\learner.\updatehypothesis{advice}$\;
+		$path \gets \learner.\searchpath{s}{g}$\;
+		$advice \gets \coach.\evaluate{path}{s}{g}$\;
+	}
+\end{algorithm}
 %
 %
 %
