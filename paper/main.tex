@@ -26,6 +26,10 @@
 \newcommand{\learner}{learner}
 \newcommand{\coach}{coach}
 \newcommand{\NULL}{{\rm\texttt{null}}}
+\newcommand{\learnerpolicy}{\texttt{P}_{\learner}}
+\newcommand{\coachpolicy}{\texttt{P}_{\coach}}
+
+
 \newcommand{\searchpath}[2]{{search\_path(#1, #2)}}
 \newcommand{\evaluate}[3]{{evaluate(#1, #2, #3)}}
 \newcommand{\updatehypothesis}[1]{{update\_hypothesis(#1)}}
@@ -80,7 +84,9 @@
 %
 \section{Experimental setup}\label{sec:experimental-setup}
 %
-In this Section we empirically explore coachable searching as an approach to preference elicitation, by having a machine learner iteratively seek advice by a proxy coach, as in \cite{proxyCoaching2022}, with the aim of iteratively improving its search capacity, as per the coach's explicit or implicit search policy. Two experimental procedures, one aiming to assess the efficacy and scalability of the coaching process and one to explore a more realistic and open--ended environment.\ednote{Add a few words about how coaching happens in the context of searching, i.e., how from a past sub--optimal state the coach provides a piece of advice according to their (implicit / explicit) policy that improves the state towards a(n implicit / explicit) goal.}
+In this Section we empirically explore search coaching, by having a machine learner iteratively seek advice by a coach, as in \cite{proxyCoaching2022}, with the aim of iteratively improving its search capacity, as per the coach's explicit search policy. Given a fixed goal state, $g$, the learner applies its search policy, $\learnerpolicy$, to identify a path, $p$, starting from an arbitrary start state $s$ and ending at $g$. Upon lack of knowledge, the learner seeks advice from its coach, which responds according to its own policy, $\coachpolicy$. A \emph{coaching session} corresponds to a full learning cycle, where the learner eventually crafts one such path or the process is aborted.
+
+\ednote{Add a few words about how coaching happens in the context of searching, i.e., how from a past sub--optimal state the coach provides a piece of advice according to their (implicit / explicit) policy that improves the state towards a(n implicit / explicit) goal.}
 %
 %
 %
@@ -97,33 +103,65 @@ Moreover, for each advice type we have considered three learner configurations r
 	\item \emph{short memory} across different iterations for the same state size, $n$, i.e., coaching sessions across different values of $n$ are independent but not within the same value for $n$, and;
 	\item \emph{long memory} across all values of state size, $n$, so all coaching sessions are correlated, building on knowledge from previous test cases.
 \end{enumerate*}
-At last, we also considered three types of coaching advice, depending on the occasion that triggers coaching advice:
+In all cases the learner seeks advice upon lack of knowledge for further searching, returning a partial path $p$ starting from $s$, while the coach adopts one of the following \emph{coaching styles}:
 \begin{enumerate*}[label=(C\arabic*)]
-	\item temp
+	\item in \emph{reactive} coaching, denoted by a superscript $a$, the coach provides advice on learner's last wrong decision in $p$;
+	\item in \emph{proactive} coaching, denoted by a superscript $p$, the coach provides advice on learner's first wrong decision in $p$;
+	\item in \emph{reflexive} coaching, denoted by a superscript $r$, the coach provides advice at a random wrong decision in $p$.
 \end{enumerate*}
 
 \begin{figure*}[!tb]
 	\centering%
 	\hfill%
-	\begin{subfigure}[t]{0.47\textwidth}
+	\begin{subfigure}[t]{0.495\textwidth}
 		\centering
-		\includegraphics[width=\linewidth]{../CLARIF-i-stable/plots/full_condition_learnability.pdf}
-		\caption{\tbc}
-		\label{fig:full sorting coaching results}
+		\includegraphics[width=\linewidth]{assets/images/a_20_100_full.pdf}\\[-1em]
+		\caption{Full condition advice, reactive coaching}
+		\label{fig:full sorting coaching results a}
 	\end{subfigure}%
 	\hfill%
-	\begin{subfigure}[t]{0.47\textwidth}
+	\begin{subfigure}[t]{0.495\textwidth}
 		\centering
-		\includegraphics[width=\linewidth]{../CLARIF-i-stable/plots/partial_condition_learnability.pdf}
-		\caption{\tbc}
-		\label{fig:partial sorting coaching results}
+		\includegraphics[width=\linewidth]{assets/images/a_20_100_partial.pdf}\\[-1em]
+		\caption{Partial condition advice, reactive coaching}
+		\label{fig:partial sorting coaching results a}
+	\end{subfigure}%
+	\hfill\\%
+	\hfill%
+	\begin{subfigure}[t]{0.495\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/p_20_100_full.pdf}\\[-1em]
+		\caption{Full condition advice, proactive coaching}
+		\label{fig:full sorting coaching results p}
 	\end{subfigure}%
 	\hfill%
+	\begin{subfigure}[t]{0.495\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/p_20_100_partial.pdf}\\[-1em]
+		\caption{Partial condition advice, proactive coaching}
+		\label{fig:partial sorting coaching results p}
+	\end{subfigure}%
+	\hfill\\%
+	\hfill%
+	\begin{subfigure}[t]{0.495\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/r_20_100_full.pdf}\\[-1em]
+		\caption{Full condition advice, reflexive coaching}
+		\label{fig:full sorting coaching results r}
+	\end{subfigure}%
+	\hfill%
+	\begin{subfigure}[t]{0.495\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/r_20_100_partial.pdf}\\[-1em]
+		\caption{Partial condition advice, reflexive coaching}
+		\label{fig:partial sorting coaching results r}
+	\end{subfigure}%
+	\hfill\\%
 	\caption{\tbc}
 	\label{fig:full and partial sorting coaching results}
 \end{figure*}
 
-In Figures~\ref{fig:full and partial sorting coaching results} we present the number of coaching interactions required to reach the goal state in each case as a function of the state size, $n$. Regarding the full advice condition (Fig.~\ref{fig:full sorting coaching results}), the utilization of either short of long term memory does not appear to have any particular effect on the number of coaching interactions, which was expected given the overspecific nature of provided advice, being fully tailored to the state it triggered the learner to seek for that piece of advice. On the contrary, partial advice (Fig.~\ref{fig:partial sorting coaching results}) offer a significant advantage to the learner, in both short and long memory conditions. As for the short memory case, 
+In Figures~\ref{fig:full and partial sorting coaching results} we present the number of coaching interactions required to reach the goal state in each case as a function of the state size, $n$. Regarding the full advice condition (Fig.~\ref{fig:full sorting coaching results a}), the utilization of either short of long term memory does not appear to have any particular effect on the number of coaching interactions, which was expected given the overspecific nature of provided advice, being fully tailored to the state it triggered the learner to seek for that piece of advice. On the contrary, partial advice (Fig.~\ref{fig:partial sorting coaching results a}) offer a significant advantage to the learner, in both short and long memory conditions. As for the short memory case, 
 
 \begin{algorithm}
 	\caption{Coaching process. $s$, $g$ denote the start and goal states respectively.}%
