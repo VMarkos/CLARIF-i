@@ -1,4 +1,6 @@
+% !TeX document-id = {1ccb3ec0-e2ca-46a7-8a74-05b20a6a54d6}
 % !TeX spellcheck = en_US
+% !BIB program = bibtex 
 \documentclass[a4paper,twoside]{article}
 
 \usepackage{epsfig}
@@ -84,7 +86,7 @@
 %
 \section{Experimental setup}\label{sec:experimental-setup}
 %
-In this Section we empirically explore search coaching, by having a machine learner iteratively seek advice by a coach, as in \cite{proxyCoaching2022}, with the aim of iteratively improving its search capacity, as per the coach's explicit search policy. Given a fixed goal state, $g$, the learner applies its search policy, $\learnerpolicy$, to identify a path, $p$, starting from an arbitrary start state $s$ and ending at $g$. Upon lack of knowledge, the learner seeks advice from its coach, which responds according to its own policy, $\coachpolicy$. A \emph{coaching session} corresponds to a full learning cycle, where the learner eventually crafts one such path or the process is aborted.
+In this Section we empirically explore search coaching, by having a machine learner iteratively seek advice by a coach, as in \cite{proxyCoaching2022}, with the aim of iteratively improving its search capacity, as per the coach's explicit search policy. Given a fixed goal state, $g$, the learner applies its search policy, $\learnerpolicy$, to identify a path, $p$, starting from an arbitrary start state $s$ and ending at $g$. Upon lack of knowledge, the learner seeks advice from its coach, which responds according to its own policy, $\coachpolicy$. A \emph{coaching step} is a single learner request for advice and the corresponding coach response, while a \emph{coaching session} comprises of the full learning cycle, where the learner eventually crafts one such path or the process is aborted.
 
 \ednote{Add a few words about how coaching happens in the context of searching, i.e., how from a past sub--optimal state the coach provides a piece of advice according to their (implicit / explicit) policy that improves the state towards a(n implicit / explicit) goal.}
 %
@@ -167,7 +169,7 @@ In Figures~\ref{fig:full and partial sorting coaching results} we present the nu
 	\caption{Coaching process. $s$, $g$ denote the start and goal states respectively.}%
 	\label{alg:coaching process}
 	\KwData{$s$, $g$, $\learner$, $\coach$}
-	\KwResult{$\learner$ with updated searching policy.}
+	\KwResult{$\learner$ with updated search policy.}
 	$advice\gets\NULL$\;
 	\Do{advice is not \NULL}{%
 		$\learner.\updatehypothesis{advice}$\;

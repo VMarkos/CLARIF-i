@@ -61,8 +61,8 @@ def line_plot(paths: list[tuple[str]], figname: str, reps: int = 100):
         )
         ax.fill_between(ns, *one_std_interval, color=colour, alpha=0.1)
     plt.xticks(ticks=ns)
-    plt.xlabel("n")
-    plt.ylabel("Coaching Steps")
+    # plt.xlabel("n")
+    # plt.ylabel("Coaching Steps")
     plt.tight_layout()
     # plt.title("Coachable Search Learnability")
     ax.grid()
@@ -83,6 +83,9 @@ def main():
     res_type = input(
         "Results type ({f}ull, {p}artial, {i}nertia, prepend {p}roactive): "
     )
+    plot(N, reps, res_type, figname)
+
+def plot(N, reps, res_type, figname, reduced=False):
     all_paths = {
         "paths": [
             (

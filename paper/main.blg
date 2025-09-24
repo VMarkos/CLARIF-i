@@ -1,5 +1,46 @@
-[0] Config.pm:308> INFO - This is Biber 2.20
-[0] Config.pm:311> INFO - Logfile is 'main.blg'
-[163] biber:340> INFO - === Wed Sep 24, 2025, 11:35:54
-[309] Utils.pm:410> ERROR - Cannot find 'main.bcf'!
-[310] Biber.pm:136> INFO - ERRORS: 1
+This is BibTeX, Version 0.99d (TeX Live 2022/Debian)
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+The style file: apalike.bst
+Database file #1: references.bib
+You've used 1 entry,
+            1935 wiz_defined-function locations,
+            482 strings with 4110 characters,
+and the built_in function-call counts, 609 in all, are:
+= -- 57
+> -- 29
+< -- 2
++ -- 9
+- -- 9
+* -- 53
+:= -- 101
+add.period$ -- 4
+call.type$ -- 1
+change.case$ -- 8
+chr.to.int$ -- 1
+cite$ -- 1
+duplicate$ -- 26
+empty$ -- 42
+format.name$ -- 10
+if$ -- 126
+int.to.chr$ -- 1
+int.to.str$ -- 0
+missing$ -- 1
+newline$ -- 8
+num.names$ -- 5
+pop$ -- 10
+preamble$ -- 1
+purify$ -- 8
+quote$ -- 0
+skip$ -- 19
+stack$ -- 0
+substring$ -- 36
+swap$ -- 10
+text.length$ -- 2
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 6
+warning$ -- 0
+while$ -- 6
+width$ -- 0
+write$ -- 17
