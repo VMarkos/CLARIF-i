@@ -133,7 +133,7 @@ def plot(N, reps, res_type, figname, reduced=False):
                 "Bubble (no mem)",
             ),
             (
-                f"qp_test_N{N}_reps{reps}_memn_longn.txt",
+                f"qp_a_test_N{N}_reps{reps}_memn_longn.txt",
                 "tab:orange",
                 "solid",
                 "Quick (no mem)",
