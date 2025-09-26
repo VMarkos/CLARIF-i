@@ -5,17 +5,20 @@
 		faded/.style={opacity=0.2},
 		correct/.style={draw=correctColor, fill=correctColor, fill opacity=0.1, label={center, text=correctColor}:{\small\checkmark}},
 		wrong/.style={draw=wrongColor, fill=wrongColor, fill opacity=0.1, label={center, text=wrongColor}:{\small\ding{55}}},
+		unknown/.style={draw=unknownColor, fill=unknownColor, fill opacity=0.1, label={center, text=unknownColor}:{\qmark}},
+		text box/.style n args={1}{text width={#1cm}}
 	]
 	% Nodes
 	\foreach \i/\j/\lab in {0/0/a, 2/2/b, 0.3/0.7/c} {
 		\node[node, faded] (\lab) at (\i, \j) {};
 	}
-	\foreach \i/\j/\lab in {1/2/d, 2.5/0/e, 1.3/0.1/f} {
+	\foreach \i/\j/\lab in {1/2/d, 2.5/0/e} {
 		\node[node, correct] (\lab) at (\i, \j) {};
 	}
 	\foreach \i/\j/\lab in {1.4/1/g, 3/1/h} {
 		\node[node, wrong] (\lab) at (\i, \j) {};
 	}
+	\node[node, unknown] (f) at (1.3, 0.1) {};
 
 	% Arrows
 	\foreach \s/\goal in {d/g, e/f} {
@@ -30,5 +33,14 @@
 	\foreach \s/\goal in {d/c, d/b, g/b, c/f, b/h} {
 		\draw[arrow, faded] (\s) -- (\goal);
 	}
+
+	% Text boxes
+	\node[text box={1.4}] (proactive) at (-0.8,2.2) {Proactive Coaching};
+	\node[text box={1.4}] (reactive) at (-0.8,-0.9) {Reactive Coaching};
+	\node[text box={1.4}] (reflexive) at (4.2,2.2) {Reflexive Coaching};
 	
+	% Text box to graph arrows
+	\draw[arrow, thin, dashed] ($(g)!0.5!(c)$) to[bend right] (proactive);
+	\draw[arrow, thin, dashed] ($(f)!0.5!(a)$) to[bend left] (reactive);
+	\draw[arrow, thin, dashed] ($(f)!0.5!(h)$) to[bend left] (reflexive);
 \end{tikzpicture}

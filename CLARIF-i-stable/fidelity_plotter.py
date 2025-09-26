@@ -36,9 +36,9 @@ COLORS = plt.rcParams["axes.prop_cycle"].by_key()["color"]
 MARKERS = ("^", ">", "v", "<")
 
 CONFIGS = filter(
-    lambda c: c[0] or not c[1],
+    lambda c: c[0] or not c[1],i
     it.product(
-        (True, False), (True, False), COACH_ACTIONS.keys(), list(COACH_TYPES.keys())[1:]
+        (True, False), (True, False), COACH_ACTIONS.keys(), list(COACH_TYPES.keys())[1:] # HACK: Make results uniform
     ),
 )
 
@@ -86,7 +86,7 @@ def compute_fidelities(traces: list, coach_type: str = "r") -> list:
     """traces as parsed by `parse_traces()`"""
     fidelities = dict()
     for ts, config in zip(traces, CONFIGS):
-        if (not config[0] and config[1]) or config[3] != coach_type:
+        if (not config[0] and config[1]) or (coach_type != "a" and config[3] != coach_type):
             continue
         coach_action_fn = COACH_ACTIONS[config[2]]
         fidelities[config] = {
@@ -108,6 +108,7 @@ def plot_fidelities(fidelities: dict, save_path) -> None:
             *((n, mean(fs), stdev(fs)) for n, fs in fidelity.items())
         )
         mean_minus, mean_plus = zip(*((m - s, m + s) for m, s in zip(mean_fs, std_fs)))
+        print(config)
         c, m, ls = STYLE_CONFIGS_MAP(config)
         ax.fill_between(ns, mean_minus, mean_plus, alpha=0.1, color=c, linewidth=0.0)
         (h,) = ax.plot(
@@ -122,8 +123,9 @@ def plot_fidelities(fidelities: dict, save_path) -> None:
         handles.append(h)
     ax.grid()
     ax.legend(
-        handles=sorted(handles, key=lambda h: h._label)
-    )  # TODO add markers and sort legend
+        handles=sorted(handles, key=lambda h: h._label),
+        loc="upper right",
+    )
     fig.tight_layout()
     fig.savefig(save_path)
 
@@ -165,7 +167,7 @@ def main():
     parser = prepare_parser()
     N, r, s, ct = vars(parser.parse_args()).values()
     fname = f"fidelity_test_N{N}_reps{r}_step{s}"
-    source_name = fname + "_coaches2.trace"
+    source_name = fname + ".trace"
     res_path = os.path.join(RESULTS_PATH, source_name)
     fig_name = fname + f"_coach_{ct}.pdf"
     fig_path = os.path.join(PLOTS_PATH, fig_name)

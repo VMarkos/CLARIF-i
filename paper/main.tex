@@ -24,6 +24,9 @@
 
 \usepackage{SCITEPRESS}     % Please add other packages that you may need BEFORE the SCITEPRESS.sty package.
 
+% tikz libraries
+\usetikzlibrary{calc}
+
 %%%% Local definitions %%%%
 \newcommand{\bubblecoach}{\ensuremath{\mathcal{C}_{\rm bubble}}\,}
 \newcommand{\quickcoach}{\ensuremath{\mathcal{C}_{\rm quick}}\,}
@@ -32,16 +35,20 @@
 \newcommand{\NULL}{{\rm\texttt{null}}}
 \newcommand{\learnerpolicy}{\texttt{P}_{\learner}}
 \newcommand{\coachpolicy}{\texttt{P}_{\coach}}
+\newcommand{\qmark}{\texttt{\textbf{?}}}
 
 
 \newcommand{\searchpath}[2]{{search\_path(#1, #2)}}
 \newcommand{\evaluate}[3]{{evaluate(#1, #2, #3)}}
 \newcommand{\updatehypothesis}[1]{{update\_hypothesis(#1)}}
 
+\newcommand{\partialadvice}[1]{partial@{#1}}
+
 %%%% Color definitions
 \definecolor{correctColor}{HTML}{19aa50}
 \definecolor{wrongColor}{HTML}{aa1950}
 \definecolor{adviceColor}{HTML}{1950aa}
+\definecolor{unknownColor}{HTML}{ca8520}
 
 %%%% algorithm2e macros
 \SetKwRepeat{Do}{do}{while}
@@ -134,7 +141,7 @@ In all cases the learner seeks advice upon lack of knowledge for further searchi
 \begin{figure}[!tb]
 	\centering
 	\include{assets/tikz/coaching_styles.tex}
-	\caption{Coaching styles.}
+	\caption{Different coaching styles used in our experimental setup. Upon the learner reaching a state from where there is no knowledge on how to proceed (\textcolor{unknownColor}{\qmark}), a reactive piece of advice resolves this lack of knowledge, a proactive piece of advice addresses the first wrong decision in the learner's search path, while a reflexive piece of advice addresses a random mistake / lack of knowledge of the learner.}
 	\label{fig:coaching styles}
 \end{figure}
 
@@ -196,7 +203,26 @@ Considering proactive coaching, where the learner receives advice on its first w
 
 Regarding reflexive coaching (Figs.~\ref{fig:full sorting coaching results r}, \ref{fig:partial sorting coaching results r}), we observe similar trends as in proactive coaching, i.e., the coach providing advice addressing earlier learner mistakes on average, guides the latter more accurately even in the case of partial advice. We also report in that case the number of coaching sessions (indicated as \emph{trivial runs}) where at least one advice was provided more than once by the coach, which stems from the randomness in which the learner's mistake is chosen by the coach.
 
-Also, a common trend across all cases is that the learner always obtains enough knowledge to construct a valid path from $s$ to $g$.
+\edcom{A few more comments on the differences of the two coaches.}
+
+%Also, a common trend across all cases is that the learner always obtains enough knowledge to construct a valid path from $s$ to $g$.
+
+\section{Coaching fidelity}\label{sec:coaching-fidelity}
+%
+Motivated by the high accuracy with which the learner applies the coach's policy in the case of full advice (Fig.~\ref{fig:full and partial sorting coaching results}, top row), we explore how much the learner conforms to the coach's instructions in the various settings explored in our case. To that end, we define \emph{coaching fidelity} to be the relative frequency of learner decisions confirming to coach decisions on the same states over all such decisions in a coaching session. We samples $m=20$ repetitions for state size $n\in\{5,10,15,20\}$ and compute coaching fidelity for each one of those for \bubblecoach, \quickcoach, all coaching styles, and memory configurations.
+
+In Figure~\ref{fig:coaching fidelities} we show average coaching fidelity as a function of state size, $n$. Regardless of coaching style or memory configuration, full advice results to a fully conformant learner, replicating perfectly the coach's policy. However, with partial advice, coaching fidelity depends on the coaching style and the corresponding memory configuration. In particular, reactive coaching results to virtually vanishing fidelity for all memory configurations. For proactive coaching, however, partial advice results to a virtually constant fidelity for all examined state sizes, barely affected by the corresponding memory configuration. Similarly, reflexive coaching also results to higher fidelity than reactive coaching, roughly replicating results for proactive coaching.
+
+\begin{figure*}
+	\centering\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_a.pdf}\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_p.pdf}\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_r.pdf}\hfill%
+	\caption{Coaching fidelity for reactive (left), proactive (middle) and reflexive (right) coaching. In all cases, full advice configurations (blue and green lines with any linestyle) are constant at coaching fidelity $1.0$.}
+	\label{fig:coaching fidelities}
+\end{figure*}
+
+Overall, Figure~\ref{fig:coaching fidelities} hints towards a trade--off between advice specificity and coaching fidelity. The more specific the advice the more conformant the learner to the coaching policy and, conversely, the more loose the advice, the more the learner explores the state space, utilizing previous knowledge and generalizing. To shed more light onto that interplay, we introduce a new type of advice, \partialadvice{k}, $2\leq k\leq n$, where $k$ randomly selected state variables are included into the advice condition, corresponding to intermediate specificity between the two extremes explored so far.
 
 %
 %

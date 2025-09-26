@@ -139,7 +139,6 @@ def find_bubble_swap_action(state: State, keys: list[str]) -> tuple[State, Actio
             return state, swap_action, 0
     return state, Action(), 0
 
-
 def find_bubble_partial_swap_action(
     state: State, keys: list[str]
 ) -> tuple[State, Action, int]:
@@ -155,6 +154,13 @@ def find_bubble_partial_swap_action(
             return swap_state, swap_action, n - i
     return State(), Action(), 0
 
+def _get_condition(state: State, left: str, right: str, k: int) -> State:
+    if k < 2 or k > len(state):
+        raise ValueError(f"'k' should be in range [2, {len(state)}], not {k}.")
+    rest_keys = [k for k in state.state.keys() if k not in {left, right}]
+    additional_keys = random.sample(rest_keys, k - 2)
+    all_leys = additional_keys + [left, right]
+    return State({k: state.get(k) for k in all_keys})
 
 def _generate_targets(N: int = 20) -> None:
     random.seed(42)
