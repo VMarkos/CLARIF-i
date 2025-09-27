@@ -12,6 +12,8 @@ from utils import (
     generate_quick_sort_test_case,
     generate_bubble_sort_partial_test_case,
     generate_quick_sort_partial_test_case,
+    generate_bubble_sort_test_case_at_k,
+    generate_quick_sort_test_case_at_k,
 )
 
 from api.TestCase import TestCase
@@ -63,7 +65,7 @@ def single_run(
         f"\tshort memory: {memory}\n"
         f"\tlong memory: {long_memory}\n"
     )
-    for n in tqdm(n_range):
+    for n in n_range:
         logger.info(f"Running test for n={n}.")
         if not long_memory:
             learner = Learner() if memory else None
@@ -102,16 +104,20 @@ def main():
         ReflexiveCoach,
         ProactiveCoach,
     )
-    configs = filter(
-        lambda c: c[0] or not c[1],
-        it.product((True, False), (True, False), ALGORITHMS, COACHES[1:]),
+    PARTIAL_ALGORITHMS = (
+        generate_bubble_sort_test_case_at_k,
+        generate_quick_sort_test_case_at_k,
     )
+    configs = list(filter(
+        lambda c: c[0] or not c[1],
+        it.product((True, False), (True, False), PARTIAL_ALGORITHMS, COACHES),
+    ))
     # Create argument parser
     parser = prepare_parser()
     args = vars(parser.parse_args())
     N, r, s = args.values()
     # Result and trace files
-    fname = f"fidelity_test_N{N}_reps{r}_step{s}_coaches{len(COACHES[1:])}"
+    fname = f"fidelity_test_N{N}_reps{r}_step{s}_coaches{len(COACHES)}_partial_2_{N}"
     res_file_name = os.path.join(RESULTS_PATH, f"{fname}.txt")
     trace_file_name = os.path.join(RESULTS_PATH, f"{fname}.trace")
     FORMAT = "%(asctime)s :: %(message)s"
@@ -124,21 +130,23 @@ def main():
         results_file.write("")
     with open(trace_file_name, "w") as trace_file:
         trace_file.write("")
-    for short, long, algorithm, coach_class in configs:
-        print(
-            f"Running configuration: short memory: {short}, long memory: {long}, algorithm: {algorithm.__name__}"
-        )
-        single_run(
-            algorithm,
-            N,
-            n_range,
-            r,
-            short,
-            long,
-            coach_class,
-            res_file_name,
-            trace_file_name,
-        )
+    for k in range(2, N + 1):
+        print(f"Running case for k={k}...")
+        for short, long, algorithm, coach_class in tqdm(configs, total=18):
+            # print(
+            #     f"Running configuration: short memory: {short}, long memory: {long}, algorithm: {algorithm.__name__}"
+            # )
+            single_run(
+                algorithm,
+                N,
+                n_range,
+                r,
+                short,
+                long,
+                coach_class,
+                res_file_name,
+                trace_file_name,
+            )
 
 
 if __name__ == "__main__":

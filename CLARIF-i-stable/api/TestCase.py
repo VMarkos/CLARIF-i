@@ -51,7 +51,7 @@ class TestCase:
             if advice[1] in advice_log:
                 # print(f"Advice log: {advice_log}")
                 # if previous_advice != None and all((x == y for x, y in zip(previous_advice, advice[1]))):
-                print(f"\tLearner hypothesis: {self.learner.hypothesis}")
+                # print(f"\tLearner hypothesis: {self.learner.hypothesis}")
                 logger.info(
                     "Duplicate advice: %s\n\tStart state: %s\n\tPath: %s\n\tSteps: %s\n\tHypothesis: %s\n\tAdvice log: %s",
                     str(advice),

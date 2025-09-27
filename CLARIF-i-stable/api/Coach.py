@@ -154,7 +154,7 @@ class ProactiveCoach(ReflexiveCoach):
         if len(last_path) == 0:
             return self.start_state
         previous_state = self.start_state
-        print(f"last path: {last_path}")
+        # print(f"last path: {last_path}")
         for state, rule in last_path:
             if self.target_rules(previous_state) != rule:
                 return previous_state

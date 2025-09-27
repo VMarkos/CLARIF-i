@@ -66,6 +66,11 @@ def find_quick_swap_action(state: State, keys: list[str]) -> tuple[State, Action
 def find_quick_partial_swap_action(
     state: State, keys: list[str]
 ) -> tuple[State, Action, int]:
+    return find_quick_swap_action_at_k(state, keys, k=2)
+
+def find_quick_swap_action_at_k(
+        state: State, keys: list[str], k: int=2
+) -> tuple[State, Action, int]:
     # print(f"State: {state}")
     n = len(keys)
     priority: int = n * n
@@ -122,7 +127,8 @@ def find_quick_partial_swap_action(
         0,
     )
     swap_state = (
-        State({left_key: state.get(left_key), right_key: state.get(right_key)})
+        _get_condition(state, left_key, right_key, k)
+        # State({left_key: state.get(left_key), right_key: state.get(right_key)})
         if action
         else State()
     )
@@ -139,8 +145,14 @@ def find_bubble_swap_action(state: State, keys: list[str]) -> tuple[State, Actio
             return state, swap_action, 0
     return state, Action(), 0
 
+
 def find_bubble_partial_swap_action(
     state: State, keys: list[str]
+) -> tuple[State, Action, int]:
+    return find_bubble_swap_action_at_k(state, keys, k=2)
+
+def find_bubble_swap_action_at_k(
+        state: State, keys: list[str], k: int=2
 ) -> tuple[State, Action, int]:
     n = len(keys)
     for i in range(n - 1):
@@ -149,7 +161,8 @@ def find_bubble_partial_swap_action(
         next_val = state.get(next_key)
         if cur_val > next_val:
             swap_callback = get_swap_callback(cur_key, next_key)
-            swap_state = State({cur_key: cur_val, next_key: next_val})
+            # swap_state = State({cur_key: cur_val, next_key: next_val}) # NOTE: Old version
+            swap_state = _get_condition(state, cur_key, next_key, k)
             swap_action = Action(swap_callback, f"swap({cur_key}, {next_key})")
             return swap_state, swap_action, n - i
     return State(), Action(), 0
@@ -159,7 +172,7 @@ def _get_condition(state: State, left: str, right: str, k: int) -> State:
         raise ValueError(f"'k' should be in range [2, {len(state)}], not {k}.")
     rest_keys = [k for k in state.state.keys() if k not in {left, right}]
     additional_keys = random.sample(rest_keys, k - 2)
-    all_leys = additional_keys + [left, right]
+    all_keys = additional_keys + [left, right]
     return State({k: state.get(k) for k in all_keys})
 
 def _generate_targets(N: int = 20) -> None:
@@ -195,6 +208,60 @@ def get_swap_callback(left, right) -> Callable:
 
     return swap_callback
 
+
+def generate_bubble_sort_test_case_at_k(
+    n: int,
+    N: int = 20,
+    learner: Learner | None = None,
+    coach_class: Coach = Coach,
+    full_reporting: bool = True,
+    report_traces: bool = True,
+    randomize_target: bool = False,
+    k: int=2,
+):
+    return generate_test_case_at_k(
+        find_bubble_swap_action_at_k, n, N, learner, coach_class, full_reporting, report_traces,
+        randomize_target, k
+    )
+
+def generate_quick_sort_test_case_at_k(
+    n: int,
+    N: int = 20,
+    learner: Learner | None = None,
+    coach_class: Coach = Coach,
+    full_reporting: bool = True,
+    report_traces: bool = True,
+    randomize_target: bool = False,
+    k: int=2,
+):
+    return generate_test_case_at_k(
+        find_quick_swap_action_at_k, n, N, learner, coach_class, full_reporting, report_traces,
+        randomize_target, k
+    )
+
+def generate_test_case_at_k(
+    find_at_k: Callable,
+    n: int,
+    N: int = 20,
+    learner: Learner | None = None,
+    coach_class: Coach = Coach,
+    full_reporting: bool = True,
+    report_traces: bool = True,
+    randomize_target: bool = False,
+    k: int=2,
+):
+    def action_fn(state: State, keys: list[str]) -> tuple[State, Action, int]:
+        return find_at_k(state, keys, k)
+    return generate_sorting_test_case(
+        n,
+        action_fn,
+        N,
+        learner,
+        coach_class,
+        full_reporting,
+        report_traces,
+        randomize_target,
+    )
 
 def generate_bubble_sort_partial_test_case(
     n: int,
