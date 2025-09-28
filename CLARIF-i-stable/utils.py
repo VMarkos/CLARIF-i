@@ -1,10 +1,10 @@
 # utils.py
 
 import os
-import random
 import math
 import json
 import itertools as it
+import numpy as np
 from copy import deepcopy
 from typing import Callable
 from bidict import bidict
@@ -19,10 +19,13 @@ from api.State import State
 # To speed things up in all cases we need some sort of memory, e.g., remember some parameters for each algorithm to save up time in rule generation
 # Theseshould not be kept into the state itself but maybe some of the agents (learner? coach? TestCase? `target_rules` itself?)
 
+# RNG
+SEED = 263929578137129915746167952750852099914
+RNG = np.random.default_rng(SEED)
+
 # Local Lambdas
 digit_count = lambda n: 1 if n == 0 else int(math.log10(abs(n))) + 1
 pad_num = lambda n, p: "0" * (p - len((s := str(n)))) + s
-
 
 def find_quick_swap_action(state: State, keys: list[str]) -> tuple[State, Action, int]:
     # print(f"State: {state}")
@@ -169,19 +172,19 @@ def find_bubble_swap_action_at_k(
 
 def _get_condition(state: State, left: str, right: str, k: int) -> State:
     if k < 2 or k > len(state):
-        raise ValueError(f"'k' should be in range [2, {len(state)}], not {k}.")
+        # raise ValueError(f"'k' should be in range [2, {len(state)}], not {k}.")
+        k = min(max(k, 2), len(state))
     rest_keys = [k for k in state.state.keys() if k not in {left, right}]
-    additional_keys = random.sample(rest_keys, k - 2)
-    all_keys = additional_keys + [left, right]
+    additional_keys = RNG.choice(rest_keys, k - 2)
+    all_keys = list(additional_keys) + [left, right]
     return State({k: state.get(k) for k in all_keys})
 
 def _generate_targets(N: int = 20) -> None:
-    random.seed(42)
     targets = dict()
     d = digit_count(N)
     for n in range(1, N + 1):
         targets[n] = {
-            f"k{pad_num(k, d)}": v for k, v in enumerate(random.sample(range(n), k=n))
+            f"k{pad_num(k, d)}": v for k, v in enumerate(RNG.permutation(range(n)))
         }
     CWD = os.path.abspath(os.path.dirname(__file__))
     targets_path = os.path.join(CWD, "targets.json")
@@ -361,7 +364,7 @@ def generate_sorting_test_case(
     d = digit_count(N)
     keys = [f"k{pad_num(i, d)}" for i in range(n)]
     start_values = [x for x in range(n)]
-    random.shuffle(start_values)
+    RNG.shuffle(start_values)
     start_state = State(dict(zip(keys, start_values)))
     permutation = None
     goal_state = None
@@ -415,8 +418,10 @@ def compute_fidelity(
     misses = 0
     keys = tuple(trace[0].state.keys())
     for current_state, next_state in zip(
-        trace[1:-1], trace[1:]
+        trace[1:-1], trace[2:]
     ):  # Skip first state, as it is always the start state duplicated
-        if coach_action_fn(current_state, keys)[0] != next_state:
+        coach_action = coach_action_fn(current_state, keys)[1]
+        coach_next_state = coach_action.apply(current_state)
+        if coach_next_state != next_state:
             misses += 1
     return 1.0 - misses / (len(trace) - 1)

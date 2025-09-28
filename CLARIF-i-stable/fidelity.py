@@ -54,6 +54,7 @@ def single_run(
     coach_class,
     res_file_name,
     trace_file_name,
+    k: int=2
 ) -> None:
     learner = Learner() if long_memory else None
     logger.info(
@@ -67,10 +68,13 @@ def single_run(
     )
     for n in n_range:
         logger.info(f"Running test for n={n}.")
+        if k > n:
+            logger.warning(f">>> Skip execution since k > n, ({k} > {n}).")
+            continue
         if not long_memory:
             learner = Learner() if memory else None
         for i in range(reps):
-            test = algorithm(n, N, learner, coach_class, False, True, False)
+            test = algorithm(n, N, learner, coach_class, False, True, False, k=k)
             try:
                 test.run()
             except ValueError as e:
@@ -124,7 +128,7 @@ def main():
     log_file_name = os.path.join(LOGS_PATH, f"{fname}.log")
     logging.basicConfig(filename=log_file_name, format=FORMAT, level=logging.INFO)
     # Range of values for n
-    n_range = range(s, N + s, s)
+    NS = list(range(s, N + s, s))
     # Initialize results and traces files
     with open(res_file_name, "w") as results_file:
         results_file.write("")
@@ -133,6 +137,7 @@ def main():
     for k in range(2, N + 1):
         print(f"Running case for k={k}...")
         for short, long, algorithm, coach_class in tqdm(configs, total=18):
+            n_range = [n for n in NS if n >= k]
             # print(
             #     f"Running configuration: short memory: {short}, long memory: {long}, algorithm: {algorithm.__name__}"
             # )
@@ -146,6 +151,7 @@ def main():
                 coach_class,
                 res_file_name,
                 trace_file_name,
+                k,
             )
 
 
