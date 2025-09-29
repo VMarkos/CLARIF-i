@@ -110,13 +110,16 @@ def compute_partial_fidelities(traces: list, coach_type: str="a", k_range=range(
     for k in k_range:
         offset = sum(K_STEPS[:(k - 2)])
         print(offset)
-        fidelities[k] = compute_fidelities(traces, coach_type, configs=PARTIAL_CONFIGS, coach_actions=PARTIAL_COACH_ACTIONS, offset=offset, k=k)
+        fidelities[k] = compute_fidelities(traces, coach_type, configs=PARTIAL_CONFIGS, coach_actions=PARTIAL_COACH_ACTIONS, k=k)
     return fidelities
 
-def compute_fidelities(traces: list, coach_type: str="r", configs=CONFIGS, coach_actions=COACH_ACTIONS, offset: int=0, k: int=2) -> list:
+def compute_fidelities(traces: list, coach_type: str="r", configs=CONFIGS, coach_actions=COACH_ACTIONS, k: int=2) -> list:
     """traces as parsed by `parse_traces()`"""
     fidelities = dict()
-    for ts, config in zip(traces[offset:], configs): # FIXME: This needs to be recalculated
+    offset = sum(K_STEPS[:(k - 2)])
+    step = K_STEPS[k - 2]
+    # FIXME: Here you should group things by configuration by groupby or something like that...
+    for ts, config in zip(traces[offset:(offset + step)], configs): # FIXME: This needs to be recalculated
         if (not config[0] and config[1]) or config[3] != coach_type:
             continue
         coach_action_fn = lambda s, ks: coach_actions[config[2]](s, ks, k=k)
