@@ -425,3 +425,13 @@ def compute_fidelity(
         if coach_next_state != next_state:
             misses += 1
     return 1.0 - misses / (len(trace) - 1)
+
+def batched(iterable, n, *, strict=False):
+    # batched('ABCDEFG', 2) → AB CD EF G
+    if n < 1:
+        raise ValueError('n must be at least one')
+    iterator = iter(iterable)
+    while batch := tuple(it.islice(iterator, n)):
+        if strict and len(batch) != n:
+            raise ValueError('batched(): incomplete batch')
+        yield batch

@@ -17,6 +17,7 @@ from utils import (
     find_quick_partial_swap_action,
     find_bubble_swap_action_at_k,
     find_quick_swap_action_at_k,
+    batched,
 )
 from api.Coach import Coach, ProactiveCoach, ReflexiveCoach
 from api.State import State
@@ -118,16 +119,18 @@ def compute_fidelities(traces: list, coach_type: str="r", configs=CONFIGS, coach
     fidelities = dict()
     offset = sum(K_STEPS[:(k - 2)])
     step = K_STEPS[k - 2]
-    # FIXME: Here you should group things by configuration by groupby or something like that...
-    for ts, config in zip(traces[offset:(offset + step)], configs): # FIXME: This needs to be recalculated
+    chunk_size = step // 18
+    grouped_traces = tuple(traces[(offset + i * chunk_size):(offset + (i + 1) * chunk_size)] for i in range(step) )
+    for ts, config in zip(grouped_traces, configs): # FIXME: This needs to be recalculated
         if (not config[0] and config[1]) or config[3] != coach_type:
             continue
         coach_action_fn = lambda s, ks: coach_actions[config[2]](s, ks, k=k)
         fidelities[config] = {
             n: [compute_fidelity(t, coach_action_fn) for t in trs]
-            for n, trs in ts
+            for n, trs in sorted(ts, key=lambda t: t[0])
         }
     return fidelities
+# TODO: Allow for percentage grouping in fidelities
 
 def config_to_str(c: tuple) -> str:
     return f"{c[2]}, Mem: {'Long' if c[1] else 'Short' if c[0] else 'None'}"
