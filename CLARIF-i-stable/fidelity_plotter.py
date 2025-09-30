@@ -126,7 +126,7 @@ def compute_fidelities(traces: list, coach_type: str="r", configs=CONFIGS, coach
     grouped_traces = tuple(traces[(offset + i * chunk_size):(offset + (i + 1) * chunk_size)] for i in range(step) )
     # print(offset, step, chunk_size)
     # print(', '.join(map(lambda xs: '-'.join([str(x[0]) for x in xs]), grouped_traces)))
-    for ts, config in zip(grouped_traces, configs): # FIXME: This needs to be recalculated
+    for ts, config in zip(grouped_traces, configs):
         if (not config[0] and config[1]) or config[3] != coach_type:
             continue
         coach_action_fn = lambda s, ks: coach_actions[config[2]](s, ks, k=k)
@@ -139,6 +139,66 @@ def compute_fidelities(traces: list, coach_type: str="r", configs=CONFIGS, coach
 
 def config_to_str(c: tuple) -> str:
     return f"{c[2]}, Mem: {'Long' if c[1] else 'Short' if c[0] else 'None'}"
+
+def plot_partial_percentage(fidelities: dict, save_path, config) -> None:
+    fig, ax = plt.subplots()
+    ax.set_ylim((-0.05, 1.05))
+    handles = []
+    mean_fs = _get_mean_fs(fidelities, config)
+    ps, ms = _aggr_means(mean_fs)
+    ax.plot(ps, ms)
+    # for n, mfs in mean_fs.items():
+    #     ax.plot(mfs[0], mfs[1], c=COLORS[n // 5], label=f"{n}")
+    ax.grid()
+    ax.legend()
+    plt.show()
+
+def _aggr_means(means) -> tuple[list, list]:
+    aggr_ms = dict()
+    for n, ms in means.items():
+        for p, m in zip(*ms):
+            added = False
+            for k in aggr_ms.keys():
+                if abs(p - k) < 1e-2:
+                    added = True
+                    aggr_ms[k].append(m)
+                    break
+            if not added:
+                aggr_ms[p] = [m]
+    vs = zip(*sorted(( (p, mean(ms)) for p, ms in aggr_ms.items() ), key=lambda x: x[0]))
+    return vs
+
+def _y_offset(ys, dy):
+    return [y + dy for y in ys]
+
+def _get_mean_fs(fidelities: dict, config) -> dict:
+    reshaped_fs = _reshape_fidelities(fidelities)
+    mean_fs = dict()
+    for n, fidelities in reshaped_fs.items():
+        for f_config, fs in fidelities.items():
+            if f_config != config:
+                continue
+            for k, fidelity in fs.items():
+                p = k / n
+                m = mean(fidelity)
+                if n not in mean_fs.keys():
+                    mean_fs[n] = [[], []]
+                mean_fs[n][0].append(p)
+                mean_fs[n][1].append(m)
+    return mean_fs
+    
+def _reshape_fidelities(fidelities: dict, k_range=range(2, 21), n_range=range(5, 21, 5)) -> dict:
+    reshaped_fs = dict()
+    for k in k_range:
+        for config, fs in fidelities[k].items():
+            for n, fidelity in fs.items():
+                if n not in reshaped_fs.keys():
+                    reshaped_fs[n] = dict()
+                if config not in reshaped_fs[n].keys():
+                    reshaped_fs[n][config] = dict()
+                reshaped_fs[n][config][k] = fidelity
+    return reshaped_fs
+
 
 def plot_partial_fidelities(fidelities: dict, save_path, k_range=range(2,21)) -> None:
     fig, ax = plt.subplots()
@@ -257,6 +317,11 @@ def prepare_parser() -> ArgumentParser:
         action="store_true",
         help=f"Boolean flag determining whether to plot only edge cases. Default value: False",
     )
+    parser.add_argument(
+        "-p",
+        action="store_true",
+        help=f"Boolean flag determining whether to plot partial fidelities per n. Default value: False",
+    )
     return parser
 
 
@@ -265,10 +330,12 @@ def main():
     RESULTS_PATH = os.path.join(CWD, "raw_results")
     PLOTS_PATH = os.path.join(CWD, "plots")
     parser = prepare_parser()
-    N, r, s, ct, ks, edge = vars(parser.parse_args()).values()
+    N, r, s, ct, ks, edge, pper = vars(parser.parse_args()).values()
     f_comp = compute_partial_fidelities
     if edge:
         f_plot = lambda fs, p: plot_min_max_fidelities(fs, p, range(s, N + 1, s))
+    elif pper:
+        f_plot = lambda fs, p: plot_partial_percentage(fs, p, (True, True, 'b', ct))
     else:
         f_plot = lambda fs, p: plot_partial_fidelities(fs, p, ks)
     # fname = f"fidelity_test_N{N}_reps{r}_step{s}_coaches3_partial_2_20"
