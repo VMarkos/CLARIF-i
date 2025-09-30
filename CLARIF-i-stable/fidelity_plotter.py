@@ -8,6 +8,7 @@ from argparse import ArgumentParser
 from copy import deepcopy
 from matplotlib import pyplot as plt
 from statistics import mean, stdev
+from tqdm import tqdm
 
 from utils import (
     compute_fidelity,
@@ -76,7 +77,6 @@ def parse_trace_line(line: str) -> list[State]:
         print("trace line:", line)
         raise e
 
-
 def split_header(hdr_str: str) -> tuple[int, int]:
     return [int(n) for n in hdr_str.split("; ")]
 
@@ -87,19 +87,21 @@ def parse_traces(path: str) -> dict[int, list[list[State]]]:
     previous_line = None
     n = -1
     i = -1
+    previous_n = -1
     with open(path, "r") as file:
         for line in iter(file.readline, ""):
             if HEADER_PATTERN.match(line):
+                previous_n = n
                 n, i = split_header(line)
                 if previous_line != None:
                     traces.append(parse_trace_line(previous_line))
                 if i == 0:
                     # trace_list.append(deepcopy(traces))
                     if traces != []:
-                        trace_list.append( (n, deepcopy(traces)) )
+                        trace_list.append( (previous_n, deepcopy(traces)) )
                     traces = []
             previous_line = line
-        trace_list.append( (n, deepcopy(traces)) )  # Append last config
+        trace_list.append( (previous_n, deepcopy(traces)) )  # Append last config
     return trace_list
 
 K_STEPS = [4 * 18] * 4 + [3 * 18] * 5 + [2 * 18] * 5 + [1 * 18] * 5
@@ -108,9 +110,9 @@ def compute_partial_fidelities(traces: list, coach_type: str="a", k_range=range(
     fidelities = dict()
     # step = len(traces) // (k_range[-1] - k_range[0])
     # print(step, len(traces), traces[0])
-    for k in k_range:
+    for k in tqdm(k_range):
         offset = sum(K_STEPS[:(k - 2)])
-        print(offset)
+        # print(offset)
         fidelities[k] = compute_fidelities(traces, coach_type, configs=PARTIAL_CONFIGS, coach_actions=PARTIAL_COACH_ACTIONS, k=k)
     return fidelities
 
@@ -120,7 +122,10 @@ def compute_fidelities(traces: list, coach_type: str="r", configs=CONFIGS, coach
     offset = sum(K_STEPS[:(k - 2)])
     step = K_STEPS[k - 2]
     chunk_size = step // 18
+    # print('->'.join(str(traces[i][0]) for i in (sum(K_STEPS[:j]) for j in range(len(K_STEPS)))))
     grouped_traces = tuple(traces[(offset + i * chunk_size):(offset + (i + 1) * chunk_size)] for i in range(step) )
+    # print(offset, step, chunk_size)
+    # print(', '.join(map(lambda xs: '-'.join([str(x[0]) for x in xs]), grouped_traces)))
     for ts, config in zip(grouped_traces, configs): # FIXME: This needs to be recalculated
         if (not config[0] and config[1]) or config[3] != coach_type:
             continue
@@ -151,6 +156,34 @@ def plot_partial_fidelities(fidelities: dict, save_path, k_range=range(2,21)) ->
     fig.tight_layout()
     fig.savefig(save_path)
 
+def plot_min_max_fidelities(fidelities: dict, save_path, n_range=range(5, 21, 5)) -> None:
+    fig, ax = plt.subplots()
+    ax.set_ylim((-0.05, 1.05))
+    handles = []
+    # print(fidelities.keys())
+    max_fidelities = _get_max_fidelities(fidelities, n_range)
+    labels = ("full", "partial")
+    for f, lab in zip((max_fidelities, fidelities[2]), labels):
+        for config, fidelity in f.items():
+            add_line(config, fidelity, ax, handles, 2 if lab == "partial" else 20, lab)
+    ax.grid()
+    ax.legend(
+        handles=sorted(handles, key=lambda h: h._label),
+        loc="lower left",
+    )
+    fig.tight_layout()
+    fig.savefig(save_path)
+
+def _get_max_fidelities(fidelities: dict, n_range) -> dict:
+    max_fs = dict()
+    for n in n_range:
+        for config, fidelity in fidelities[n].items():
+            fs = { k: v for k, v in fidelity.items() if k == n}
+            if config not in max_fs.keys():
+                max_fs[config] = fs
+            else:
+                max_fs[config].update(fs)
+    return max_fs
 
 def plot_fidelities(fidelities: dict, save_path) -> None:
     fig, ax = plt.subplots()
@@ -166,7 +199,7 @@ def plot_fidelities(fidelities: dict, save_path) -> None:
     fig.tight_layout()
     fig.savefig(save_path)
 
-def add_line(config, fidelity, ax, handles, k) -> None:
+def add_line(config, fidelity, ax, handles, k, lab: str="") -> None:
     ns, mean_fs, std_fs = zip(
         *((n, mean(fs), stdev(fs)) for n, fs in fidelity.items())
     )
@@ -177,14 +210,13 @@ def add_line(config, fidelity, ax, handles, k) -> None:
     (h,) = ax.plot(
         ns,
         mean_fs,
-        label=config_to_str(config) + f"@{k}",
+        label=config_to_str(config) + f" ({lab})",
         color=c,
         linestyle=ls,
         marker=m,
         alpha=0.9,
     )
     handles.append(h)
-
 
 def prepare_parser() -> ArgumentParser:
     parser = ArgumentParser()
@@ -220,6 +252,11 @@ def prepare_parser() -> ArgumentParser:
         default=list(range(2, 21)),
         help=f"Values of k to consider for partial@k advice. Default value: [2,3,...,20]",
     )
+    parser.add_argument(
+        "-e",
+        action="store_true",
+        help=f"Boolean flag determining whether to plot only edge cases. Default value: False",
+    )
     return parser
 
 
@@ -228,21 +265,27 @@ def main():
     RESULTS_PATH = os.path.join(CWD, "raw_results")
     PLOTS_PATH = os.path.join(CWD, "plots")
     parser = prepare_parser()
-    N, r, s, ct, ks = vars(parser.parse_args()).values()
+    N, r, s, ct, ks, edge = vars(parser.parse_args()).values()
     f_comp = compute_partial_fidelities
-    f_plot = plot_partial_fidelities
+    if edge:
+        f_plot = lambda fs, p: plot_min_max_fidelities(fs, p, range(s, N + 1, s))
+    else:
+        f_plot = lambda fs, p: plot_partial_fidelities(fs, p, ks)
     # fname = f"fidelity_test_N{N}_reps{r}_step{s}_coaches3_partial_2_20"
     fname = f"fidelity_test_N{N}_reps{r}_step{s}_coaches3_partial_2_20"
     source_name = fname + ".trace"
     res_path = os.path.join(RESULTS_PATH, source_name)
     fig_name = fname + f"_coach_{ct}.pdf"
+    if edge:
+        fig_name = "edge_" + fig_name
+        ks = range(2, N + 1)
     fig_path = os.path.join(PLOTS_PATH, fig_name)
     print("Parsing results...")
     traces = parse_traces(res_path)
     print("Magic happens...")
     fidelities = f_comp(traces, coach_type=ct, k_range=ks)
     print("Creating plot...")
-    f_plot(fidelities, fig_path, ks)
+    f_plot(fidelities, fig_path)
     print(f"Plot saved at: {fig_path}")
 
 
