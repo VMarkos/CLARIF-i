@@ -59,6 +59,7 @@ PARTIAL_CONFIGS = [
 CONFIG_COLORS = dict(zip(COACH_ACTIONS.keys(), zip(COLORS, MARKERS)))
 
 PARTIAL_CONFIG_COLORS = dict(zip(it.product(PARTIAL_COACH_ACTIONS.keys(), (2, 20)), zip(COLORS, MARKERS)))
+PERCENTAGE_CC = dict(zip(PARTIAL_COACH_ACTIONS.keys(), zip(COLORS, MARKERS)))
 
 STYLE_CONFIGS_MAP = lambda c: (
     *CONFIG_COLORS[c[2]],
@@ -67,6 +68,11 @@ STYLE_CONFIGS_MAP = lambda c: (
 
 PARTIAL_STYLE_CONFIGS_MAP = lambda c, k: (
     *PARTIAL_CONFIG_COLORS[(c[2], k)],
+    "dotted" if c[1] else "dashed" if c[0] else "solid",
+)
+
+PERCENTAGE_SCM = lambda c: (
+    *PERCENTAGE_CC[c[2]], 
     "dotted" if c[1] else "dashed" if c[0] else "solid",
 )
 
@@ -135,56 +141,68 @@ def compute_fidelities(traces: list, coach_type: str="r", configs=CONFIGS, coach
             for n, trs in sorted(ts, key=lambda t: t[0])
         }
     return fidelities
-# TODO: Allow for percentage grouping in fidelities
 
 def config_to_str(c: tuple) -> str:
-    return f"{c[2]}, Mem: {'Long' if c[1] else 'Short' if c[0] else 'None'}"
+    coach = "Bubble" if c[2][0] == 'b' else "Quick"
+    return f"{coach}, Mem: {'Long' if c[1] else 'Short' if c[0] else 'None'}"
 
-def plot_partial_percentage(fidelities: dict, save_path, config) -> None:
+def plot_partial_percentage(fidelities: dict, save_path) -> None:
     fig, ax = plt.subplots()
     ax.set_ylim((-0.05, 1.05))
     handles = []
-    mean_fs = _get_mean_fs(fidelities, config)
-    ps, ms = _aggr_means(mean_fs)
-    ax.plot(ps, ms)
-    # for n, mfs in mean_fs.items():
-    #     ax.plot(mfs[0], mfs[1], c=COLORS[n // 5], label=f"{n}")
+    mean_fs = _get_mean_fs(fidelities)
+    for config, mfs in mean_fs.items():
+        ps, ms, ss = _aggr_means(mfs)
+        c, m, ls = PERCENTAGE_SCM(config)
+        ps = [100 * p for p in ps]
+        (h,) = ax.plot(ps, ms, label=config_to_str(config), c=c, marker=m, linestyle=ls)
+        handles.append(h)
+        msp = [ms[i] + ss[i] for i in range(len(ms))]
+        msm = [ms[i] - ss[i] for i in range(len(ms))]
+        ax.fill_between(ps, msp, msm, color=c, alpha=0.1, linewidth=0.0)
     ax.grid()
-    ax.legend()
-    plt.show()
+    ax.legend(
+        handles=sorted(handles, key=lambda h: h._label),
+        loc="lower right",
+    )
+    fig.tight_layout()
+    fig.savefig(save_path)
 
 def _aggr_means(means) -> tuple[list, list]:
     aggr_ms = dict()
     for n, ms in means.items():
-        for p, m in zip(*ms):
+        for p, m, s in zip(*ms):
             added = False
             for k in aggr_ms.keys():
-                if abs(p - k) < 1e-2:
+                if abs(p - k) < 2e-2:
                     added = True
-                    aggr_ms[k].append(m)
+                    aggr_ms[k][0].append(m)
+                    aggr_ms[k][1].append(s)
                     break
             if not added:
-                aggr_ms[p] = [m]
-    vs = zip(*sorted(( (p, mean(ms)) for p, ms in aggr_ms.items() ), key=lambda x: x[0]))
+                aggr_ms[p] = [[m], [s]]
+    vs = zip(*sorted(( (p, mean(ms[0]), mean(ms[1])) for p, ms in aggr_ms.items() ), key=lambda x: x[0]))
     return vs
 
 def _y_offset(ys, dy):
     return [y + dy for y in ys]
 
-def _get_mean_fs(fidelities: dict, config) -> dict:
+def _get_mean_fs(fidelities: dict) -> dict:
     reshaped_fs = _reshape_fidelities(fidelities)
     mean_fs = dict()
     for n, fidelities in reshaped_fs.items():
-        for f_config, fs in fidelities.items():
-            if f_config != config:
-                continue
+        for config, fs in fidelities.items():
+            if config not in mean_fs.keys():
+                mean_fs[config] = dict()
             for k, fidelity in fs.items():
                 p = k / n
                 m = mean(fidelity)
-                if n not in mean_fs.keys():
-                    mean_fs[n] = [[], []]
-                mean_fs[n][0].append(p)
-                mean_fs[n][1].append(m)
+                s = stdev(fidelity)
+                if n not in mean_fs[config].keys():
+                    mean_fs[config][n] = [[], [], []]
+                mean_fs[config][n][0].append(p)
+                mean_fs[config][n][1].append(m)
+                mean_fs[config][n][2].append(s)
     return mean_fs
     
 def _reshape_fidelities(fidelities: dict, k_range=range(2, 21), n_range=range(5, 21, 5)) -> dict:
@@ -335,7 +353,7 @@ def main():
     if edge:
         f_plot = lambda fs, p: plot_min_max_fidelities(fs, p, range(s, N + 1, s))
     elif pper:
-        f_plot = lambda fs, p: plot_partial_percentage(fs, p, (True, True, 'b', ct))
+        f_plot = lambda fs, p: plot_partial_percentage(fs, p)
     else:
         f_plot = lambda fs, p: plot_partial_fidelities(fs, p, ks)
     # fname = f"fidelity_test_N{N}_reps{r}_step{s}_coaches3_partial_2_20"
@@ -346,6 +364,8 @@ def main():
     if edge:
         fig_name = "edge_" + fig_name
         ks = range(2, N + 1)
+    elif pper:
+        fig_name = "pper_" + fig_name
     fig_path = os.path.join(PLOTS_PATH, fig_name)
     print("Parsing results...")
     traces = parse_traces(res_path)

@@ -218,11 +218,20 @@ In Figure~\ref{fig:coaching fidelities} we show average coaching fidelity as a f
 	\includegraphics[width=0.33\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_a.pdf}\hfill%
 	\includegraphics[width=0.33\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_p.pdf}\hfill%
 	\includegraphics[width=0.33\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_r.pdf}\hfill%
-	\caption{Coaching fidelity for reactive (left), proactive (middle) and reflexive (right) coaching. In all cases, full advice configurations (blue and green lines with any linestyle) are constant at coaching fidelity $1.0$.}
+	\caption{Coaching fidelity against state size for reactive (left), proactive (middle) and reflexive (right) coaching.}
 	\label{fig:coaching fidelities}
 \end{figure*}
 
 Overall, Figure~\ref{fig:coaching fidelities} hints towards a trade--off between advice specificity and coaching fidelity. The more specific the advice the more conformant the learner to the coaching policy and, conversely, the more loose the advice, the more the learner explores the state space, utilizing previous knowledge and generalizing. To shed more light onto that interplay, we introduce a new type of advice, \partialadvice{k}, $2\leq k\leq n$, where $k$ randomly selected state variables are included into the advice condition, corresponding to intermediate specificity between the two extremes explored so far.
+
+\begin{figure*}
+	\centering\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/pper_fidelity_test_N20_reps20_step5_coaches3_partial_2_20_coach_a.pdf}\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/pper_fidelity_test_N20_reps20_step5_coaches3_partial_2_20_coach_p.pdf}\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/pper_fidelity_test_N20_reps20_step5_coaches3_partial_2_20_coach_r.pdf}\hfill%
+	\caption{Coaching fidelity against advice coverage for reactive (left), proactive (middle) and reflexive (right) coaching.}
+	\label{fig:fidelities against coverage}
+\end{figure*}
 
 %
 %
