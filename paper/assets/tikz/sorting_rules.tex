@@ -1,0 +1,22 @@
+\begin{tikzpicture}[
+		arrow/.style={->, draw=black, thick},
+		advice/.style={draw=adviceColor, densely dotted},
+		node/.style={circle, inner sep=0.125cm, outer sep=0.2mm, draw=black, thick},
+		faded/.style={opacity=0.2},
+		bubble/.style={draw=bubbleColor, fill=bubbleColor, fill opacity=0.1},
+		quick/.style={draw=quickColor, fill=quickColor, fill opacity=0.1, text opacity=1.0},
+		unknown/.style={draw=unknownColor, fill=unknownColor, fill opacity=0.1},
+		text box/.style={font=\tt}
+	]
+	% State nodes
+	\node[node, quick] (state 1) at (1, 0) {3};
+	\node[node, bubble] (state 2) at (2, 0) {4};
+	\node[node, bubble] (state 3) at (3, 0) {1};
+	\node[node] (state 4) at (4, 0) {5};
+	\node[node, quick] (state 5) at (5, 0) {2};
+	% Rules
+	\node[text box, below={of state 3.south}, anchor=north] (full bubble) {Rbf ::~(3,4,1,5,2) implies swap(4,1);};
+	\node[text box, below={0.1cm of full bubble.south west}, anchor=west] (partial bubble) {Rbp ::~(\_,4,1,\_,\_) implies swap(4,1);};
+	\node[text box, below={0.2cm of partial bubble.south west}, anchor=west] (full quick) {Rqf ::~(3,4,1,5,2) implies swap(3,2);};
+	\node[text box, below={0.1cm of full quick.south west}, anchor=west] (partial quick) {Rqp ::~(3,\_,\_,\_,2) implies swap(3,2);};
+\end{tikzpicture}

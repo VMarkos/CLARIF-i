@@ -1,5 +1,33 @@
 \begin{thebibliography}{}
 
+\bibitem[Fiske et~al., 2019]{fiske2019}
+Fiske, A., Henningsen, P., and Buyx, A. (2019).
+\newblock Your robot therapist will see you now: Ethical implications of
+  embodied artificial intelligence in psychiatry, psychology, and
+  psychotherapy.
+\newblock {\em J Med Internet Res}, 21(5):e13216.
+
+\bibitem[Ioannou and Michael,
+  2021]{ioannouKnowledgeBasedTranslationNatural2021}
+Ioannou, C. and Michael, L. (2021).
+\newblock Knowledge-{{Based Translation}} of {{Natural Language}} into
+  {{Symbolic Form}}.
+\newblock In {\em Proceedings of the 7th {{Linguistic}} and {{Cognitive
+  Approaches To Dialog Agents Workshop}} - {{LaCATODA}} 2021}, pages 24--32,
+  {Montreal, Canada}.
+
+\bibitem[Liu, 1996]{liu1996intelligent}
+Liu, B. (1996).
+\newblock Intelligent route finding: combining knowledge, cases and an
+  efficient search algorithm'.
+\newblock In {\em ECAI}, volume~96, pages 380--384. PITMAN.
+
+\bibitem[Markos and Michael, 2022]{prudens2022}
+Markos, V. and Michael, L. (2022).
+\newblock Prudens: An argumentation-based language for cognitive assistants.
+\newblock In Governatori, G. and Turhan, A.-Y., editors, {\em Rules and
+  Reasoning}, pages 296--304, Cham. Springer International Publishing.
+
 \bibitem[Markos et~al., 2022]{proxyCoaching2022}
 Markos, V.~T., Thoma, M., and Michael, L. (2022).
 \newblock Machine coaching with proxy coaches.
@@ -8,5 +36,113 @@ Markos, V.~T., Thoma, M., and Michael, L. (2022).
   co-located with 9th International Conference on Computational Models of
   Argument {(COMMA} 2022), Cardiff, Wales, September 13th, 2022}, volume 3208
   of {\em {CEUR} Workshop Proceedings}, pages 45--64. CEUR-WS.org.
+
+\bibitem[McCarthy, 1959]{mccarthyProgramsCommonSense1959}
+McCarthy, J. (1959).
+\newblock Programs with {{Common Sense}}.
+\newblock In {\em Proceedings of the {{Teddington Conference}} on the
+  {{Mechanization}} of {{Thought Processes}}}, pages 75--91, {London, U.K}.
+
+\bibitem[McCarthy, 1998]{mccarthyElaborationTolerance1998}
+McCarthy, J. (1998).
+\newblock Elaboration {{Tolerance}}.
+\newblock In {\em Common {{Sense}} 98}, {London, U.K}.
+
+\bibitem[Michael, 2017]{michaelAdviceTaker2017}
+Michael, L. (2017).
+\newblock The {{Advice Taker}} 2.0.
+\newblock In {\em Proceedings of the 13th {{International Symposium}} on
+  {{Commonsense Reasoning}}}, volume 2052, {London, U.K}.
+
+\bibitem[Michael, 2019]{michaelMachineCoaching2019}
+Michael, L. (2019).
+\newblock Machine {{Coaching}}.
+\newblock In {\em {{IJCAI}} 2019 {{Workshop}} on {{Explainable Artificial
+  Intelligence}}}, pages 80--86, {Macau, China}.
+
+\bibitem[Migel et~al., 2024]{migel2024optimal}
+Migel, S., Maloied, M., Zaliskyi, M., Lelechenko, A., Osipchuk, A., and
+  Solomentsev, O. (2024).
+\newblock Optimal pathfinding based on artificial intelligence tools.
+\newblock In {\em International Workshop on Advances in Civil Aviation Systems
+  Development}, pages 242--261. Springer.
+
+\bibitem[Mutalova et~al., 2023]{mutalova2023}
+Mutalova, R., Sarrazin-Gendron, R., Ghasemloo~Gheidari, P., Cai, E., Richard,
+  G., Caisse, S., Knight, R., Blanchette, M., Szantner, A., and Waldisp\"{u}hl,
+  J. (2023).
+\newblock Player-guided ai outperforms standard ai in sequence alignment
+  puzzles.
+\newblock In {\em Proceedings of The ACM Collective Intelligence Conference},
+  CI '23, page 53–62, New York, NY, USA. Association for Computing Machinery.
+
+\bibitem[Raghavan and Allan, 2007]{raghavanAllan2007}
+Raghavan, H. and Allan, J. (2007).
+\newblock An {{Interactive Algorithm}} for {{Asking}} and {{Incorporating
+  Feature Feedback}} into {{Support Vector Machines}}.
+\newblock In {\em Proceedings of the 30th {{Annual International ACM SIGIR
+  Conference}} on {{Research}} and {{Development}} in {{Information
+  Retrieval}}}, {{SIGIR}} '07, pages 79--86, {New York, NY, USA}. {Association
+  for Computing Machinery}.
+
+\bibitem[Ribeiro et~al., 2016]{ribeiro2016}
+Ribeiro, M.~T., Singh, S., and Guestrin, C. (2016).
+\newblock "{{Why Should I Trust You}}?": {{Explaining}} the {{Predictions}} of
+  {{Any Classifier}}.
+\newblock In {\em Proceedings of the 22nd {{ACM SIGKDD International
+  Conference}} on {{Knowledge Discovery}} and {{Data Mining}}}, {{KDD}} '16,
+  pages 1135--1144, {New York, NY, USA}. {Association for Computing Machinery}.
+
+\bibitem[Sedlakova and Trachsel, 2023]{sedlakova2023}
+Sedlakova, J. and Trachsel, M. (2023).
+\newblock Conversational artificial intelligence in psychotherapy: A new
+  therapeutic tool or agent?
+\newblock {\em The American Journal of Bioethics}, 23(5):4--13.
+
+\bibitem[Settles, 2009]{Settles2009ActiveLL}
+Settles, B. (2009).
+\newblock Active {{Learning Literature Survey}}.
+\newblock Technical {{Report}}, {University of Wisconsin-Madison Department of
+  Computer Sciences}.
+
+\bibitem[Settles, 2011]{settles-2011-closing}
+Settles, B. (2011).
+\newblock Closing the {{Loop}}: {{Fast}}, {{Interactive Semi-Supervised
+  Annotation With Queries}} on {{Features}} and {{Instances}}.
+\newblock In {\em Proceedings of the 2011 {{Conference}} on {{Empirical
+  Methods}} in {{Natural Language Processing}}}, pages 1467--1478, {Edinburgh,
+  Scotland, UK.} {Association for Computational Linguistics}.
+
+\bibitem[Shivaswamy and Joachims, 2015]{shivaswamyJoachims2015}
+Shivaswamy, P. and Joachims, T. (2015).
+\newblock Coactive {{Learning}}.
+\newblock {\em Journal of Artificial Intelligence Research}, 53:1--40.
+
+\bibitem[Teso and Kersting, 2019]{tesoKerstingIML2019}
+Teso, S. and Kersting, K. (2019).
+\newblock Explanatory {{Interactive Machine Learning}}.
+\newblock In {\em Proceedings of the 2019 {{AAAI}}/{{ACM Conference}} on
+  {{AI}}, {{Ethics}}, and {{Society}}}, {{AIES}} '19, pages 239--245, {New
+  York, NY, USA}. {Association for Computing Machinery}.
+
+\bibitem[Valiant, 1984]{valiantPAC1984}
+Valiant, L.~G. (1984).
+\newblock A {{Theory}} of the {{Learnable}}.
+\newblock {\em Communications of the ACM}, 27(11):1134--1142.
+
+\bibitem[Welz and Lanquillon, 2024]{welz2024}
+Welz, L. and Lanquillon, C. (2024).
+\newblock Enhancing large language models through external domain knowledge.
+\newblock In Degen, H. and Ntoa, S., editors, {\em Artificial Intelligence in
+  HCI}, pages 135--146, Cham. Springer Nature Switzerland.
+
+\bibitem[Zaidan et~al., 2007]{zaidan2007using}
+Zaidan, O., Eisner, J., and Piatko, C. (2007).
+\newblock Using ``{{Annotator Rationales}}'' to {{Improve Machine Learning}}
+  for {{Text Categorization}}.
+\newblock In {\em Human {{Language Technologies}} 2007: {{The Conference}} of
+  the {{North American Chapter}} of the {{Association}} for {{Computational
+  Linguistics}}; {{Proceedings}} of the {{Main Conference}}}, pages 260--267,
+  {Rochester, New York}. {Association for Computational Linguistics}.
 
 \end{thebibliography}
