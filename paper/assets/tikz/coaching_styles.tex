@@ -1,4 +1,5 @@
 \begin{tikzpicture}[
+		bezier bounding box,
 		arrow/.style={->, draw=black, thick},
 		advice/.style={draw=adviceColor, densely dotted},
 		node/.style={circle, inner sep=0.125cm, outer sep=0.2mm, draw=black, thick},
@@ -43,4 +44,15 @@
 	\draw[arrow, thin, dashed] ($(g)!0.5!(c)$) to[bend right] (proactive);
 	\draw[arrow, thin, dashed] ($(f)!0.5!(a)$) to[bend left] (reactive);
 	\draw[arrow, thin, dashed] ($(f)!0.5!(h)$) to[bend left] (reflexive);
+	
+	% Legend
+	\node[anchor=north west, draw=black!40, rounded corners=0.2cm, inner sep=0.1cm] (legend) at (2.6,-0.3) {%
+		\begin{tikzpicture}
+			\pgfmathsetmacro{\dx}{0.4}
+			\pgfmathsetmacro{\dy}{0.4}
+			\draw[ultra thick, correctColor] (0,0) -- (\dx,0) node[pos=1, right] {correct action};
+			\draw[ultra thick, wrongColor] (0,-\dy) -- (\dx,-\dy) node[pos=1, right] {wrong action};
+			\draw[ultra thick, adviceColor, densely dotted] (0,{-2*\dy}) -- (\dx,{-2*\dy}) node[pos=1, right] {advised action};
+		\end{tikzpicture}%
+	};
 \end{tikzpicture}

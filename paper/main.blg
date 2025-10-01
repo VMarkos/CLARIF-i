@@ -1,47 +1,46 @@
 This is BibTeX, Version 0.99d (TeX Live 2022/Debian)
 Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
-A level-1 auxiliary file: assets/tikz/coaching_styles.aux
 The style file: apalike.bst
 Database file #1: references.bib
-You've used 21 entries,
+You've used 25 entries,
             1935 wiz_defined-function locations,
-            631 strings with 8924 characters,
-and the built_in function-call counts, 10225 in all, are:
-= -- 1068
-> -- 332
+            655 strings with 10007 characters,
+and the built_in function-call counts, 12097 in all, are:
+= -- 1236
+> -- 474
 < -- 32
-+ -- 113
-- -- 107
-* -- 759
-:= -- 1607
-add.period$ -- 74
-call.type$ -- 21
-change.case$ -- 156
-chr.to.int$ -- 21
-cite$ -- 21
-duplicate$ -- 482
-empty$ -- 769
-format.name$ -- 142
-if$ -- 2194
++ -- 165
+- -- 159
+* -- 942
+:= -- 1955
+add.period$ -- 84
+call.type$ -- 25
+change.case$ -- 202
+chr.to.int$ -- 25
+cite$ -- 25
+duplicate$ -- 530
+empty$ -- 857
+format.name$ -- 198
+if$ -- 2533
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 20
-newline$ -- 108
-num.names$ -- 69
-pop$ -- 163
+missing$ -- 22
+newline$ -- 126
+num.names$ -- 81
+pop$ -- 203
 preamble$ -- 1
-purify$ -- 155
+purify$ -- 201
 quote$ -- 0
-skip$ -- 381
+skip$ -- 417
 stack$ -- 0
-substring$ -- 741
-swap$ -- 150
+substring$ -- 832
+swap$ -- 152
 text.length$ -- 17
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 126
+type$ -- 150
 warning$ -- 0
-while$ -- 91
+while$ -- 102
 width$ -- 0
-write$ -- 304
+write$ -- 350

@@ -28,6 +28,7 @@
 % tikz libraries
 \usetikzlibrary{calc}
 \usetikzlibrary{positioning}
+\usetikzlibrary{bbox}
 
 %%%% Local definitions %%%%
 \newcommand{\bubblecoach}{\ensuremath{\mathcal{C}_{\rm bubble}}\,}
@@ -38,7 +39,7 @@
 \newcommand{\learnerpolicy}{\texttt{P}_{\learner}}
 \newcommand{\coachpolicy}{\texttt{P}_{\coach}}
 \newcommand{\qmark}{\texttt{\textbf{?}}}
-
+\newcommand{\ttus}{\char`_}
 
 \newcommand{\searchpath}[2]{{search\_path(#1, #2)}}
 \newcommand{\evaluate}[3]{{evaluate(#1, #2, #3)}}
@@ -62,22 +63,24 @@
 %%%% Editor's commands %%%%
 \newcommand{\edcom}[1]{{\sf\color{red}$>>>$ #1}}
 \newcommand{\tbc}{\edcom{To be completed\ldots}}
+\setlength\marginparwidth{2cm}
 \newcommand{\ednote}[1]{\marginpar{\flushleft\tiny\sf\color{red}{#1}}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{document}
 
-\title{Authors' Instructions: Preparation of Camera-Ready Contributions to SCITEPRESS Proceedings}
+\title{Faithful Cognitive Representatives}
 
-\author{\authorname{First Author Name\sup{1}\orcidAuthor{0000-0000-0000-0000}, Second Author Name\sup{1}\orcidAuthor{0000-0000-0000-0000} and Third Author Name\sup{2}\orcidAuthor{0000-0000-0000-0000}}
-\affiliation{\sup{1}Institute of Problem Solving, XYZ University, My Street, MyTown, MyCountry}
-\affiliation{\sup{2}Department of Computing, Main University, MySecondTown, MyCountry}
-\email{\{first\_author, second\_author\}@ips.xyz.edu, third\_author@dc.mu.edu}
+\author{\authorname{Vassilis Markos\sup{1}%\orcidAuthor{0000-0000-0000-0000}
+		and Loizos Michael\sup{1,2}}%\orcidAuthor{0000-0000-0000-0000}}
+\affiliation{\sup{1}Open University of Cyprus, Nicosia, Cyprus}
+\affiliation{\sup{2}CYENS Center of Excellence, Nicosia, Cyprus}
+\email{vasileios.markos@st.ouc.ac.cy, loizos@ouc.ac.cy}
 }
 
-\keywords{The paper must have at least one keyword. The text must be set to 9-point font size and without the use of bold or italic font style. For more than one keyword, please use a comma as a separator. Keywords must be titlecased.}
+\keywords{Machine Coaching, Search Coaching.}
 
-\abstract{The abstract should summarize the contents of the paper and should contain at least 70 and at most 200 words. The text must be set to 9-point font size.}
+\abstract{In this paper we propose and demonstrate a human--computer--interaction methodology allowing the accurate and faithful extraction of user knowledge. We demonstrate its efficiency in a controlled artificial setting, showcasing how learning in this context is both efficient and faithful to the user's knowledge and intentions. Finally, we discuss potential areas of application for this machine learning paradigm.}
 
 \onecolumn \maketitle \normalsize \setcounter{footnote}{0} \vfill
 
@@ -85,7 +88,7 @@
 %
 Artificial Intelligence (AI), and Generative AI (GenAI) in particular, has found a plentiful applications in nearly all aspects of everyday life. On several occasions, the underlying tasks can be formulated as search problems, in the sense of having an AI agent move around a state space, starting from an initial state, crafting a path towards a goal state. Examples of this might include route finding, puzzle solving, shopping planning, code debugging, clinical counseling and so on. Furthermore, restrictions are put on the shape of the \emph{optimal} path, in accordance to the nature of the task at hand, e.g., seeking a shortest path for route finding \cite{liu1996intelligent,migel2024optimal}, finding a particular kind of solution to a puzzle \cite{mutalova2023}, or strictly following a therapist's guidance to provide further advice to a client \cite{sedlakova2023,fiske2019}.
 
-Notably, in all such cases, path optimality can also be understood in the context of conformance to the search policy of a coach, be it explicit, e.g., in a therapeutic setting, or implicit, e.g., in the case of route finding. This kind of formulation allows one to also control under appropriate learning semantics, not only \emph{what} the learner learns to accomplish, but also \emph{how} it does so, which might be of higher significance in particular settings. In this work, we put forward such a search coaching paradigm in a simplified setting, exploring this interplay between the end and the means to it learned by a machine learner.
+Notably, in all such cases, path optimality can also be understood in the context of conformance to the search policy of a coach, be it explicit, e.g., in a therapeutic setting, or implicit, e.g., in the case of route finding. This kind of formulation allows one to also control under appropriate learning semantics, not only \emph{what} the learner learns to accomplish, but also \emph{how} it does so, which might be of higher significance in particular settings. In this work, we put forward such a search coaching paradigm inspired by previous work \cite{michaelMachineCoaching2019,prudens2022} in a simplified setting, exploring this interplay between the end and the means to it learned by an agent.
 %\begin{itemize}
 %	\item We present ``search coaching'' as a way to instill knowledge faithfully to a learner;
 %	\item We compare this to our own and others' previous works;
@@ -100,9 +103,9 @@ Knowledge exchange between a coach and a machine learner in the form of context-
 
 A similar approach, eXplainable Interactive Learning (XIL), \cite{tesoKerstingIML2019} also considers a human supervisor in the role of a learning ``coach'', with advice either correcting mislabeled data, or wrong explanations provided by the learner for otherwise correct predictions. Nevertheless, while in Machine Coaching coach advice can be directly embedded into the learner's knowledge base in an elaboration--tolerant manner \cite{mccarthyElaborationTolerance1998}, XIL utilizes an active learning algorithm as a black--box \cite{Settles2009ActiveLL} alongside a local post-hoc explainer \cite{ribeiro2016}. The corresponding explanations are then used to generate additional labeled data for the learner, to help it cure any misunderstandings.
 
-User feedback can also be utilized to proactively reduce the need for data point labeling, as in \cite{raghavanAllan2007} for Support Vector Machines. In the same spirit, \cite{settles-2011-closing} proposes an interactive framework allowing users to label selected data points with the aim of further polishing the training of a document classifier, while in \cite{zaidan2007using}, a machine learning paradigm utilizing user--provided explanations to reduce learning complexity is proposed. Interestingly, in \cite{zaidan2007using} it is stressed that an alternative to immense data load for performance improvement is \emph{data richness}, i.e., the provision of more meaningful data, e.g., in the form of a correct label accompanied by an explanation for it.
+User feedback can also be utilized to proactively reduce the need for data point labeling, as in \cite{raghavanAllan2007} for Support Vector Machines. In the same spirit, \cite{settles-2011-closing} proposes an interactive framework allowing users to label selected data points with the aim of further polishing the training of a document classifier, while in \cite{zaidan2007using}, a machine learning paradigm utilizing user--provided explanations to reduce learning complexity is proposed. Interestingly, in \cite{zaidan2007using} it is stressed that an alternative to immense data load for performance improvement is \emph{data richness}, i.e., the provision of more meaningful data, e.g., in the form of a correct label accompanied by an explanation for it. \emph{Coactive Learning}, proposed in \cite{shivaswamyJoachims2015}, is another interactive Machine Learning framework where a learner receives user advice that is, inherently, only ``slightly better'' than the learner's current prediction. The main benefit of the approach, as shown in \cite{shivaswamyJoachims2015}, is that this approach can be integrated into many existing black--box  methodologies.
 
-\emph{Coactive Learning}, proposed in \cite{shivaswamyJoachims2015}, is another interactive Machine Learning framework where a learner receives user advice that is, inherently, only ``slightly better'' than the learner's current prediction. The main benefit of the approach, as shown in \cite{shivaswamyJoachims2015}, is that this approach can be integrated into many existing black--box machine learning methodologies.
+Besides guaranteeing faithfulness and effectively building user trust \cite{BARREDOARRIETA202082}, explanation embedding during model training has been reported to improve testing performance \cite{Selvaraju_2019}. Moreover, utilizing bilateral explanations, i.e., from the learner towards the coach and vice versa, can further speed up the learning process \cite{dongSu2017}, with similar results also obtained in model retraining upon the provision of additional explanations regarding both wrong and correct, but for the wrong reasons, model decisions \cite{riegerSingh2019}. At last, post--hoc model fine tuning also leads to performance improvements \cite{ribeiro2016}.
 
 Given the recent spike in the use of Large Language Models (LLMs) in virtually all domains, human--machine interaction methodologies that utilize human expertise to further polish a LLM have been proposed. In \cite{welz2024} a human knowledge infusion methodology is presented, where expert users provide domain specific knowledge that is used to populate a knowledge base, then utilized by the system in tandem with the LLM to generate responses to user queries.
 %
@@ -114,7 +117,7 @@ In this Section we empirically explore search coaching, by having a machine lear
 
 
 \begin{algorithm}
-	\caption{Coaching process. $s$, $g$ denote the start and goal states respectively.}%
+	\caption{Search coaching process. $s$, $g$ denote the start and goal states, respectively.}%
 	\label{alg:coaching process}
 	\KwData{$s$, $g$, $\learner$, $\coach$}
 	\KwResult{$\learner$ with updated search policy.}
@@ -130,7 +133,7 @@ In this Section we empirically explore search coaching, by having a machine lear
 %
 \subsection{Experimental setup}\label{subsec:experimental-setup}
 %
-We have implemented two machine coaches, \bubblecoach, which uses bubble sort as its underlying coaching policy, and \quickcoach, which uses quicksort for that purpose, both resulting to advice of the form of ``what would the next step in the sorting algorithm be?''. A state of size $n$ in this case is any permutation of $\{1,2,\ldots,n\}$, start states might be arbitrary and the goal state is always $(1,2,\ldots,n)$. Rules in this case have a potentially partial permutation of $\{1,2,\ldots,n\}$ as their condition and a swap action between two items of this permutation, as shown in Figure~\ref{fig:sorting rules}. We let $n$ range from $1$ to $20$, running $m=100$ iterations for each value of $n$. We have also explored two different types of advice for each coach:
+We have implemented two machine coaches, \bubblecoach, which uses bubble sort as its underlying coaching policy, and \quickcoach, which uses quicksort for that purpose, both resulting to advice corresponding to the next step in the algorithm underlying each coaching policy. A state of size $n$ in this case is any permutation of $\{1,2,\ldots,n\}$, with start states being arbitrarily chosen among all possible states of the same size and the goal state is always $(1,2,\ldots,n)$. Rules in this case have a potentially partial permutation of $\{1,2,\ldots,n\}$ as their condition and a swap action between two items of this permutation, as shown in Figure~\ref{fig:sorting rules}. We let $n$ range from $1$ to $20$, running $m=100$ iterations for each value of $n$. We have also explored two different types of advice for each coach:
 \begin{enumerate*}[label=(A\arabic*)]
 	\item \emph{full advice}, where each piece of advice depends on the entire state, and;
 	\item \emph{partial advice}, where each piece of advice depends on the specific part of the state to be improved.
@@ -141,23 +144,23 @@ Moreover, for each advice type we have considered three learner configurations r
 	\item \emph{short memory} across different iterations for the same state size, $n$, i.e., coaching sessions across different values of $n$ are independent but not within the same value for $n$, and;
 	\item \emph{long memory} across all values of state size, $n$, so all coaching sessions are correlated, building on knowledge from previous test cases.
 \end{enumerate*}
-In all cases the learner seeks advice upon lack of knowledge for further searching, returning a partial path $p$ starting from $s$, while the coach adopts one of the following \emph{coaching styles} as illustrated in Figure~\ref{fig:coaching styles}.:
+In all cases the learner seeks advice upon lack of knowledge for further searching, returning a partial path $p$ starting from $s$, while the coach adopts one of the following \emph{coaching styles} as illustrated in Figure~\ref{fig:coaching styles}:
 \begin{enumerate*}[label=(C\arabic*)]
-	\item in \emph{reactive} coaching, the coach provides advice on learner's last wrong decision in $p$;
-	\item in \emph{proactive} coaching, the coach provides advice on learner's first wrong decision in $p$;
-	\item in \emph{reflexive} coaching, the coach provides advice at a random wrong decision in $p$.
+	\item \emph{reactive} coaching, where coach provides advice on learner's last wrong decision in $p$;
+	\item \emph{proactive} coaching, where coach provides advice on learner's earliest wrong decision in $p$, and;
+	\item \emph{reflexive} coaching, where coach provides advice at a random wrong decision in $p$.
 \end{enumerate*}
 
 \begin{figure}[!tb]
 	\centering
-	\include{assets/tikz/sorting_rules.tex}
-	\caption{\tbc}
+	\input{assets/tikz/sorting_rules.tex}
+	\caption{Examples of full (\texttt{f}) and partial (\texttt{p}) advice from \bubblecoach (\texttt{b}) and \quickcoach (\texttt{q}) on $(3,4,1,5,2)$.}
 	\label{fig:sorting rules}
 \end{figure}
 
 \begin{figure}[!tb]
 	\centering
-	\include{assets/tikz/coaching_styles.tex}
+	\input{assets/tikz/coaching_styles.tex}
 	\caption{Different coaching styles used in our experimental setup. Upon the learner reaching a state from where there is no knowledge on how to proceed (\textcolor{unknownColor}{\qmark}), a reactive piece of advice resolves this lack of knowledge, a proactive piece of advice addresses the first wrong decision in the learner's search path, while a reflexive piece of advice addresses a random mistake / lack of knowledge of the learner.}
 	\label{fig:coaching styles}
 \end{figure}
@@ -214,21 +217,25 @@ In all cases the learner seeks advice upon lack of knowledge for further searchi
 	\label{fig:full and partial sorting coaching results}
 \end{figure*}
 
-In Figures~\ref{fig:full and partial sorting coaching results} we present the number of coaching interactions required to reach the goal state in each case as a function of the state size, $n$ for all three types of coaching. Considering reactive coaching and the full advice (Fig.~\ref{fig:full sorting coaching results a}), the utilization of either short or long term memory does not appear to have any particular effect on the number of coaching steps, which was expected given the restricted applicability of provided advice. On the contrary, partial advice (Fig.~\ref{fig:partial sorting coaching results a}) combined with both short and long term memory result to fewer coaching steps, which can be explained by the broader applicability of provided advice. Also observe that in the case of full advice, coaching steps are proportional to the big--O complexity of the underlying policy / sorting algorithm, which, again, comes as a result of limited advice applicability, leading to the learner receiving step--by--step guidance in each separate case. However, the introduction of both types of memory alongside broader advice allows the learner to generalize beyond the scope of the coach's policy. Thus, especially in the long memory case (Fig.~\ref{fig:partial sorting coaching results a}), coaching steps for both \bubblecoach and \quickcoach are essentially the same (dotted lines).
+In Figures~\ref{fig:full and partial sorting coaching results} we present the number of coaching interactions required to reach the goal state in each case as a function of the state size, $n$, for all three types of coaching. Considering reactive coaching and full advice (Fig.~\ref{fig:full sorting coaching results a}), the utilization of either short or long memory does not appear to have any particular effect on the number of coaching steps, which was expected given the restricted applicability of provided advice. On the contrary, partial advice (Fig.~\ref{fig:partial sorting coaching results a}) combined with both short and long memory results to fewer coaching steps, which can be symmetrically explained by the broader applicability of the provided advice. Also observe that in the case of full advice, coaching steps are proportional to the big--O complexity of the underlying policy / sorting algorithm, which, again, comes as a result of limited advice applicability, forcing the learner to essentially ask for step--by--step guidance in each separate case. In juxtaposition to the full advice case, utilizing memory significantly reduces the required coaching steps per session, since now the learner can effectively apply previously acquired knowledge to new cases. Furthermore, note that in the long memory case (Fig.~\ref{fig:partial sorting coaching results a}), coaching steps for both \bubblecoach and \quickcoach are essentially the same (dotted lines).
 
-Considering proactive coaching, where the learner receives advice on its first wrong search decision (Figs.~\ref{fig:full sorting coaching results p}, \ref{fig:partial sorting coaching results p}), we observe that full advice imposes the same trends in coaching step growth as with reactive coaching. However, providing partial advice, results, again, to the same pattern of coaching steps collapsing under the light of memory, as the learner is able to generalize from previous examples / cases. Furthermore, coaching steps are systematically higher from the corresponding reactive coaching cases (Figs.~\ref{fig:partial sorting coaching results a}, \ref{fig:partial sorting coaching results p}). This reflects the more ``meticulous'' way a proactive coach interacts with the learner, providing (even partial) advice that is more accurate, preventing any unnecessary exploration of the search space, at the cost of having to interact more frequently with the learner, compared to a more ``lazy'' reactive coach.
+Considering proactive coaching, where the learner receives advice on its first wrong decision (Figs.~\ref{fig:full sorting coaching results p}, \ref{fig:partial sorting coaching results p}), we observe that full advice imposes the same trends in coaching step growth as with reactive coaching. However, providing partial advice, leads to a significantly reduced number of coaching steps per session, as with reactive coaching, since, utilizing memory, the learner is able to generalize from previous cases. Notably, coaching steps are systematically higher from the corresponding reactive coaching cases (Figs.~\ref{fig:partial sorting coaching results a}, \ref{fig:partial sorting coaching results p}). This reflects the more ``meticulous'' way a proactive coach interacts with the learner, providing (even partial) advice that is more accurate, preventing any unnecessary exploration of the search space, at the cost of having to interact more frequently with the learner, compared to a more ``lazy'' reactive coach, which prefers to just react to a learner's demand for further knowledge.
 
-Regarding reflexive coaching (Figs.~\ref{fig:full sorting coaching results r}, \ref{fig:partial sorting coaching results r}), we observe similar trends as in proactive coaching, i.e., the coach providing advice addressing earlier learner mistakes on average, guides the latter more accurately even in the case of partial advice. We also report in that case the number of coaching sessions (indicated as \emph{trivial runs}) where at least one advice was provided more than once by the coach, which stems from the randomness in which the learner's mistake is chosen by the coach.
+Regarding reflexive coaching (Figs.~\ref{fig:full sorting coaching results r}, \ref{fig:partial sorting coaching results r}), proactive coaching trends are still observed, in the same fashion, on average. However, in this case, the coach, randomly selecting a state to intervene, might provide the same piece of advice more than once. We report the number of such sessions as \emph{trivial runs}. As state size grows larger, so does the number of trivial runs, especially in short / long memory cases, where the learner has a, typically, larger policy, hence it is more probably to be exposed to the same piece of advice more than once.
 
-\edcom{A few more comments on the differences of the two coaches.}
+Finally, we observe that coach type is irrelevant in case the learner is equipped with some kind of memory, regardless of advice type. For full advice this is expected given the restricted advice applicability which prohibits the learner from reusing previous knowledge, while partial advice, on the contrary, allows the learner to generalize conforming to $\coachpolicy$, reducing the need for coach feedback. Focusing on partial advice in the absence of memory, reactive coaching results to coaching sessions of size proportional to the coaching policy complexity, as noted above. However, for proactive and reflexive coaching this is not true, as the coach appears to interact with the learner significantly more frequently, indicating that in the reactive case the learner might end up learning an efficacious but unfaithful policy, which might not be true for proactive / reflexive coaching.
 
 %Also, a common trend across all cases is that the learner always obtains enough knowledge to construct a valid path from $s$ to $g$.
 
 \section{Coaching fidelity}\label{sec:coaching-fidelity}
 %
-Motivated by the high accuracy with which the learner applies the coach's policy in the case of full advice (Fig.~\ref{fig:full and partial sorting coaching results}, top row), we explore how much the learner conforms to the coach's instructions in the various settings explored in our case. To that end, we define \emph{coaching fidelity} to be the relative frequency of learner decisions conforming to coach decisions on the same states over all such decisions in a coaching session. We sample $m=20$ repetitions for state size $n\in\{5,10,15,20\}$ and compute coaching fidelity for each one of those for \bubblecoach, \quickcoach, all coaching styles, and memory configurations.
-
-In Figure~\ref{fig:coaching fidelities} we show average coaching fidelity as a function of state size, $n$. Regardless of memory configuration, full advice and reactive coaching style results to a virtually fully conformant learner, replicating the coach's policy. Similar results are also obtained for proactive and reactive coaches. However, with partial advice, coaching fidelity depends on the coaching style and the corresponding memory configuration. In particular, in the case of reactive coaching, partial advice results to virtually vanishing fidelity for all memory configurations. For proactive coaching, however, partial advice results to a virtually constant high fidelity for all examined state sizes, barely affected by the corresponding memory configuration. Similarly, reflexive coaching also results to higher fidelity than reactive coaching, roughly replicating results for proactive coaching. Also, observe how in all cases coach type (\bubblecoach or \quickcoach) does not affect fidelity, except for partial advice reactive coaching, where any differences appear to vanish as state size grows.
+Motivated by the potential learner unfaithfulness discussed before, we explore how much the learner conforms to the coach's instructions in the various settings explored in Section~\ref{sec:sorting coaching}. To that end, we define \emph{coaching fidelity} to be the relative frequency of learner decisions conforming to coach decisions on the same states over all such decisions in a session.
+%
+%
+%
+\subsection{Experimental setup}\label{subsec:fidelity-experimental-setup}
+%
+First, we sample $m=20$ repetitions for state size $n\in\{5,10,15,20\}$ and compute coaching fidelity for each one, across all coach types, coaching styles, and memory configurations. Then, aiming to shed more light on the parameters affecting coaching fidelity, we introduce a new type of advice, \partialadvice{k}, $2\leq k\leq n$, where $k-2$ randomly selected state variables are included into the advice condition, alongside the two required to describe the swap action of interest. Such advice captures intermediate levels of specificity between the two extremes explored so far, with $\partialadvice{2}$ corresponding to partial and $\partialadvice{n}$ to full advice for state size $n$. We also define \emph{advice coverage} as the percentage of state variables that is included in the condition of a piece of advice. So, e.g., a rule like \texttt{R ::~(\ttus,2,1,\ttus,5) implies swap(2,5)} has an advice coverage of $\sfrac{3}{5}=60\%$. Again, we ran $m=20$ iterations for state sizes $n\in\{5,10,15,20\}$ and $2\leq k\leq n$ in each case, for all coach types, coaching styles, and memory configurations.
 
 \begin{figure*}
 	\centering\hfill%
@@ -239,11 +246,9 @@ In Figure~\ref{fig:coaching fidelities} we show average coaching fidelity as a f
 	\label{fig:coaching fidelities}
 \end{figure*}
 
-Overall, Figure~\ref{fig:coaching fidelities} hints towards a trade--off between advice specificity and coaching fidelity. The more specific the advice the more conformant the learner to the coaching policy and, conversely, the more loose the advice, the more the learner explores the state space, utilizing previous knowledge and generalizing. To shed more light onto that interplay, we introduce a new type of advice, \partialadvice{k}, $2\leq k\leq n$, where $k-2$ randomly selected state variables are included into the advice condition, alongside the two required to describe the swap action of interest. Such advice captures intermediate specificity between the two extremes explored so far, with $\partialadvice{2}$ corresponding to partial and $\partialadvice{n}$ to full advice. We also define \emph{advice coverage} as the percentage state variables that is included in a the condition of a piece of advice, so that, e.g., a piece of advice being triggered for $(x_1,x_2,x_4)=(2,0,3)$ for state size $n=5$ has an advice coverage of $\sfrac{3}{5}=60\%$.
+\subsection{Results}\label{subsec:fidelity-results}
 
-We ran $m=20$ iterations for state sizes $n\in\{5,10,15,20\}$ and $2\leq k\leq n$ in each case, for all coaching types, styles, and memory configurations. In Figure~\ref{fig:fidelities against coverage} we present coaching fidelity against advice coverage for all those cases. Observe, at first, how coach type and memory configuration do not affect coaching fidelity, while the most significant effect comes from different coaching styles. Indeed, in the case of reactive coaching, the interplay between fidelity and coverage is clear, with lower advice coverage resulting to the learner eventually reaching the goal state but in a way not conforming to the coach's search policy, while the more specific the provided advice, the more accurate the learner in its searching steps towards the goal state.
-
-On the contrary, for proactive and reflexive coaching, coaching fidelity is just slightly increasing with respect to advice coverage, being relatively high, even for lower values of advice coverage. Compared to reactive coaching, proactive and reflexive coaching appear to guarantee a constant high fidelity, mitigating the negative effects of low coverage. In a sense, intervening early on guarantees that the learner cannot deviate much from the coach's guidance, even in case where advice is rather minimal, allowing space for exploration.
+In Figure~\ref{fig:coaching fidelities} we show average coaching fidelity as a function of state size, $n$. Regardless of memory configuration, full advice combined with reactive coaching result to a virtually fully conformant learner, replicating the coach's policy. Similar results are also obtained for proactive and reactive coaches. However, with partial advice, coaching fidelity depends on the coaching style and the corresponding memory configuration. In particular, in the case of reactive coaching, partial advice results to virtually vanishing fidelity for all memory configurations. For proactive coaching, however, partial advice results to a constantly high fidelity for all examined state sizes, also barely affected by the corresponding memory configuration. Similarly, reflexive coaching also results to higher fidelity than reactive coaching, roughly replicating results for proactive coaching. Also, observe how in all cases coach type does not affect fidelity, except for partial advice reactive coaching, where any differences appear to vanish as state size grows.
 
 \begin{figure*}
 	\centering\hfill%
@@ -254,19 +259,9 @@ On the contrary, for proactive and reflexive coaching, coaching fidelity is just
 	\label{fig:fidelities against coverage}
 \end{figure*}
 
-%
-%
-%
-%\subsection{Clustering Coaching}\label{subsec:Clustering Coaching}
-%%
-%\begin{itemize}
-%	\item We explore clustering in various settings, using an inertia-based algorithm.
-%	\item The setting is \textbf{similar} in terms of the coaching process, but there do exist \textbf{domain differences:}
-%	\begin{itemize}
-%		\item Algorithms rely mostly on full-- and not partial--state advice;
-%		\item We are exploring how different levels of ``generalization freedom'' affect learning (with memory).
-%	\end{itemize}
-%\end{itemize}
+Overall, Figure~\ref{fig:coaching fidelities} hints towards a trade--off between advice specificity and coaching fidelity. The more specific the advice the more conformant the learner to the coaching policy and, conversely, the more loose the advice, the more the learner generalizes utilizing previous knowledge.
+
+In Figure~\ref{fig:fidelities against coverage} we present coaching fidelity against advice coverage for all coach types and coaching styles, aggregating on state size. Observe, at first, how coach type and memory configuration do not affect coaching fidelity, while the most significant effect comes from different coaching styles. Indeed, in the case of reactive coaching, lower advice coverage results to the learner eventually reaching the goal state but in a way not conforming to the coach's search policy, while the more specific the provided advice, the more accurate the learner in its searching steps towards the goal state. On the contrary, for proactive and reflexive coaching, coaching fidelity is just slightly increasing with respect to advice coverage, being relatively high, even for lower values of advice coverage. Compared to reactive coaching, proactive and reflexive coaching appear to guarantee a constant high fidelity, mitigating the negative effects of arbitrarily low coverage almost equally well. In a sense, intervening early on guarantees that the learner cannot deviate much from the coach's guidance, even in case where advice is rather minimal.
 %
 %
 %
@@ -287,7 +282,13 @@ On the contrary, for proactive and reflexive coaching, coaching fidelity is just
 %
 \section{Discussion and future work}\label{sec:discussion-and-future-work}
 %
-\tbc
+In the above, we have explored a machine learning paradigm that allows for the efficacious and, under certain configurations, faithful transfer of knowledge from a coach to a machine learner. A limitation of our design is that the list sorting task is highly structured, admitting a single solution, which might not match many real--world scenarios. Nevertheless, this stiffness makes the sorting task ideal for a proof of concept study design.\ednote{This seems a bit weak, maybe revise later.} Moreover, the presented in depth analysis in terms of different coach types, coaching styles and learner memory types effectively mitigates this restriction in the context of exploring and discussing the key features of the proposed learning paradigm. Another limitation stems from the used knowledge representation, which has been artificially restricted to linearly ordered propositional knowledge bases, with rules of a task--specific form. However, utilizing richer representations, as in other works \cite{michaelMachineCoaching2019,prudens2022,ioannouKnowledgeBasedTranslationNatural2021} would make policy description trivial, since, e.g., bubble sort can be easily described by a single relational rule. This, in turn, would result to single--step coaching sessions, regardless of coach type, coaching style, or memory configuration, making any substantial analysis in this setting impossible or trivial. Hence, restricting to a highly structured yet rich problem with ``expressive enough'' semantics allows for an in depth initial exploration of the search coaching learning paradigm while does not deduce much value from generalizations that can be made to broader scopes of application.
+
+A key outcome appears to be that properly shaping an agent's learning environment strongly affects both the acquired knowledge and the way it is applied, allowing for a wide variety of agent behaviors, aligned with the subtleties of the actual task at hand. For instance, if just reaching a certain target state is the ultimate goal, as, e.g., in naive route finding, then using a lazy reactive coaching style allows for learning such a policy in a minimal number of coaching steps. Furthermore, the utilization of memory by the learner appears to essentially wipe out any coaching policy differences, at least in the case explored in this work. This is a useful feature in the case of coaches with potentially imperfect policies, or merging knowledge from multiple resources / coaches, at the cost of not having any guarantees on \emph{how} the agent will end up solving the task.
+
+On the other hand, in cases where not only \emph{what} the goal state is, but also \emph{how} it is reached matters, the proposed search coaching paradigm can be properly configured in plentiful ways to allow for such a more meticulous learning. As shown, one way this can be achieved is by providing overspecific advice, for virtually any coach type, coaching style, and / or memory configuration, essentially having the coach guide the learner step--by--step. While implying higher and more time consuming coach involvement, this kind of coaching and its independence of any other examined parameters except for advice shape might prove useful in the design of knowledge acquisition methodologies where there are no guarantees on the coaching policy efficiency, coaching style, or learner memory availability, e.g., when acquiring potentially conflicting knowledge from multiple semi--expert users. By utilizing proactive, or even reactive, coaching, at least in uniform probability setting explored here, one might coach an eventually efficacious and faithful learner, with the additional advantage of utilizing just partial advice, if needed. This, again, might correspond to real--world scenarios where users are expert or more careful in the way advice is provided and the provision of full advice is impossible due to combinatorial or other restrictions.
+
+Overall, \edcom{Add some future directions here, maybe hint towards real--world applications as in Othello, a clinical setting etc}
 %
 %
 %

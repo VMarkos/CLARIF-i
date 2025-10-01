@@ -1,5 +1,18 @@
 \begin{thebibliography}{}
 
+\bibitem[{Barredo Arrieta} et~al., 2020]{BARREDOARRIETA202082}
+{Barredo Arrieta}, A., Díaz-Rodríguez, N., {Del Ser}, J., Bennetot, A.,
+  Tabik, S., Barbado, A., Garcia, S., Gil-Lopez, S., Molina, D., Benjamins, R.,
+  Chatila, R., and Herrera, F. (2020).
+\newblock {Explainable Artificial Intelligence (XAI): Concepts, taxonomies,
+  opportunities and challenges toward responsible AI}.
+\newblock {\em Information Fusion}, 58:82--115.
+
+\bibitem[Dong et~al., 2017]{dongSu2017}
+Dong, Y., Su, H., Zhu, J., and Zhang, B. (2017).
+\newblock {Improving Interpretability of Deep Neural Networks with Semantic
+  Information}.
+
 \bibitem[Fiske et~al., 2019]{fiske2019}
 Fiske, A., Henningsen, P., and Buyx, A. (2019).
 \newblock Your robot therapist will see you now: Ethical implications of
@@ -93,11 +106,23 @@ Ribeiro, M.~T., Singh, S., and Guestrin, C. (2016).
   Conference}} on {{Knowledge Discovery}} and {{Data Mining}}}, {{KDD}} '16,
   pages 1135--1144, {New York, NY, USA}. {Association for Computing Machinery}.
 
+\bibitem[Rieger et~al., 2019]{riegerSingh2019}
+Rieger, L., Singh, C., Murdoch, W.~J., and Yu, B. (2019).
+\newblock {Interpretations are Useful: Penalizing Explanations to Align Neural
+  Networks With Prior Knowledge}.
+
 \bibitem[Sedlakova and Trachsel, 2023]{sedlakova2023}
 Sedlakova, J. and Trachsel, M. (2023).
 \newblock Conversational artificial intelligence in psychotherapy: A new
   therapeutic tool or agent?
 \newblock {\em The American Journal of Bioethics}, 23(5):4--13.
+
+\bibitem[Selvaraju et~al., 2019]{Selvaraju_2019}
+Selvaraju, R.~R., Cogswell, M., Das, A., Vedantam, R., Parikh, D., and Batra,
+  D. (2019).
+\newblock {Grad-{CAM}: Visual Explanations from Deep Networks via
+  Gradient-Based Localization}.
+\newblock {\em International Journal of Computer Vision}, 128(2):336--359.
 
 \bibitem[Settles, 2009]{Settles2009ActiveLL}
 Settles, B. (2009).
