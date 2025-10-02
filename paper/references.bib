@@ -74,6 +74,16 @@
 	isbn = {978-1-57735-633-2}
 }
 
+@misc{kim2024megannohumanllmcollaborativeannotation,
+	title={MEGAnno+: A Human-LLM Collaborative Annotation System}, 
+	author={Hannah Kim and Kushan Mitra and Rafael Li Chen and Sajjadur Rahman and Dan Zhang},
+	year={2024},
+	eprint={2402.18050},
+	archivePrefix={arXiv},
+	primaryClass={cs.CL},
+	url={https://arxiv.org/abs/2402.18050}, 
+}
+
 @article{khardonRothLearningReason1997,
 	title = {Learning to {{Reason}}},
 	author = {Khardon, Roni and Roth, Dan},
@@ -94,6 +104,16 @@ volume={96},
 pages={380--384},
 year={1996},
 organization={PITMAN}
+}
+
+@misc{liu2023llmbasedhumanrobotcollaborationframework,
+	title={LLM-Based Human-Robot Collaboration Framework for Manipulation Tasks}, 
+	author={Haokun Liu and Yaonan Zhu and Kenji Kato and Izumi Kondo and Tadayoshi Aoyama and Yasuhisa Hasegawa},
+	year={2023},
+	eprint={2308.14972},
+	archivePrefix={arXiv},
+	primaryClass={cs.RO},
+	url={https://arxiv.org/abs/2308.14972}, 
 }
 
 @inproceedings{mccarthyElaborationTolerance1998,
@@ -396,6 +416,24 @@ copyright = {arXiv.org perpetual, non-exclusive license}
 	doi = {10.1613/jair.4539}
 }
 
+@inproceedings{tang2024,
+	author = {Tang, Yi and Chang, Chia-Ming and Yang, Xi},
+	title = {PDFChatAnnotator: A Human-LLM Collaborative Multi-Modal Data Annotation Tool for PDF-Format Catalogs},
+	year = {2024},
+	isbn = {9798400705083},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	url = {https://doi.org/10.1145/3640543.3645174},
+	doi = {10.1145/3640543.3645174},
+	abstract = {The document contains substantial unannotated data, necessitating extensive manual labeling efforts. To address this issue, we introduce PDFChatAnnotator, a human-LLM collaborative tool to collect multi-modal data from PDF catalogs. Initially, PDFChatAnnotator automatically employs our proposed multi-modal binding rules to link related data from different modalities and harnesses the information extraction capabilities of large language models (LLMs) to extract specific information from text descriptions. Furthermore, the tool empowers users to guide and refine the LLM’s annotations. During the annotation process, users can influence the LLM through multiple rounds of communication and example establishment via the provided interfaces. To assess the effectiveness of PDFChatAnnotator’s techniques, we conducted a technical evaluation using three catalogs with typical layouts as experimental data. The results showed that all accuracy rates for multi-modal binding exceeded 90\%, and both the proposed "example establishment" and "interactive adjustment of requirements" contributed to enhanced accuracy rates.},
+	booktitle = {Proceedings of the 29th International Conference on Intelligent User Interfaces},
+	pages = {419–430},
+	numpages = {12},
+	keywords = {Document annotation tool, GPT, Human-LLM collaborative data collection, Interactive system},
+	location = {Greenville, SC, USA},
+	series = {IUI '24}
+}
+
 @inproceedings{tesoKerstingIML2019,
 	title = {Explanatory {{Interactive Machine Learning}}},
 	booktitle = {Proceedings of the 2019 {{AAAI}}/{{ACM Conference}} on {{AI}}, {{Ethics}}, and {{Society}}},
@@ -419,6 +457,38 @@ copyright = {arXiv.org perpetual, non-exclusive license}
 	pages = {1134--1142},
 	issn = {00010782},
 	doi = {10.1145/1968.1972}
+}
+
+@inproceedings{wang2024,
+	author = {Wang, Xinru and Kim, Hannah and Rahman, Sajjadur and Mitra, Kushan and Miao, Zhengjie},
+	title = {Human-LLM Collaborative Annotation Through Effective Verification of LLM Labels},
+	year = {2024},
+	isbn = {9798400703300},
+	publisher = {Association for Computing Machinery},
+	address = {New York, NY, USA},
+	url = {https://doi.org/10.1145/3613904.3641960},
+	doi = {10.1145/3613904.3641960},
+	abstract = {Large language models (LLMs) have shown remarkable performance across various natural language processing (NLP) tasks, indicating their significant potential as data annotators. Although LLM-generated annotations are more cost-effective and efficient to obtain, they are often erroneous for complex or domain-specific tasks and may introduce bias when compared to human annotations. Therefore, instead of completely replacing human annotators with LLMs, we need to leverage the strengths of both LLMs and humans to ensure the accuracy and reliability of annotations. This paper presents a multi-step human-LLM collaborative approach where (1) LLMs generate labels and provide explanations, (2) a verifier assesses the quality of LLM-generated labels, and (3) human annotators re-annotate a subset of labels with lower verification scores. To facilitate human-LLM collaboration, we make use of LLM’s ability to rationalize its decisions. LLM-generated explanations can provide additional information to the verifier model as well as help humans better understand LLM labels. We demonstrate that our verifier is able to identify potentially incorrect LLM labels for human re-annotation. Furthermore, we investigate the impact of presenting LLM labels and explanations on human re-annotation through crowdsourced studies.},
+	booktitle = {Proceedings of the 2024 CHI Conference on Human Factors in Computing Systems},
+	articleno = {303},
+	numpages = {21},
+	keywords = {Human-LLM collaborative annotation, LLM annotation, NLP, self-rationalization, text annotation},
+	location = {Honolulu, HI, USA},
+	series = {CHI '24}
+}
+
+@article{WANG2025425,
+	title = {Human-LLM collaboration in generative design for customization},
+	journal = {Journal of Manufacturing Systems},
+	volume = {80},
+	pages = {425-435},
+	year = {2025},
+	issn = {0278-6125},
+	doi = {https://doi.org/10.1016/j.jmsy.2025.03.012},
+	url = {https://www.sciencedirect.com/science/article/pii/S0278612525000731},
+	author = {Xingzhi Wang and Zhoumingju Jiang and Yi Xiong and Ang Liu},
+	keywords = {Customization, Generative design, Large language models, Collaborative design, Knowledge-based system},
+	abstract = {Generative design enables the rapid creation of diverse designs, making it a promising means for customization. However, due to the multidisciplinary knowledge required for operation, the full potential of generative design for customization (GDfC) remains under-explored. Recently, large language models (LLM) have attracted significant attention from designers. Unlike traditional text-based generative models, LLM’s expansive knowledge base and unique interaction capabilities offer clear advantages for assuming more proactive roles in GDfC. Against the background, this paper explores the potential of LLM in redefining GDfC. Based on the division of the generative design process, this paper identifies three human-LLM collaboration schemes to demonstrate the potential roles of LLM in GDfC. Additionally, this paper proposes a process framework based on the characteristics of required design knowledge, which aids designers in selecting the appropriate LLM performance enhancement strategy for their customization tasks. A case study of vehicle interior customization is presented to demonstrate the application of the proposed framework.}
 }
 
 @inproceedings{welz2024,

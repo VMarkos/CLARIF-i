@@ -29,11 +29,19 @@ Ioannou, C. and Michael, L. (2021).
   Approaches To Dialog Agents Workshop}} - {{LaCATODA}} 2021}, pages 24--32,
   {Montreal, Canada}.
 
+\bibitem[Kim et~al., 2024]{kim2024megannohumanllmcollaborativeannotation}
+Kim, H., Mitra, K., Chen, R.~L., Rahman, S., and Zhang, D. (2024).
+\newblock Meganno+: A human-llm collaborative annotation system.
+
 \bibitem[Liu, 1996]{liu1996intelligent}
 Liu, B. (1996).
 \newblock Intelligent route finding: combining knowledge, cases and an
   efficient search algorithm'.
 \newblock In {\em ECAI}, volume~96, pages 380--384. PITMAN.
+
+\bibitem[Liu et~al., 2023]{liu2023llmbasedhumanrobotcollaborationframework}
+Liu, H., Zhu, Y., Kato, K., Kondo, I., Aoyama, T., and Hasegawa, Y. (2023).
+\newblock Llm-based human-robot collaboration framework for manipulation tasks.
 
 \bibitem[Markos and Michael, 2022]{prudens2022}
 Markos, V. and Michael, L. (2022).
@@ -143,6 +151,14 @@ Shivaswamy, P. and Joachims, T. (2015).
 \newblock Coactive {{Learning}}.
 \newblock {\em Journal of Artificial Intelligence Research}, 53:1--40.
 
+\bibitem[Tang et~al., 2024]{tang2024}
+Tang, Y., Chang, C.-M., and Yang, X. (2024).
+\newblock Pdfchatannotator: A human-llm collaborative multi-modal data
+  annotation tool for pdf-format catalogs.
+\newblock In {\em Proceedings of the 29th International Conference on
+  Intelligent User Interfaces}, IUI '24, page 419–430, New York, NY, USA.
+  Association for Computing Machinery.
+
 \bibitem[Teso and Kersting, 2019]{tesoKerstingIML2019}
 Teso, S. and Kersting, K. (2019).
 \newblock Explanatory {{Interactive Machine Learning}}.
@@ -154,6 +170,19 @@ Teso, S. and Kersting, K. (2019).
 Valiant, L.~G. (1984).
 \newblock A {{Theory}} of the {{Learnable}}.
 \newblock {\em Communications of the ACM}, 27(11):1134--1142.
+
+\bibitem[Wang et~al., 2025]{WANG2025425}
+Wang, X., Jiang, Z., Xiong, Y., and Liu, A. (2025).
+\newblock Human-llm collaboration in generative design for customization.
+\newblock {\em Journal of Manufacturing Systems}, 80:425--435.
+
+\bibitem[Wang et~al., 2024]{wang2024}
+Wang, X., Kim, H., Rahman, S., Mitra, K., and Miao, Z. (2024).
+\newblock Human-llm collaborative annotation through effective verification of
+  llm labels.
+\newblock In {\em Proceedings of the 2024 CHI Conference on Human Factors in
+  Computing Systems}, CHI '24, New York, NY, USA. Association for Computing
+  Machinery.
 
 \bibitem[Welz and Lanquillon, 2024]{welz2024}
 Welz, L. and Lanquillon, C. (2024).
