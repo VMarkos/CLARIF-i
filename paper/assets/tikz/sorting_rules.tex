@@ -21,6 +21,6 @@
 	\node[text box, below={0.2cm of partial bubble.south west}, anchor=west, quickColor] (full quick) {Rqf ::~(3,4,1,5,2) implies swap(3,2);};
 	\node[text box, below={0.1cm of full quick.south west}, anchor=west, quickColor] (partial quick) {Rqp ::~(3,\ttus,\ttus,\ttus,2) implies swap(3,2);};
 	% Swap arrows
-	\draw[<->, thick, bubbleColor] (state 2.south) to[bend right, in=255, out=-75] node[pos=0.5, below]{bubble swap} (state 3.south);
-	\draw[<->, thick, quickColor] (state 1.north east) to[bend left] node[pos=0.5, above]{quick swap} (state 5.north west);
+	\draw[<->, thick, bubbleColor] (state 2.south) to[bend right, in=255, out=-75] node[pos=0.5, below]{bubble sort swap} (state 3.south);
+	\draw[<->, thick, quickColor] (state 1.north east) to[bend left] node[pos=0.5, above]{quicksort swap} (state 5.north west);
 \end{tikzpicture}

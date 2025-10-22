@@ -31,8 +31,8 @@
 \usetikzlibrary{bbox}
 
 %%%% Local definitions %%%%
-\newcommand{\bubblecoach}{\ensuremath{\mathcal{C}_{\rm bubble}}\,}
-\newcommand{\quickcoach}{\ensuremath{\mathcal{C}_{\rm quick}}\,}
+\newcommand{\bubblecoach}{\ensuremath{\texttt{P}_{\rm bubble}}\,}
+\newcommand{\quickcoach}{\ensuremath{\texttt{P}_{\rm quick}}\,}
 \newcommand{\learner}{learner}
 \newcommand{\coach}{coach}
 \newcommand{\NULL}{{\rm\texttt{null}}}
@@ -69,7 +69,7 @@
 
 \begin{document}
 
-\title{Algorithm Coaching}
+\title{Coaching How To Search}
 
 \author{\authorname{Vassilis Markos\sup{1}%\orcidAuthor{0000-0000-0000-0000}
 		and Loizos Michael\sup{1,2}}%\orcidAuthor{0000-0000-0000-0000}}
@@ -78,7 +78,7 @@
 \email{vasileios.markos@st.ouc.ac.cy, loizos@ouc.ac.cy}
 }
 
-\keywords{Machine Coaching, Search Coaching.}
+\keywords{Machine Coaching, Searching, Planning, Machine Learning.}
 
 \abstract{In this paper we propose a human--computer--interaction methodology allowing the accurate and faithful extraction of user knowledge. We demonstrate its efficiency in a controlled artificial setting, showcasing how learning in this context is both efficient and faithful to the user's knowledge and intentions. Finally, we discuss potential areas of application for this machine learning paradigm.}
 
@@ -92,24 +92,23 @@ Notably, in all such cases, path optimality can also be understood in the contex
 %
 %
 %
-\section{Related literature}\label{sec:related-literature}
+\section{Related Literature}\label{sec:related-literature}
 %
-Knowledge exchange between a coach and a machine learner in the form of context--driven advice giving based on the learner's decisions has been described as soon as in \cite{mccarthyProgramsCommonSense1959}. Recently, it has been formalized in the context of \emph{Machine Coaching} \cite{michaelAdviceTaker2017,michaelMachineCoaching2019} under the Probably Approximately Correct (PAC) model \cite{valiantPAC1984}.
-
-A similar approach, eXplainable Interactive Learning (XIL), \cite{tesoKerstingIML2019} also considers a human supervisor in the role of a learning ``coach'', with advice either correcting mislabeled data, or wrong explanations provided by the learner for otherwise correct predictions. Nevertheless, while in Machine Coaching coach advice can be directly embedded into the learner's knowledge base in an elaboration--tolerant manner \cite{mccarthyElaborationTolerance1998}, XIL utilizes an active learning algorithm as a black--box \cite{Settles2009ActiveLL} alongside a local post-hoc explainer \cite{ribeiro2016}. The corresponding explanations are then used to generate additional labeled data for the learner, to help it cure any misunderstandings.
+Knowledge transfer between a machine learner and a human coach has been discussed in various works, such as eXplainable Interactive Learning (XIL), \cite{tesoKerstingIML2019} which considers a human supervisor in the role of a learning ``coach'', with advice either correcting mislabeled data, or wrong explanations provided by the learner for otherwise correct predictions. Nevertheless, while in Machine Coaching coach advice can be directly embedded into the learner's knowledge base in an elaboration--tolerant manner \cite{mccarthyElaborationTolerance1998}, XIL utilizes an active learning algorithm as a black--box \cite{Settles2009ActiveLL} alongside a local post-hoc explainer \cite{ribeiro2016}. The corresponding explanations are then used to generate additional labeled data for the learner, to help it cure any misunderstandings.
 
 User feedback can also be utilized to proactively reduce the need for data point labeling, as in \cite{raghavanAllan2007} for Support Vector Machines. In the same spirit, \cite{settles-2011-closing} proposes an interactive framework allowing users to label selected data points with the aim of further polishing the training of a document classifier, while in \cite{zaidan2007using}, a machine learning paradigm utilizing user--provided explanations to reduce learning complexity is proposed. Interestingly, in \cite{zaidan2007using} it is stressed that an alternative to immense data load for performance improvement is \emph{data richness}, i.e., the provision of more meaningful data, e.g., in the form of a correct label accompanied by an explanation for it. \emph{Coactive Learning}, proposed in \cite{shivaswamyJoachims2015}, is another interactive Machine Learning framework where a learner receives user advice that is, inherently, only ``slightly better'' than the learner's current prediction. The main benefit of the approach, as shown in \cite{shivaswamyJoachims2015}, is that this approach can be integrated into many existing black--box  methodologies.
 
 Besides guaranteeing faithfulness and effectively building user trust \cite{BARREDOARRIETA202082}, explanation embedding during model training has been reported to improve testing performance \cite{Selvaraju_2019}. Moreover, utilizing bilateral explanations, i.e., from the learner towards the coach and vice versa, can further speed up the learning process \cite{dongSu2017}, with similar results also obtained in model retraining upon the provision of additional explanations regarding both wrong and correct, but for the wrong reasons, model decisions \cite{riegerSingh2019}. At last, post--hoc model fine tuning also leads to performance improvements \cite{ribeiro2016}.
 
 Given the recent spike in the use of Large Language Models (LLMs) in virtually all domains, human--machine interaction methodologies that utilize human expertise to further polish a LLM have been proposed. In \cite{welz2024} a human knowledge infusion methodology is presented, where expert users provide domain specific knowledge that is used to populate a knowledge base, then utilized by the system in tandem with the LLM to generate responses to user queries. In a similar fashion, \cite{wang2024} discuss a human--LLM collaborative data annotation approach where the human undertakes the role of the LLM supervisor by revising and correcting the latter's erroneous data labels and / or the corresponding LLM explanations, as in \cite{tesoKerstingIML2019}. In \cite{kim2024megannohumanllmcollaborativeannotation}, human--LLM collaboration is explored in a setting where the user can freely explore, correct and interact with LLM responses through appropriate programmatic interfaces or interface widgets. A variant of this approach, where human supervisors freely observe and correct LLM annotations in PDF files is also proposed in \cite{tang2024}. In robotics, human robot teleoperators have been put in coaching roles in hybrid robot--LLM systems, with the aim of system decision verification \cite{liu2023llmbasedhumanrobotcollaborationframework}. In the context of generative design customization, \cite{WANG2025425} discuss passive, assistive and proactive human--LLM collaboration schemes are discussed, each one proposed for users of different levels of expertise.
-%
-%
-%
-\section{Sorting coaching}\label{sec:sorting coaching}
-%
-In this Section we empirically explore search coaching, by having a machine learner iteratively seek advice by a machine coach, emulating a human coach, as in \cite{proxyCoaching2022}, with the aim of iteratively improving its search capacity, guided by the coach's explicit search policy. Given a fixed goal state, $g$, the learner applies its search policy, $\learnerpolicy$, to identify a path, $p$, starting from an arbitrary state, $s$, and ending at a goal state, $g$. Upon lack of knowledge, the learner seeks advice from its coach, which responds according to its own policy, $\coachpolicy$, providing a single piece of advice to the learner. Each piece of advice has the form of an ``if--then'' rule, where the rule's \emph{body} (``if'' part) is state--dependent and its \emph{head} (the ``then'' part) is always an action to be undertaken by the learner. Rules are prioritized by the coach as in previous works \cite{proxyCoaching2022,prudens2022,ioannouKnowledgeBasedTranslationNatural2021} with later received ones by default overriding previous ones in $\learnerpolicy$, besides cases where the coach demands otherwise. In this setting, a \emph{coaching step} is a single learner request for advice and the corresponding coach response, while a \emph{coaching session} comprises of the full learning cycle, ending when the learner eventually crafts a path as requested or the process is aborted (cf Algorithm~\ref{alg:coaching process}).
 
+It should be noted that knowledge exchange between a coach and a machine learner in the form of context--driven advice giving based on the learner's decisions has been described as soon as in \cite{mccarthyProgramsCommonSense1959}. Recently, it has been formalized in the context of \emph{Machine Coaching} \cite{michaelAdviceTaker2017,michaelMachineCoaching2019} under the Probably Approximately Correct (PAC) model \cite{valiantPAC1984}.
+%
+%
+%
+\section{Background and Preliminaries}\label{sec:background and preliminaries}
+%
+Utilizing learning semantics presented in previous work on Machine Coaching \cite{michaelMachineCoaching2019,prudens2022}, we empirically explore its particular application on search coaching, by having a machine learner iteratively seek advice by a machine coach, emulating a human coach, as in \cite{proxyCoaching2022}, with the aim of iteratively improving its search capacity, guided by the coach's explicit search policy. Given a fixed goal state, $g$, the learner applies its search policy, $\learnerpolicy$, to identify a path, $p$, starting from an arbitrary state, $s$, and ending at a goal state, $g$. Upon lack of knowledge, the learner seeks advice from its coach, which responds according to its own policy, $\coachpolicy$, providing a single piece of advice to the learner. Each piece of advice has the form of an ``if--then'' rule, where the rule's \emph{body} (``if'' part) is state--dependent and its \emph{head} (the ``then'' part) is always an action to be undertaken by the learner. Rules are prioritized by the coach as in previous works \cite{proxyCoaching2022,prudens2022,ioannouKnowledgeBasedTranslationNatural2021} with later received ones by default overriding previous ones in $\learnerpolicy$, besides cases where the coach demands otherwise. In this setting, a \emph{coaching step} is a single learner request for advice and the corresponding coach response, while a \emph{coaching session} comprises of the full learning cycle, ending when the learner eventually crafts a path as requested or the process is aborted (cf Algorithm~\ref{alg:coaching process}).
 
 \begin{algorithm}
 	\caption{Search coaching process. $s$, $g$ denote the start and goal states, respectively.}%
@@ -123,12 +122,35 @@ In this Section we empirically explore search coaching, by having a machine lear
 		$advice \gets \coach.\evaluate{path}{s}{g}$\;
 	}
 \end{algorithm}
+
+We have implemented two machine \emph{policies}, \bubblecoach, which relies on bubble sort, and \quickcoach, which relies on quicksort, both resulting to advice corresponding to the next step in the algorithm underlying each coaching policy. A state of size $n$ in this case is any permutation of $\{1,2,\ldots,n\}$, with start states being arbitrarily chosen among all possible states of the same size, while the goal state is always $(1,2,\ldots,n)$. Rules in this case have a potentially partial permutation of $\{1,2,\ldots,n\}$ as their body and a swap action between two items of this permutation as their head, as shown in Figure~\ref{fig:sorting rules}.
+%
+%
+%
+\section{Sorting coaching}\label{sec:sorting coaching}
+%
+%In this Section we empirically explore search coaching, by having a machine learner iteratively seek advice by a machine coach, emulating a human coach, as in \cite{proxyCoaching2022}, with the aim of iteratively improving its search capacity, guided by the coach's explicit search policy. Given a fixed goal state, $g$, the learner applies its search policy, $\learnerpolicy$, to identify a path, $p$, starting from an arbitrary state, $s$, and ending at a goal state, $g$. Upon lack of knowledge, the learner seeks advice from its coach, which responds according to its own policy, $\coachpolicy$, providing a single piece of advice to the learner. Each piece of advice has the form of an ``if--then'' rule, where the rule's \emph{body} (``if'' part) is state--dependent and its \emph{head} (the ``then'' part) is always an action to be undertaken by the learner. Rules are prioritized by the coach as in previous works \cite{proxyCoaching2022,prudens2022,ioannouKnowledgeBasedTranslationNatural2021} with later received ones by default overriding previous ones in $\learnerpolicy$, besides cases where the coach demands otherwise. In this setting, a \emph{coaching step} is a single learner request for advice and the corresponding coach response, while a \emph{coaching session} comprises of the full learning cycle, ending when the learner eventually crafts a path as requested or the process is aborted (cf Algorithm~\ref{alg:coaching process}).
+%
+%
+%\begin{algorithm}
+%	\caption{Search coaching process. $s$, $g$ denote the start and goal states, respectively.}%
+%	\label{alg:coaching process}
+%	\KwData{$s$, $g$, $\learner$, $\coach$}
+%	\KwResult{$\learner$ with updated search policy; $path$ from $s$ to $g$ or aborted.}
+%	$advice\gets\NULL$\;
+%	\Do{advice is not \NULL}{%
+%		$\learner.\updatehypothesis{advice}$\;
+%		$path \gets \learner.\searchpath{s}{g}$\;
+%		$advice \gets \coach.\evaluate{path}{s}{g}$\;
+%	}
+%\end{algorithm}
 %
 %
 %
 \subsection{Experimental setup}\label{subsec:experimental-setup}
 %
-We have implemented two machine \emph{coach types}, \bubblecoach, which uses bubble sort as its underlying coaching policy, and \quickcoach, which uses quicksort for that purpose, both resulting to advice corresponding to the next step in the algorithm underlying each coaching policy. A state of size $n$ in this case is any permutation of $\{1,2,\ldots,n\}$, with start states being arbitrarily chosen among all possible states of the same size, while the goal state is always $(1,2,\ldots,n)$. Rules in this case have a potentially partial permutation of $\{1,2,\ldots,n\}$ as their body and a swap action between two items of this permutation as their head, as shown in Figure~\ref{fig:sorting rules}. We let $n$ range from $1$ to $20$, running $m=100$ iterations for each value of $n$. We have also explored two different types of advice for each coach:
+
+We let $n$ range from $1$ to $20$, running $m=100$ iterations for each value of $n$. We have also explored two different types of advice for each coach:
 \begin{enumerate*}[label=(A\arabic*)]
 	\item \emph{full advice}, where each piece of advice depends on the entire state, and;
 	\item \emph{partial advice}, where each piece of advice depends on the specific part of the state to be improved.
