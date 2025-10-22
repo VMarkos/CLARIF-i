@@ -64,9 +64,10 @@ def line_plot(paths: list[tuple[str]], figname: str, reps: int = 100):
     # plt.xlabel("n")
     # plt.ylabel("Coaching Steps")
     plt.tight_layout()
+    ax.set_ylim([-10,300])
     # plt.title("Coachable Search Learnability")
     ax.grid()
-    ax.legend()
+    ax.legend(loc='upper left')
     CWD = os.path.abspath(os.path.dirname(__file__))
     PLOT_PATH = os.path.join(CWD, "plots")
     if not os.path.isdir(PLOT_PATH):
