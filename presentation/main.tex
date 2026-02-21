@@ -1,0 +1,130 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{booktabs}
+\usepackage{graphicx} % Required for inserting images
+% \usepackage[table]{xcolor}
+\usepackage{pifont}
+
+\title{Coaching How To Search}
+\subtitle{ICAART 2026}
+\author{Vassilis Markos, and Loizos Michael}
+\date{March 2026}
+
+\usetheme{streamline}
+
+\input{local_definitions}
+
+% tikz libraries
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{bbox}
+
+\begin{document}
+
+\maketitle
+
+\begin{frame}{Contents}
+    \tableofcontents
+\end{frame}
+
+\section{Motivation}
+
+\begin{frame}{Motivation}
+    Examples where it does not / it does matter how things are done by AI agents.
+\end{frame}
+
+\begin{frame}{Symbolic AI + Searching}
+    \begin{itemize}
+        \item On many occasions, \emph{how} an agent achieves its goals matters at least as much as \emph{whether} it does so or not.
+        \item Such cases can be naturally encoded as search problems, where the agent searches for an optimal path, $p$, from a starting state, $s$, to a goal state, $p$.
+        \item In ensuring a faithful implementation of instructions, design guarantees are key to avoid common modern AI issues, like overfitting / inability to generalize, hallucinations, and so on.
+        \item Thus, symbolic AI approaches, offering formal guarantees, are a good candidate to undertake this task.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Argumentation Frameworks}
+    Slide with figure discussing key AF concepts.
+\end{frame}
+
+\begin{frame}{Machine Coaching}
+    Figure presenting machine coaching using birds.
+\end{frame}
+
+\begin{frame}{Search Coaching}
+    \begin{itemize}
+        \item In this work, we explore a particular way to gradually instill knowledge to an agent about both \emph{what} and \emph{how} to look for $g$.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Sorting Rules}
+    \centering
+    \include{assets/tikz/sorting_rules}
+\end{frame}
+
+
+\begin{frame}{Coaching Styles}
+    \centering
+    \include{assets/tikz/coaching_styles}
+\end{frame}
+
+\section{Empirical Setting}
+
+\begin{frame}{Definitions}
+    \begin{itemize}
+        \item Advice coverage
+        \item Memory
+        \item Coaching conformity
+        \item Coaching step
+    \end{itemize}
+\end{frame}
+
+\begin{frame}{Empirical Setting}
+    ~\vfill
+    \centering
+    % \rowcolors{1}{white}{streamlinegray}
+    \begin{tabular}{lll}
+        \toprule
+        \textbf{Attribute} & \textbf{Series A Experiments} & \textbf{Series B Experiments}\\\midrule
+        State size, $n$ & $\{1,2,\ldots,20\}$ & $\{5,10,15,20\}$ \\
+        Iterations, $m$ & $100$ & $20$ \\
+        Advice type & Full / Partial & partial@$k$ \\
+        Memory & \multicolumn{2}{c}{long / short / no} \\
+        Coaching style & \multicolumn{2}{c}{reactive / reflexive / proactive} \\
+        Coaching policy & \multicolumn{2}{c}{bubble sort, quicksort} \\
+        \bottomrule
+    \end{tabular}
+    \vfill
+\end{frame}
+
+\section{Results}
+
+\begin{frame}{Series A: Full Advice Coaching Steps}
+    
+\end{frame}
+
+\begin{frame}{Series A: Partial Advice Coaching Steps}
+    
+\end{frame}
+
+\begin{frame}{Series B: Coaching Conformity vs $n$}
+    
+\end{frame}
+
+\begin{frame}{Series B: Coaching Conformity vs Advice Coverage}
+    
+\end{frame}
+
+\section{Discussion \& Future Work}
+
+\begin{frame}{Discussion}
+    
+\end{frame}
+
+\begin{frame}{Future Work}
+    
+\end{frame}
+
+\begin{frame}{Coachello}
+    
+\end{frame}
+
+\end{document}

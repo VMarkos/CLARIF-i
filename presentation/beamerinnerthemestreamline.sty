@@ -1,0 +1,116 @@
+\mode<presentation>
+
+\setbeamertemplate{background}{
+  \begin{tikzpicture}
+	\useasboundingbox (0,0) rectangle (\the\paperwidth,\the\paperheight);
+	\fill[color=streamlinegray] (0,0) rectangle (\the\paperwidth, {\headeryoffsetratio * \the\paperheight});
+	\fill[color=white] (0,{\headeryoffsetratio * \the\paperheight}) rectangle (\the\paperwidth,\the\paperheight);
+	\fill[color=streamlinegreen] ({\delimxoffsetratio * \the\paperwidth},{\delimyoffsetratio * \the\paperheight}) rectangle ({(\delimxoffsetratio + \delimlengthratio) * \the\paperwidth},{(\delimyoffsetratio + \delimheightratio)* \the\paperheight});
+	\fill[color=streamlineorange] ({(\delimxoffsetratio + \delimlengthratio) * \the\paperwidth},{\delimyoffsetratio * \the\paperheight}) rectangle ({(\delimxoffsetratio + 2*\delimlengthratio) * \the\paperwidth},{(\delimyoffsetratio + \delimheightratio)* \the\paperheight});
+	\ifnum\thepage>1\relax%
+		\fill[color=streamlinegray] (0,{\headeryoffsetratio * \the\paperheight}) rectangle (\the\paperwidth,\the\paperheight);
+		\fill[color=white] (0,0) rectangle (\the\paperwidth, {\headeryoffsetratio * \the\paperheight});
+		\fill[color=streamlinegreen] ({\delimxoffsetratio * \the\paperwidth},{\delimyoffsetratio * \the\paperheight}) rectangle ({(\delimxoffsetratio + \delimlengthratio) * \the\paperwidth},{(\delimyoffsetratio + \delimheightratio)* \the\paperheight});
+		\fill[color=streamlineorange] ({(\delimxoffsetratio + \delimlengthratio) * \the\paperwidth},{\delimyoffsetratio * \the\paperheight}) rectangle ({(\delimxoffsetratio + 2*\delimlengthratio) * \the\paperwidth},{(\delimyoffsetratio + \delimheightratio)* \the\paperheight});
+	\fi
+  \end{tikzpicture}
+}%
+%
+\setbeamersize{text margin left={0.0909\paperwidth}, text margin right={0.0795\paperwidth}}%
+%
+% Title page
+\defbeamertemplate*{title page}{streamline}[1][]%
+{%
+	\vfil%
+   \vskip\headertopoffsetratio\paperheight%
+    \begin{beamercolorbox}[wd=\paperwidth, leftskip={\headerleftoffsetratio\paperwidth}, rightskip={\headerrightoffsetratio\paperwidth}]{title page header}%
+      {\Huge\bfseries\usebeamerfont{title}\inserttitle}\par%
+    \end{beamercolorbox}%
+	\vskip0.2cm%
+	\begin{beamercolorbox}[wd=\paperwidth, leftskip={\headerleftoffsetratio\paperwidth}, rightskip={\headerrightoffsetratio\paperwidth}]{subtitle page header}%
+		{\large\usebeamerfont{subtitle}\insertsubtitle}\par%
+	\end{beamercolorbox}
+    \vskip1.5cm%
+    \begin{beamercolorbox}[wd=\paperwidth, leftskip={\headerleftoffsetratio\paperwidth}]{author}%
+      {\small\usebeamerfont{author}\insertauthor}%
+    \end{beamercolorbox}%
+     \vskip0.8cm%
+    \begin{beamercolorbox}[right, wd=\paperwidth, rightskip={\headerrightoffsetratio\paperwidth}]{date}%
+      {\small\usebeamerfont{date}\insertdate}%
+    \end{beamercolorbox}
+}
+
+\makeatletter
+\patchcmd{\beamer@calculateheadfoot}{\advance\footheight by 4pt}{\advance\footheight by 20pt}{}{}
+\makeatother
+
+\setbeamertemplate{footline}{%
+	\usebeamercolor[fg]{page number}%
+	\usebeamerfont{page number}%
+	\ifnum\thepage>1%
+		\begin{beamercolorbox}[wd=\paperwidth, leftskip={10pt}]{footline title left}%
+			\inserttitle:\ \insertsubtitle\par%
+		\end{beamercolorbox}%
+		\vskip1.2ex%
+		\begin{beamercolorbox}[wd=\paperwidth, leftskip={10pt}, rightskip={10pt}]{footline author date left}%
+			\insertauthor,\ \insertdate\hfill \insertframenumber/\inserttotalframenumber\par%
+		\end{beamercolorbox}%
+		\vspace{10pt}%
+	\fi%
+}%
+%
+\newcommand{\sectionframe}{{%
+	\setbeamertemplate{background}{%
+		\begin{tikzpicture}%
+			\useasboundingbox (0,0) rectangle (\the\paperwidth,\the\paperheight);
+			\fill[color=streamlinegreen] (0, 0) rectangle (\the\paperwidth,\the\paperheight);
+			\fill[color=white] ({\delimxoffsetratio * \the\paperwidth},{\delimyoffsetratio * \the\paperheight}) rectangle ({(\delimxoffsetratio + 2*\delimlengthratio) * \the\paperwidth},{(\delimyoffsetratio + \delimheightratio)* \the\paperheight});
+		\end{tikzpicture}%
+	}%
+	\setbeamertemplate{footline}{%
+		\usebeamercolor[fg]{section name}%
+		\usebeamerfont{page number}%
+		\hfill%
+		\insertframenumber/\inserttotalframenumber\hspace{10pt}%
+		\vspace{10pt}%
+	}
+	\frame{\sectionpage}
+}}
+
+% Section page
+\defbeamertemplate*{section page}{streamline}[1][]%
+{%
+	\vskip\headertopoffsetratio\paperheight%
+	\begin{beamercolorbox}[wd=\paperwidth, leftskip={\headerleftoffsetratio\paperwidth}, rightskip={\headerrightoffsetratio\paperwidth}]{section name}
+		{\Huge\bfseries\usebeamerfont{section name}\insertsection}\par%
+	\end{beamercolorbox}%
+	\vfill
+}%
+
+% Heads up page
+\newenvironment{headsup}[1]{%
+		\setbeamertemplate{background}{%
+		\begin{tikzpicture}
+			\useasboundingbox (0,0) rectangle (\the\paperwidth,\the\paperheight);
+			\fill[color=streamlinegray] (0,0) rectangle (\the\paperwidth, {\headeryoffsetratio * \the\paperheight});
+			\fill[color=streamlinegreen] (0,{\headeryoffsetratio * \the\paperheight}) rectangle (\the\paperwidth,\the\paperheight) node[anchor=west, pos=0.0080, yshift=1.4ex, white] {\textbf{Heads up!}};
+			\fill[color=streamlinegreen] ({\delimxoffsetratio * \the\paperwidth},{\delimyoffsetratio * \the\paperheight}) rectangle ({(\delimxoffsetratio + \delimlengthratio) * \the\paperwidth},{(\delimyoffsetratio + \delimheightratio)* \the\paperheight});
+			\fill[color=streamlineorange] ({(\delimxoffsetratio + \delimlengthratio) * \the\paperwidth},{\delimyoffsetratio * \the\paperheight}) rectangle ({(\delimxoffsetratio + 2*\delimlengthratio) * \the\paperwidth},{(\delimyoffsetratio + \delimheightratio)* \the\paperheight});
+		\end{tikzpicture}
+	}
+	\begin{frame}{#1}%
+}{\end{frame}}
+
+% Not relevant for module assessment page
+\newenvironment{irrelevant}[1]{%
+	\setbeamertemplate{background}{%
+		\begin{tikzpicture}
+		\useasboundingbox (0,0) rectangle (\the\paperwidth,\the\paperheight);
+		\fill[color=streamlinegray] (0,0) rectangle (\the\paperwidth, {\headeryoffsetratio * \the\paperheight});
+		\fill[color=streamlineorange] (0,{\headeryoffsetratio * \the\paperheight}) rectangle (\the\paperwidth,\the\paperheight) node[pos=0.0080, yshift=1.4ex, white, anchor=west] {\textbf{Not relevant for the assessment of the module!}};
+		\fill[color=streamlinegreen] ({\delimxoffsetratio * \the\paperwidth},{\delimyoffsetratio * \the\paperheight}) rectangle ({(\delimxoffsetratio + \delimlengthratio) * \the\paperwidth},{(\delimyoffsetratio + \delimheightratio)* \the\paperheight});
+		\fill[color=streamlineorange] ({(\delimxoffsetratio + \delimlengthratio) * \the\paperwidth},{\delimyoffsetratio * \the\paperheight}) rectangle ({(\delimxoffsetratio + 2*\delimlengthratio) * \the\paperwidth},{(\delimyoffsetratio + \delimheightratio)* \the\paperheight});
+		\end{tikzpicture}
+	}
+	\begin{frame}{#1}%
+	}{\end{frame}}
