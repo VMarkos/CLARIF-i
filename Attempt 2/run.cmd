@@ -1,2 +1,0 @@
-python starter.py
-pause

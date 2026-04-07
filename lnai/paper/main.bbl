@@ -1,0 +1,31 @@
+\begin{thebibliography}{1}
+\providecommand{\url}[1]{\texttt{#1}}
+\providecommand{\urlprefix}{URL }
+\providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{ioannouKnowledgeBasedTranslationNatural2021}
+Ioannou, C., Michael, L.: Knowledge-{{Based Translation}} of {{Natural
+  Language}} into {{Symbolic Form}}. In: Proceedings of the 7th {{Linguistic}}
+  and {{Cognitive Approaches To Dialog Agents Workshop}} - {{LaCATODA}} 2021.
+  pp. 24--32. {Montreal, Canada} (2021),
+  \url{http://ceur-ws.org/Vol-2935/\#paper3}
+
+\bibitem{proxyCoaching2022}
+Markos, V.T., Thoma, M., Michael, L.: Machine coaching with proxy coaches. In:
+  Kuhlmann, I., Mumford, J., Sarkadi, S. (eds.) Proceedings of the 1st Workshop
+  on Argumentation {\&} Machine Learning co-located with 9th International
+  Conference on Computational Models of Argument {(COMMA} 2022), Cardiff,
+  Wales, September 13th, 2022. {CEUR} Workshop Proceedings, vol.~3208, pp.
+  45--64. CEUR-WS.org (2022), \url{https://ceur-ws.org/Vol-3208/paper4.pdf}
+
+\bibitem{prudens2022}
+Markos, V., Michael, L.: Prudens: An argumentation-based language for cognitive
+  assistants. In: Governatori, G., Turhan, A.Y. (eds.) Rules and Reasoning. pp.
+  296--304. Springer International Publishing, Cham (2022)
+
+\bibitem{michaelMachineCoaching2019}
+Michael, L.: Machine {{Coaching}}. In: {{IJCAI}} 2019 {{Workshop}} on
+  {{Explainable Artificial Intelligence}}. pp. 80--86. {Macau, China} (2019),
+  \url{https://www.researchgate.net/publication/334989337\_Machine\_Coaching}
+
+\end{thebibliography}

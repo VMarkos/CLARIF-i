@@ -1,0 +1,26 @@
+\begin{tikzpicture}[
+		bezier bounding box,
+		arrow/.style={->, draw=black, thick},
+		advice/.style={draw=adviceColor, densely dotted},
+		node/.style={circle, inner sep=0.125cm, outer sep=0.2mm, draw=black, thick},
+		faded/.style={opacity=0.2},
+		bubble/.style={draw=bubbleColor, fill=bubbleColor, fill opacity=0.1, text opacity=1.0},
+		quick/.style={draw=quickColor, fill=quickColor, fill opacity=0.1, text opacity=1.0},
+		unknown/.style={draw=unknownColor, fill=unknownColor, fill opacity=0.1},
+		text box/.style={font=\tt},
+	]
+	% State nodes
+	\node[node, quick] (state 1) at (1, 0) {3};
+	\node[node, bubble] (state 2) at (2, 0) {4};
+	\node[node, bubble] (state 3) at (3, 0) {1};
+	\node[node] (state 4) at (4, 0) {5};
+	\node[node, quick] (state 5) at (5, 0) {2};
+	% Rules
+	\node[text box, below={of state 3.south}, anchor=north, bubbleColor] (full bubble) {\bfseries\small Rbf ::~(3,4,1,5,2) implies swap(4,1);};
+	\node[text box, below={0.1cm of full bubble.south west}, anchor=west, bubbleColor] (partial bubble) {\bfseries\small Rbp ::~(\ttus,4,1,\ttus,\ttus) implies swap(4,1);};
+	\node[text box, below={0.2cm of partial bubble.south west}, anchor=west, quickColor] (full quick) {\bfseries\small Rqf ::~(3,4,1,5,2) implies swap(3,2);};
+	\node[text box, below={0.1cm of full quick.south west}, anchor=west, quickColor] (partial quick) {\bfseries\small Rqp ::~(3,\ttus,\ttus,\ttus,2) implies swap(3,2);};
+	% Swap arrows
+	\draw[<->, thick, bubbleColor] (state 2.south) to[bend right, in=255, out=-75] node[pos=0.5, below]{bubble sort swap} (state 3.south);
+	\draw[<->, thick, quickColor] (state 1.north east) to[bend left] node[pos=0.5, above]{quicksort swap} (state 5.north west);
+\end{tikzpicture}
