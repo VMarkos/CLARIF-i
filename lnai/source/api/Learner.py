@@ -1,0 +1,144 @@
+# api/Learner.py
+
+"""
+Learner implementation for the coachable search framework.
+"""
+
+import itertools as it
+from typing import Dict, List, Tuple, Set, Optional, Callable
+from avltree import AvlTree
+from ordered_set import OrderedSet
+
+from .Rule import Rule
+from .State import State
+
+
+class Learner:
+    """
+    The learner maintains a hypothesis and updates it based on coach feedback.
+
+    Attributes:
+        hypothesis: List of rules that represent the learner's current understanding
+    """
+
+    def __init__(self, initial_rules: List[Rule] = []):
+        """Initialize the learner with initial rules."""
+        p_key = lambda r: -r.priority  # a bit sub-optimal
+        grouped_rules = {
+            (1, p): set(rs)
+            for p, rs in it.groupby(sorted(initial_rules, key=p_key), p_key)
+        }
+        self.hypothesis: AvlTree = AvlTree[tuple[int, int], Rule](grouped_rules)
+        self._time = 0
+        self._trace: list[State] = (
+            []
+        )  # list of traces in the form of States the learner passes through
+
+    def search_path(
+        self, start_state: State, is_goal: Callable[State, bool]
+    ) -> Tuple[bool, List[List[Tuple[State, Optional[Rule]]]]]:
+        """
+        Search for paths from start state to goal state using current rules.
+
+        Args:
+            start_state: The initial state
+            goal_state: The goal state
+
+        Returns:
+            Tuple of (success, traces) where:
+            - success is True if a path was found, False otherwise
+            - traces is a list of reasoning traces, each trace being a list of (state, rule) pairs
+        """
+        # Check if start state already matches goal state
+        self._trace = [start_state]
+
+        # Maybe, conceptually, this check should have been outside the learner, as the is_goal function is not known to it.
+        # print(f"\t>>>{is_goal(start_state)}")
+        if is_goal(start_state):
+            # print(f"\tIs goal state: {start_state}")
+            traces = [(start_state, None)]
+            return True, traces
+
+        # Try to find paths using current rules
+        visited = set()
+        queue = [(start_state, [])]
+        partial_traces_dict = {start_state: OrderedSet([])}
+
+        while queue:
+            current_state, path = queue.pop(0)
+            if current_state in visited:
+                continue
+            visited.add(current_state)
+            self._trace.append(current_state)
+            if is_goal(current_state):
+                if current_state in partial_traces_dict:
+                    partial_traces_dict[current_state].add(tuple(new_path))
+                else:
+                    partial_traces_dict[current_state] = OrderedSet([tuple(new_path)])
+                continue
+            top_rule = self._find_top_rule(current_state)
+            # print(f"current_state: {hash(current_state)}")
+            # print(f"top rule: {top_rule}")
+            if top_rule != None:
+                new_state = top_rule.apply(current_state)
+                new_path = path + [(new_state, top_rule)]
+                queue.append((new_state, new_path))
+                if new_state in partial_traces_dict:
+                    partial_traces_dict[new_state].add(tuple(new_path))
+                else:
+                    partial_traces_dict[new_state] = OrderedSet([tuple(new_path)])
+
+        # If we found any traces, return success
+        traces = [
+            (state, path)
+            for state, paths in partial_traces_dict.items()
+            for path in paths
+        ]
+        if traces:
+            # print("RETURNING FULL TRACES")
+            # print(f"\tLEARNER TRACES{[str(t[0]) for t in traces]}")
+            return True, traces
+
+        # print("RETURNING PARTIAL TRACES")
+        return False, traces
+
+    def _find_top_rule(self, state: State) -> Rule | None:
+        # print('Looking for top rule')
+        try:
+            # print(f'\t{self.hypothesis}')
+            for rp in self.hypothesis:
+                rules = self.hypothesis[rp]
+                for r in rules:
+                    # print(f'\t{r}')
+                    if r.applies(state):  # and r.priority > max_priority:
+                        # print('\tapplies')
+                        return r
+            # print('\tReturning none')
+            return None
+        except (TypeError, ValueError) as e:
+            # print(f'\t{e}')
+            # print('\tError!')
+            return None
+
+    def update_hypothesis(self, feedback_rules: List[Rule]):
+        """
+        Update the learner's hypothesis based on feedback.
+
+        Args:
+            feedback_rules: List of rules provided as feedback
+        """
+        # print("feedback_rules:", feedback_rules)
+        # Add new rules to hypothesis
+        for rule in feedback_rules:
+            rp = (
+                -self._time,
+                -rule.priority,
+            )
+            # print(f"rule in hypothesis: {rule} in {self.hypothesis}")
+            if rp not in self.hypothesis:
+                self.hypothesis[rp] = set([rule])
+                # self.hypothesis.append(rule)
+            else:
+                self.hypothesis[rp].add(rule)
+        self._time += 1
+        # print(f"Updated: {self.hypothesis}")
