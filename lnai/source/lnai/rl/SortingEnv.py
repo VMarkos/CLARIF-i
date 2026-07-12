@@ -21,6 +21,9 @@ class SortingEnv(Env):
         self.HEIGHT = 600
         self.WIDTH = 800
 
+        # GOAL
+        self.GOAL = State(dict(zip(range(n), range(n))))
+
         # Initialize object fields
         self.n = n
 
@@ -42,6 +45,7 @@ class SortingEnv(Env):
         """Initialize state to a random state"""
         _rand_state_dict = dict(zip(range(self.n), random.sample(range(self.n), k=self.n)))
         self.state: State = State(_rand_state_dict)
+        self._previous_tau = self.state.kendall_tau(self.GOAL)
 
         
 
@@ -77,17 +81,32 @@ class SortingEnv(Env):
         self.draw_state_on_canvas()
 
 
-    def step(self, action: int) -> None:
+    def render(self) -> None:
+        """Renders the environment."""
+        pass
+
+
+    def step(self, action: int) -> tuple:
         """Makes a step forward by applying an action to the current setting"""
-        self.state = action.apply(self.state)
+        swap = self.__get_swap(action)
+        self.state.swap(*swap)
+        reward = 
+        return self.canvas
 
 
-    def __get_swap(self, i: int) -> Action:
+    def __get_reward(self) -> float:
+        GOAL = State(zip(range(self.n), range(self.n)))
+        tau = self.state.kendall_tau(GOAL)
+
+
+    def __get_swap(self, i: int) -> tuple[int]:
         k = 0
         for a in range(n - 1):
             for b in range(a + 1, n):
                 if k == i:
                     return (a, b)
+
+
 
 
     def show(self) -> None:
