@@ -14,12 +14,13 @@ random.seed(5679813004)
 
 
 class SortingEnv(Env):
-    def __init__(self, n: int, action_generator) -> None:
+    def __init__(self, n: int) -> None:
         super(SortingEnv, self).__init__()
         
         # Instance "globals"
         self.HEIGHT = 600
         self.WIDTH = 800
+        self.render_mode = 'ansi'
 
         # GOAL
         self.GOAL = State(dict(zip(range(n), range(n))))
@@ -61,7 +62,7 @@ class SortingEnv(Env):
             cv2.LINE_AA,
             0
         )
-        text_pos = (self.WIDTH // 2 - text_w // 2, self.HEIGHT // 2 + text_h // 2) # FIXME: Need to subtract text dimensions
+        text_pos = (self.WIDTH // 2 - text_w // 2, self.HEIGHT // 2 + text_h // 2)
         text_color = (0, 0, 0)
         self.canvas = cv2.putText(
             self.canvas,
@@ -81,30 +82,35 @@ class SortingEnv(Env):
         self.draw_state_on_canvas()
 
 
-    def render(self) -> None:
-        """Renders the environment."""
-        pass
+    def render(self) -> str | None:
+        """Renders the environment as ANSI string."""
+        return str(self.state)
 
 
     def step(self, action: int) -> tuple:
         """Makes a step forward by applying an action to the current setting"""
         swap = self.__get_swap(action)
         self.state.swap(*swap)
-        reward = 
-        return self.canvas
+        reward = self.__get_reward()
+        terminated = self.state == self.GOAL
+        truncated = False
+        return self.state, reward, terminated, truncated, dict()
 
 
     def __get_reward(self) -> float:
-        GOAL = State(zip(range(self.n), range(self.n)))
-        tau = self.state.kendall_tau(GOAL)
+        tau = self.state.kendall_tau(self.GOAL)
+        reward = 1 if tau > self._previous_tau else -1
+        self._previous_tau = tau
+        return reward
 
 
     def __get_swap(self, i: int) -> tuple[int]:
         k = 0
-        for a in range(n - 1):
-            for b in range(a + 1, n):
+        for a in range(self.n - 1):
+            for b in range(a + 1, self.n):
                 if k == i:
                     return (a, b)
+                k += 1
 
 
 
