@@ -1,5 +1,6 @@
 # api/State.py
 
+from numpy import ndarray, array
 from typing import Any
 from scipy.stats import kendalltau
 
@@ -37,6 +38,11 @@ class State:
         self.state = {
             k: permutation[v] if v in permutation else v for k, v in self.state.items()
         }
+
+
+    def as_ndarray(self) -> ndarray:
+        return array([x for x in self.state.values()])
+
 
     def __bool__(self) -> bool:
         return len(self.state) != 0

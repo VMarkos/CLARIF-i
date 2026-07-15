@@ -14,12 +14,10 @@ random.seed(5679813004)
 
 
 class SortingEnv(Env):
-    def __init__(self, n: int) -> None:
+    def __init__(self, n: int, target_steps: int | None=None) -> None:
         super(SortingEnv, self).__init__()
         
         # Instance "globals"
-        self.HEIGHT = 600
-        self.WIDTH = 800
         self.render_mode = 'ansi'
 
         # GOAL
@@ -27,9 +25,14 @@ class SortingEnv(Env):
 
         # Initialize object fields
         self.n = n
+        self._ticks = 0
+        if target_steps is None:
+            self._target_steps = self.n * np.log(n)
+        else:
+            self._target_steps = target_steps
 
-        # Discrete obesrvation space containing n different objects
-        self.observation_space = spaces.Discrete(n)
+        # Discrete obesrvation space containing n^n (not all valid) different objects
+        self.observation_space = spaces.MultiDiscrete([n] * n)
 
         # Action space where each action is a swap
         self.action_space = spaces.Discrete(n * (n - 1) // 2)
@@ -37,53 +40,26 @@ class SortingEnv(Env):
         # Initialize state
         self.__init_state()
 
-        # Initialize canvas
-        self._canvas_shape = (self.HEIGHT, self.WIDTH, 3)
-        self.canvas = np.ones(self._canvas_shape) * 255
-
 
     def __init_state(self) -> None:
         """Initialize state to a random state"""
         _rand_state_dict = dict(zip(range(self.n), random.sample(range(self.n), k=self.n)))
         self.state: State = State(_rand_state_dict)
         self._previous_tau = self.state.kendall_tau(self.GOAL)
-
-        
-
-
-    def draw_state_on_canvas(self) -> None:
-        """Draws the current state as a string on the environment canvas"""
-        self.canvas = np.ones(self._canvas_shape).astype(np.uint8) * 255
-        text_font = cv2.FONT_HERSHEY_SIMPLEX
-        text = str(self.state)
-        (retval, text_w), text_h = cv2.getTextSize(
-            text,
-            cv2.FONT_HERSHEY_SIMPLEX,
-            cv2.LINE_AA,
-            0
-        )
-        text_pos = (self.WIDTH // 2 - text_w // 2, self.HEIGHT // 2 + text_h // 2)
-        text_color = (0, 0, 0)
-        self.canvas = cv2.putText(
-            self.canvas,
-            text,
-            text_pos,
-            text_font,
-            1.0,
-            text_color,
-            1,
-            cv2.LINE_AA
-        )
+        self._ticks = 0
 
 
-    def reset(self) -> None:
-        """Resets internal state and redraws canvas"""
+
+    def reset(self, seed=None, options=None) -> tuple[State, dict]:
+        """Resets internal state"""
+        super().reset(seed=seed, options=options)
         self.__init_state()
-        self.draw_state_on_canvas()
+        return self.state.as_ndarray(), dict()
 
 
     def render(self) -> str | None:
         """Renders the environment as ANSI string."""
+        print(self.state)
         return str(self.state)
 
 
@@ -94,12 +70,15 @@ class SortingEnv(Env):
         reward = self.__get_reward()
         terminated = self.state == self.GOAL
         truncated = False
-        return self.state, reward, terminated, truncated, dict()
+        self._ticks += 1
+        return self.state.as_ndarray(), reward, terminated, truncated, dict()
 
 
     def __get_reward(self) -> float:
         tau = self.state.kendall_tau(self.GOAL)
-        reward = 1 if tau > self._previous_tau else -1
+        reward = tau - 1.0 * self._ticks / self._target_steps
+        if self.state == self.GOAL:
+            reward += 10.0
         self._previous_tau = tau
         return reward
 
@@ -111,8 +90,6 @@ class SortingEnv(Env):
                 if k == i:
                     return (a, b)
                 k += 1
-
-
 
 
     def show(self) -> None:
