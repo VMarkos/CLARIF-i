@@ -1,0 +1,6 @@
+\beamer@sectionintoc {1}{Motivation}{3}{0}{1}
+\beamer@sectionintoc {2}{Preliminaries}{13}{0}{2}
+\beamer@sectionintoc {3}{Empirical Setting}{41}{0}{3}
+\beamer@sectionintoc {4}{Results}{55}{0}{4}
+\beamer@sectionintoc {5}{Discussion \& Future Work}{59}{0}{5}
+\beamer@sectionintoc {6}{Appendix}{65}{0}{6}
