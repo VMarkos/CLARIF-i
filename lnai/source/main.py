@@ -19,14 +19,6 @@ def main():
     env = SortingEnv(n)
     # env = gym.make('CartPole-v1', render_mode='human')
     env = RecordEpisodeStatistics(env, n_timesteps)
-    '''q_learn_hyperparams = {
-        'learning_rate':  0.01,
-        'initial_epsilon': 1.0,
-        'epsilon_decay': 1.0 / (n_episodes / 2),
-        'final_epsilon': 0.1,
-        'discount_factor': 0.95,
-        'n_actions': env.action_space.n,
-    }'''
     # Create and train PPO model
     if load:
         model = PPO.load(load, env=env)
@@ -39,18 +31,16 @@ def main():
 
 
     # Test model
-    vec_env = model.get_env()
-    obs = vec_env.reset()
-    obs = State(dict(zip(range(n),range(n-1,-1,-1)))).as_ndarray()
+    obs, info = env.reset()
+    # obs = State(dict(zip(range(n),range(n-1,-1,-1)))).as_ndarray()
+    env.render()
     for i in range(1000):
         action, _states = model.predict(obs, deterministic=True)
-        obs, reward, done, info = vec_env.step(action)
-        vec_env.render()
-        if done:
+        obs, reward, terminated, truncated, info = env.step(action)
+        env.render()
+        if terminated or truncated:
             print(f'Done in step {i+1}!')
             break
-    # agent = SortingAgent(n, n_episodes, env, q_learn_hyperparams)
-    # agent.learn()
     env.close()
 
 

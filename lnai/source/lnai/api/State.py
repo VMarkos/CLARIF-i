@@ -41,7 +41,7 @@ class State:
 
 
     def as_ndarray(self) -> ndarray:
-        return array([x for x in self.state.values()])
+        return array([ self.state.get(i) for i in self.state.keys() ]).flatten()
 
 
     def __bool__(self) -> bool:

@@ -1,16 +1,14 @@
 # rl/Environment.py
 
 import numpy as np
-import cv2
 from gymnasium import Env, spaces
 from matplotlib import pyplot as plt
 from lnai.api.State import State
-from lnai.api.Action import Action
 
 import random
 
 # Should this be elsewhere?
-random.seed(5679813004)
+# random.seed(5679813004)
 
 
 class SortingEnv(Env):
@@ -35,7 +33,7 @@ class SortingEnv(Env):
         self.observation_space = spaces.MultiDiscrete([n] * n)
 
         # Action space where each action is a swap
-        self.action_space = spaces.Discrete(n * (n - 1) // 2)
+        self.action_space = spaces.MultiDiscrete([n, n])
 
         # Initialize state
         self.__init_state()
@@ -45,7 +43,6 @@ class SortingEnv(Env):
         """Initialize state to a random state"""
         _rand_state_dict = dict(zip(range(self.n), random.sample(range(self.n), k=self.n)))
         self.state: State = State(_rand_state_dict)
-        self._previous_tau = self.state.kendall_tau(self.GOAL)
         self._ticks = 0
 
 
@@ -63,36 +60,25 @@ class SortingEnv(Env):
         return str(self.state)
 
 
-    def step(self, action: int) -> tuple:
+    def step(self, action) -> tuple:
         """Makes a step forward by applying an action to the current setting"""
-        swap = self.__get_swap(action)
-        self.state.swap(*swap)
-        reward = self.__get_reward()
+        action = np.array(action).flatten()
+        self.state.swap(*action)
+        reward = self.__get_reward(action)
         terminated = self.state == self.GOAL
         truncated = False
         self._ticks += 1
         return self.state.as_ndarray(), reward, terminated, truncated, dict()
 
 
-    def __get_reward(self) -> float:
+    def __get_reward(self, action) -> float:
         tau = self.state.kendall_tau(self.GOAL)
+        if np.isnan(tau):
+            tau = -1.0
         reward = tau - 1.0 * self._ticks / self._target_steps
         if self.state == self.GOAL:
             reward += 10.0
-        self._previous_tau = tau
+        if action[0] == action[1]:
+            reward = -0.5
         return reward
 
-
-    def __get_swap(self, i: int) -> tuple[int]:
-        k = 0
-        for a in range(self.n - 1):
-            for b in range(a + 1, self.n):
-                if k == i:
-                    return (a, b)
-                k += 1
-
-
-    def show(self) -> None:
-        """Shows the internal state on canvas - thin wrapper around plt.imshow()"""
-        plt.imshow(self.canvas)
-        plt.show()
