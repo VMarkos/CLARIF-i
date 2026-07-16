@@ -1,3 +1,17 @@
+% =============== Tikz definitions and imports ===============
+
+\usetikzlibrary{positioning}
+\usetikzlibrary{calc}
+\usetikzlibrary{decorations.pathmorphing}
+\usetikzlibrary{decorations.pathreplacing}
+\usetikzlibrary{decorations.text}
+\usetikzlibrary{decorations.shapes}
+\usetikzlibrary{shapes}
+\usetikzlibrary{patterns}
+
+\pgfdeclarelayer{bg}
+\pgfsetlayers{bg, main}
+
 %%%% Local definitions %%%%
 \newcommand{\bubblecoach}{\ensuremath{\texttt{P}_{\rm bubble}}\,}
 \newcommand{\quickcoach}{\ensuremath{\texttt{P}_{\rm quick}}\,}
@@ -15,6 +29,10 @@
 
 \newcommand{\partialadvice}[1]{partial@{#1}}
 
+\newcommand{\ip}[2]{{\left\langle{#1},{#2}\right\rangle}}
+
+\newcommand{\constraints}{\mathcal{C}}
+
 %%%% Color definitions
 % \definecolor{correctColor}{HTML}{19aa50}
 \colorlet{correctColor}{streamlinegreen}
@@ -28,3 +46,27 @@
 \colorlet{bubbleColor}{streamlinegreen}
 % \definecolor{quickColor}{HTML}{aa1950}
 \colorlet{quickColor}{streamlineorange}
+
+% =================== Tikz animation =======================
+
+\tikzset{
+	invisible/.style={opacity=0},
+	visible on/.style={alt={#1{}{invisible}}},
+	alt/.code args={<#1>#2#3}{%
+		\alt<#1>{\pgfkeysalso{#2}}{\pgfkeysalso{#3}} % \pgfkeysalso doesn't change the path
+	},
+}
+
+% =================== Tikz animation =======================
+
+\definecolor{color1}{HTML}{f44336}
+\definecolor{color2}{HTML}{2196f3}
+\definecolor{color3}{HTML}{4caf50}
+\definecolor{color4}{HTML}{ff9800}
+\definecolor{color5}{HTML}{9c27b0}
+\definecolor{color6}{HTML}{009688}
+\definecolor{color7}{HTML}{3f51b5}
+\definecolor{color8}{HTML}{ffeb3b}
+
+\definecolor{othelloBlack}{HTML}{051005}
+\colorlet{othelloGreen}{streamlinegreen}

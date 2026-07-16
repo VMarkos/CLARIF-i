@@ -1,0 +1,69 @@
+\frametitle{More Complex Heuristics}
+\begin{figure}
+		\begin{tikzpicture}[cell/.style n args={2}{rectangle, minimum size=#2cm, draw=white, fill=#1, outer sep=1pt}, piece/.style n args={2}{circle, solid, draw=#1, fill=#1, minimum size=#2cm, outer sep=1pt}, legal/.style n args={1}{circle, densely dashed, draw=black, fill=black!80, fill opacity=0.3, minimum size=#1cm, outer sep=1pt}, arrow/.style={streamlineorange, thick, dashed, ->}, danger/.style n args={1}{minimum size=#1cm, draw=white, pattern=north west lines, pattern color=white}, rule node/.style n args={3}{below = #1cm of #2.south west, anchor = west, text width = 8cm, execute at begin node=\setlength{\baselineskip}{3ex}, visible on = <#3>}]
+			\pgfmathsetmacro{\ystep}{0.2}
+			\pgfmathsetmacro{\dystep}{0.5}
+			\pgfmathsetmacro{\tystep}{0.7}
+			\pgfmathsetmacro{\size}{0.7}
+			\pgfmathsetmacro{\psize}{0.8*\size}
+			\foreach \i in {1,...,8} {
+				\foreach \j in {1,...,8} {
+					\pgfmathsetmacro{\x}{\i*\size}
+					\pgfmathsetmacro{\y}{\j*\size}
+					\node[cell={othelloGreen}{\size}] (\i\j) at (\x,\y){};
+				}
+			}
+			\foreach \i/\j in {2/1, 2/2, 1/2, 7/1, 7/2, 8/2, 1/7, 2/7, 2/8, 7/8, 7/7, 8/7} {
+				\node[danger={\size}] at (\i\j.center){};
+			}
+			\node[piece={white}{\psize}] (p45) at (45.center){};
+			\node[piece={black}{\psize}] (p55) at (55.center){};
+			\node[piece={white}{\psize}] (p54) at (54.center){};
+			\node[piece={black}{\psize}] (p44) at (44.center){};
+			\node[legal={\psize}] (l35) at (35.center){};
+			\node[legal={\psize}] (l46) at (46.center){};
+			\node[legal={\psize}] (l53) at (53.center){};
+			\node[legal={\psize}] (l64) at (64.center){};
+			\node[right = of 88.north east, anchor=north west] (context) {\texttt{@Knowledge}};
+			\node[below = \ystep cm of context.south west, anchor = west] (dots) {\small\texttt{\ldots}};
+			\node[rule node={\dystep}{dots}{1-4}] (a1) {\small\texttt{A1 :: corner(X,Y), ?=(Z,X+1), ?=(W,Y+1)\\\hphantom{A1 :: }implies adjC(Z,W);}};
+			\node[rule node={\dystep}{a1}{2-4}] (a2) {\small\texttt{A2 :: corner(X,Y), ?=(Z,X+1), ?=(W,Y)\\\hphantom{A2 :: }implies adjC(Z,W);}};
+			\node[rule node={\dystep}{a2}{3-4}] (a3) {\small\texttt{A3 :: corner(X,Y), ?=(Z,X+1), ?=(W,Y-1)\\\hphantom{A3 :: }implies adjC(Z,W);}};
+			\node[rule node={\ystep}{a3}{4}] (ldots) {\small\texttt{\ldots}};
+			\draw[arrow, visible on=<1>] (a1.north west) to[bend right] (27.center);
+			\draw[arrow, visible on=<2>] (a2.176) to[bend left] (17.center);
+			\draw[arrow, visible on=<2>] (a2.176) to[bend left] (87.center);
+			\draw[arrow, visible on=<3>] (a3.175) to[bend left] (77.center);
+			% Procedural heuristics
+			\node[rule node={\ystep}{dots}{5-6}] (procedures) {\small\texttt{@Procedures}};
+			\node[rule node={\ystep}{procedures}{5-6}] (l1) {\small\texttt{function isAdj(x,y,z,w) \{}};
+			\node[rule node={\ystep}{l1}{5-6}] (l2) {\small\texttt{\qquad const X = parseInt(x);}};
+			\node[rule node={\ystep}{l2}{5-6}] (l3) {\small\texttt{\qquad const Y = parseInt(y);}};
+			\node[rule node={\ystep}{l3}{5-6}] (l4) {\small\texttt{\qquad const Z = parseInt(z);}};
+			\node[rule node={\ystep}{l4}{5-6}] (l5) {\small\texttt{\qquad const W = parseInt(w);}};
+			\node[rule node={\dystep}{l5}{5-6}] (l6) {\small\texttt{\qquad return Z-X < 2 \&\& X-Z < 2 \&\& W-Y < 2 \&\&\\\qquad Y-W < 2 \&\& (X != Z || Y != W);}};
+			\node[rule node={\ystep}{l6}{5-6}] (l7) {\small\texttt{\}}};
+			\begin{pgfonlayer}{bg}
+				\draw[thick, dashed, fill=streamlineorange!10, draw=streamlineorange, visible on=<6>] ($(l1.north west) + (0,-0.05)$) rectangle (14.5,0.5) node[pos=0.3, xshift=4cm]{\textbf{JavaScript}};
+			\end{pgfonlayer}
+			% Final heuristics
+			\node[rule node={\dystep}{dots}{7-}] (ad) {\small\texttt{R2 :: corner(X,Y), legalMove(Z,W),\\\hphantom{R2 :: }?isAdj(X,Y,Z,W) implies -move(Z,W);}};
+			\node[rule node={\ystep}{ad}{7-}] (ldots) {\small\texttt{\ldots}};
+			\node[rule node={\ystep}{ldots}{7-}] (procedures) {\small\texttt{@Procedures}};
+			\node[rule node={\ystep}{procedures}{7-}] (lldots) {\small\texttt{\ldots}};
+			\foreach \i/\j in {2/1, 2/2, 1/2, 7/1, 7/2, 8/2, 1/7, 2/7, 2/8, 7/8, 7/7, 8/7} {
+				\ifthenelse{\j > 6}{
+					\draw[arrow, visible on=<8->] (ad.176) to (\i\j.center);
+				}{
+					\draw[arrow, visible on=<8->] (ad.176) to (\i\j.center);
+				}
+			}
+			\node[rule node={1.5}{lldots}{9}] (benefits) {\begin{minipage}{0.8\textwidth}
+					\textbf{Benefits}:
+					\begin{itemize}
+						\item More compact representation.
+						\item Faster compilation.
+					\end{itemize}
+			\end{minipage}};
+		\end{tikzpicture}
+	\end{figure}

@@ -1,13 +1,22 @@
 \documentclass[aspectratio=169]{beamer}
 \usepackage{booktabs}
+\usepackage{fontawesome5}
+\usepackage{ifthen}
 \usepackage{graphicx} % Required for inserting images
-% \usepackage[table]{xcolor}
+\usepackage{subcaption}
+\usepackage{tikzlings-penguins}
 \usepackage{pifont}
+\usepackage{algorithmic}
+\usepackage{algorithm2e}
 
 \title{Coaching How To Search}
 \subtitle{ICAART 2026}
-\author{Vassilis Markos, and Loizos Michael}
+\author{Vassilis Markos, and Loizos Michael\\{\ttfamily vassileiosmarkos@gmail.com, loizos@ouc.ac.cy}}
 \date{March 2026}
+
+%%%% algorithm2e macros
+\SetKwRepeat{Do}{do}{while}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \usetheme{streamline}
 
@@ -29,29 +38,241 @@
 \section{Motivation}
 
 \begin{frame}{Motivation}
-    Examples where it does not / it does matter how things are done by AI agents.
-\end{frame}
-
-\begin{frame}{Symbolic AI + Searching}
-    \begin{itemize}
-        \item On many occasions, \emph{how} an agent achieves its goals matters at least as much as \emph{whether} it does so or not.
-        \item Such cases can be naturally encoded as search problems, where the agent searches for an optimal path, $p$, from a starting state, $s$, to a goal state, $p$.
-        \item In ensuring a faithful implementation of instructions, design guarantees are key to avoid common modern AI issues, like overfitting / inability to generalize, hallucinations, and so on.
-        \item Thus, symbolic AI approaches, offering formal guarantees, are a good candidate to undertake this task.
+    \begin{itemize}[<+->]
+    	\item Consider the following examples of AI agents:
+    	\begin{itemize}[<+->]
+    		\item Agent $A$ provides machine translation services.
+    		\item Agent $B$ provides ``study at home'' support for students.
+    		\item Agent $C$ serves as a cognitive substitute of a therapist for their clients.
+    	\end{itemize}
+    	\item While agent $A$ is typically focused on \emph{what} should be achieved, agents $B$ and, mostly, $C$, should also put emphasis on \emph{how} their goal is reached.
+    	\item Hence, faithful knowledge transfer arises as a natural prerequisite for tasks where an agent's behavior does matter.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Argumentation Frameworks}
-    Slide with figure discussing key AF concepts.
+\begin{frame}{Optimization as a Search Problem}
+    \begin{itemize}[<+->]
+        \item Such cases can be naturally encoded as search problems in a state space, where the agent searches for an optimal path, $p$, from a starting state, $s$, to a goal state, $g$.
+        \item Thus, the \emph{what} aspect corresponds to the goal state, $g$, the agent has to reach.
+        \item Similarly, the \emph{why} aspect corresponds to the shape of the optimal path, $p$.
+        \item Essentially, by applying restrictions on the shape of that path, the agent is searching for a tuple, $(p,g)$, such that $p$ connects its starting state, $s$, with the end state, $g$, while $p$ adheres to a set of constraints, $\constraints$.
+    \end{itemize}
+\end{frame}
+
+\section{Preliminaries}
+
+\begin{frame}[fragile]{Argumentation Frameworks}
+	\begin{figure}
+		\begin{tikzpicture}[argument/.style={circle, draw=black, inner sep = 2pt, outer sep=1pt, minimum size=0.7cm},
+			attack/.style={thick, ->},
+			text node/.style n args={3}{below = #1cm of #2.west, anchor = west, execute at begin node = {$\bullet\quad$}, visible on = <#3>},
+			highlighted node/.style n args={2}{circle, fill=#1, fill opacity=0.4, inner sep = 2pt, minimum size=0.7cm, visible on=<#2>}]
+			\pgfmathsetmacro{\ystep}{0.5}
+			\node[argument] (a) at (0,0){$a$};
+			\node[argument] (b) at (2,0){$b$};
+			\node[argument] (c) at (4,1){$c$};
+			\node[argument] (d) at (4,-1){$d$};
+			\node[argument] (e) at (6,0){$e$};
+			\draw[attack] (a) -- (b);
+			\draw[attack] (b) -- (c);
+			\draw[attack] (b) -- (d);
+			\draw[attack] (c) to[bend left] (d);
+			%            \draw[attack] (d) to[bend left] (c);
+			\draw[attack] (d) -- (e);
+			\node[anchor = north west] (theory) at ($(e.north) + (0.5,1)$){\begin{minipage}[t][5cm][t]{0.5\textwidth}
+					$\displaystyle\begin{aligned}
+						\mathcal{A}&=\{a,b,c,d,e\}\\
+						\mathcal{R}&=\{(a,b),(b,c),(c,d),(b,d),(d,c),(d,e)\}
+					\end{aligned}$
+			\end{minipage}};
+			% Acceptable
+			\node[text node={1.8}{a}{2-}] (acceptable) {\small An argument $x\in\mathcal{A}$ is {\color{streamlinegreen}\textbf{acceptable}} wrt ${\color{streamlineorange}E}\subseteq\mathcal{A}$ if $\forall y\in\mathcal{A}\exists z\in E((y,x)\in\mathcal{R}\rightarrow(z,x)\in\mathcal{R})$.};
+			\begin{pgfonlayer}{bg}
+				\node[highlighted node={streamlinegreen}{2}] (dah) at (d.center){};
+				\node[highlighted node={streamlineorange}{2}] (aah) at (a.center){};
+				\node[highlighted node={streamlineorange}{2}] (bah) at (b.center){};
+			\end{pgfonlayer}
+			% Conflict free
+			\node[text node={\ystep}{acceptable}{3-}] (conflict free) {\small A set $E\subseteq\mathcal{A}$ is {\color{streamlinegreen}\textbf{conflict free}} if $\forall x,y\in E\ ((x,y)\not\in\mathcal{R})$.};
+			\begin{pgfonlayer}{bg}
+				\node[highlighted node={streamlinegreen}{3}] (acfh) at (a.center){};
+				\node[highlighted node={streamlinegreen}{3}] (ccfh) at (d.center){};
+			\end{pgfonlayer}
+			% Admissible
+			\node[text node={\ystep}{conflict free}{4-}] (admissible) {\small A set $E\subseteq\mathcal{A}$ is {\color{streamlinegreen}\textbf{admissible}} if it is \textbf{conflict free} and each $x\in E$ is \textbf{acceptable} wrt $E$.};
+			\begin{pgfonlayer}{bg}
+				\node[highlighted node={streamlinegreen}{4}] (aadh) at (a.center){};
+				\node[highlighted node={streamlinegreen}{4}] (cadh) at (c.center){};
+			\end{pgfonlayer}
+			% Complete extension
+			\node[text node={\ystep}{admissible}{5-}] (complete) {\small $E$ is a {\color{streamlinegreen}\textbf{complete}} extension of $\ip{\mathcal{A}}{\mathcal{R}}$ if it is admissible \& if $x$ is acceptable wrt $E$ then $x\in E$.};
+			\begin{pgfonlayer}{bg}
+				\node[highlighted node={streamlinegreen}{5}] (acoh) at (a.center){};
+				\node[highlighted node={streamlinegreen}{5}] (ccoh) at (c.center){};
+				\node[highlighted node={streamlinegreen}{5}] (ecoh) at (e.center){};
+			\end{pgfonlayer}
+			% Grounded extension
+			\node[text node={\ystep}{complete}{6-}] (grounded) {\small $E$ is a {\color{streamlinegreen}\textbf{grounded}} extension of $\ip{\mathcal{A}}{\mathcal{R}}$ if it is the smallest complete extension of $\ip{\mathcal{A}}{\mathcal{R}}$.};
+			\begin{pgfonlayer}{bg}
+				\node[highlighted node={streamlinegreen}{6}] (agrh) at (a.center){};
+				\node[highlighted node={streamlinegreen}{6}] (cgrh) at (c.center){};
+				\node[highlighted node={streamlinegreen}{6}] (egrh) at (e.center){};
+			\end{pgfonlayer}
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Machine Coaching}
+	\begin{figure}
+		\begin{tikzpicture}[flow arrow/.style={thick, ->}, context arrow/.style={dashed, thick, ->}, callout/.style={rectangle callout, draw=yellow!20!black, fill=yellow!20, callout absolute pointer={#1}}]
+			\node (penguin) at (0,0){\resizebox{1.2cm}{!}{\begin{tikzpicture}
+						\penguin[body=cyan!60!black]
+			\end{tikzpicture}}};
+			\node (coach) at (3,-4){\resizebox{1.0cm}{!}{{\color{streamlineorange}\faUser}}};
+			\node (machine) at (-3,-4){\resizebox{1.2cm}{!}{{\color{streamlinegreen}\faRobot}}};
+			\draw[flow arrow, postaction={decorate, decoration={text along path, text align=center, text={Prediction + Explanation}, raise=5pt}}, visible on=<4->] (machine) to[bend left] (coach);
+			\path[postaction={decorate, decoration={text along path, text align=center, text={flies}, raise=-12pt}}, visible on=<4->] (machine) to[bend left] (coach);
+			\draw[flow arrow, postaction={decorate, decoration={text along path, reverse path, text align=center, text={Advice}, raise=-12pt}}, visible on=<6->] (coach) to[bend left] (machine);
+			\path[postaction={decorate, decoration={text along path, reverse path, text align=center, text={-flies}, raise=5pt}}, visible on=<6->] (coach) to[bend left] (machine);
+			\draw[context arrow, postaction={decorate, decoration={text along path, reverse path, text align=center, text={Context}, raise=5pt}}, visible on=<2->] (penguin) to[bend right] (machine);
+			\path[postaction={decorate, decoration={text along path, reverse path, text align=center, text={penguin}, raise=-10pt}}, visible on=<2->] (penguin) to[bend right] (machine);
+			\draw[context arrow, postaction={decorate, decoration={text along path, text align=center, text={Context}, raise=5pt}}, visible on=<4->] (penguin) to[bend left] (coach);
+			\path[postaction={decorate, decoration={text along path, text align=center, text={penguin}, raise=-10pt}}, visible on=<4->] (penguin) to[bend left] (coach);
+			\node[callout={(machine.north west)}, visible on=<3->] (machine callout) at (-4.2,-2) {{\tiny \begin{tabular}{l}Birds fly and\\penguins are\\birds.\end{tabular}}};
+			\node[callout={(coach.north east)}, visible on=<5->] (coach callout) at (4.2,-2) {{\tiny \begin{tabular}{l}Birds fly \textbf{but}\\penguins\\don't!\end{tabular}}};
+		\end{tikzpicture}
+	\end{figure}
 \end{frame}
 
 \begin{frame}{Machine Coaching}
-    Figure presenting machine coaching using birds.
+	\begin{itemize}[<+->]
+		\item Argumentation-based interaction between the coach and the machine.
+		\item Exception-based knowledge representation.
+		\item Transparent interaction.
+		\item Efficient reasoning.
+		\item Provably efficacious and efficient under PAC semantics.
+		\item Empirically verified learning efficiency and efficacy.
+	\end{itemize}
 \end{frame}
 
+\begin{frame}{Machine Coaching and AFs}
+	\begin{figure}
+		\begin{tikzpicture}[fact node/.style={rectangle, draw=black, inner sep=2pt, minimum size=0.5cm,	outer sep=1pt},
+			inf node/.style={circle, draw=black, inner sep=2pt, outer sep=1pt, minimum size=0.7cm},
+			rule node/.style={rectangle, rounded corners=2mm, minimum size=0.6cm, draw=black, outer sep=1pt},
+			inf arrow/.style={thick, ->}]
+			\pgfmathsetmacro{\ynodestep}{1.2}
+			\node[fact node] (a) at (0,0){$a$};
+			\node[fact node] (b) at (1.5,0){$b$};
+			\node[fact node] (c) at (3,0){$c$};
+			\node[rule node] (r1) at (0.75,-\ynodestep){$R1$};
+			\node[inf node] (x) at (0.75,-2*\ynodestep){$x$};
+			\node[rule node] (r2) at (2.25,-\ynodestep){$R2$};
+			\node[inf node] (y) at (2.25,-2*\ynodestep){$y$};
+			\node[rule node] (r3) at (1.5,-3*\ynodestep){$R3$};
+			\node[inf node] (z) at (1.5,-4*\ynodestep){$z$};
+			\draw[inf arrow] (a) -- (r1);
+			\draw[inf arrow] (b) -- (r1);
+			\draw[inf arrow] (b) -- (r2);
+			\draw[inf arrow] (c) -- (r2);
+			\draw[inf arrow] (r1) -- (x);
+			\draw[inf arrow] (r2) -- (y);
+			\draw[inf arrow] (x) -- (r3);
+			\draw[inf arrow] (y) -- (r3);
+			\draw[inf arrow] (r3) -- (z);
+			\node[left = of a.north west, anchor = north east] (notes) {\begin{minipage}{0.6\textwidth}
+					\raggedright
+					\begin{itemize}
+						\item \textbf{Rule-based Representation}: Knowledge is represented through rules.\pause
+						\item \textbf{Structured Arguments}: Trees of chained rules supporting an inference.\pause
+						\item \textbf{Grounded Semantics}: Cautious reasoning given a certain set of rules.\pause
+						\item \textbf{Efficient Reasoning}: Efficiency both in terms of arguments as well as in terms of available rules.
+					\end{itemize}
+			\end{minipage}};
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Reasoning in Machine Coaching}
+	\begin{figure}
+		\begin{tikzpicture}[fact node/.style n args={1}{rectangle, draw=black, fill = white, inner sep=2pt, minimum size=0.5cm, outer sep=0pt, execute at begin node = {\ttfamily}},
+			inf node/.style n args={1}{circle, draw=black, fill = white, inner sep=2pt, outer sep=0pt, minimum size=0.7cm, execute at begin node = {\ttfamily}},
+			rule node/.style n args={1}{rectangle, rounded corners=2mm, minimum size=0.6cm, draw=black, fill = white, outer sep=0pt, execute at begin node = {\ttfamily}},
+			inf arrow/.style n args={1}{thick, ->, black},
+			text node/.style n args = {2}{text width = 5cm, execute at begin node = {\ttfamily}, below = #1 of #2.west, anchor = west}]
+			\pgfmathsetmacro{\xnodestep}{1.2}
+			\pgfmathsetmacro{\ystep}{0.5}
+			\coordinate (o) at (0,0);
+			\node[text node = {0}{o}] (context) {Context};
+			\node[text node = {\ystep}{context}] (abc) {a; b; c;};
+			\node[text node = {{2*\ystep}}{abc}] (knowledge) {@Knowledge};
+			\node[text node = {\ystep}{knowledge}] (r1 text) {R1 :: a implies x;};
+			\node[text node = {\ystep}{r1 text}] (r2 text) {R2 :: a, b implies y;};
+			\node[text node = {\ystep}{r2 text}] (r3 text) {R3 :: x, c implies -y;};
+			\node[text node = {{2*\ystep}}{r3 text}] (priorities) {@Priorities};
+			\node[text node = {\ystep}{priorities}] (p1) {R3 > R2};
+			% Faded nodes
+			\begin{scope}[opacity=0.2, transparency group]
+				\node[fact node, visible on = <1>] (a) at (6,-2) {a};
+				\node[fact node, visible on = <1>] (b) at (6,-4) {b};
+				\node[fact node, visible on = <1>] (c) at (6,0) {c};
+				\node[rule node, visible on = <1-2>] (r1) at (8,-2) {R1};
+				\node[rule node, visible on = <1-2>] (r2) at (8,-4) {R2};
+				\node[rule node, visible on = <1-3>] (r3) at (12,-2) {R3};
+				\node[inf node, visible on = <1-2>] (x) at (10,-2) {x};
+				\node[inf node, visible on = <1-2>] (y) at (10,-4) {y};
+				\draw[inf arrow, visible on = <1-2>] (a) -- (r1);
+				\draw[inf arrow, visible on = <1-2>] (a) -- (r2);
+				\draw[inf arrow, visible on = <1-2>] (b) -- (r2);
+				\draw[inf arrow, visible on = <1-2>] (r1) -- (x);
+				\draw[inf arrow, visible on = <1-2>] (r2) -- (y);
+				\draw[inf arrow, visible on = <1-3>] (x) -- (r3);
+				\draw[inf arrow, visible on = <1-3>] (r3) -- (y);
+				\draw[inf arrow, visible on = <1-3>] (c) -- (r3);
+			\end{scope}
+			% Animation
+			\node[fact node, fill=streamlinegreen!20, visible on = <2->] (a) at (6,-2) {a};
+			\node[fact node, fill=streamlinegreen!20, visible on = <2->] (b) at (6,-4) {b};
+			\node[fact node, fill=streamlinegreen!20, visible on = <2->] (c) at (6,0) {c};
+			\node[rule node, visible on = <3->] (r1) at (8,-2) {R1};
+			\node[rule node, visible on = <3-5>] (r2) at (8,-4) {R2};
+			\node[inf node, fill=streamlinegreen!20, visible on = <3->] (x) at (10,-2) {x};
+			\node[inf node, fill=streamlinegreen!20, visible on = <3-4>] (y) at (10,-4) {y};
+			\draw[inf arrow, streamlinegreen, visible on = <3->] (a) -- (r1);
+			\draw[inf arrow, streamlinegreen, visible on = <3-5>] (a) -- (r2);
+			\draw[inf arrow, streamlinegreen, visible on = <3-5>] (b) -- (r2);
+			\draw[inf arrow, streamlinegreen, visible on = <3->] (r1) -- (x);
+			\draw[inf arrow, streamlinegreen, visible on = <3-5>] (r2) -- (y);
+			\node[rule node, visible on = <4->] (r3) at (12,-2) {R3};
+			\draw[inf arrow, streamlinegreen, visible on = <4->] (x) -- (r3);
+			\draw[inf arrow, streamlineorange, visible on = <4->] (r3) -- (y);
+			\draw[inf arrow, streamlinegreen, visible on = <4->] (c) -- (r3);
+			\node[inf node, visible on = <4-5>] (y) at (10,-4) {y};
+			\node[circle, minimum size = 1.0cm, draw=red!80!black, very thick, dashed, visible on = <4-5>] at (y.center) {};
+			\draw[cyan!60!black, very thick, dashed, ->, visible on = <5>] (r3) to (r2);
+			\node[inf node, fill=streamlineorange!20, visible on = <6>] (y) at (10,-4) {y};
+			\begin{scope}[opacity=0.2, transparency group]
+				\draw[inf arrow, streamlinegreen, visible on = <6>] (a) -- (r2);
+				\draw[inf arrow, streamlinegreen, visible on = <6>] (b) -- (r2);
+				\node[rule node, visible on = <6>] (r2) at (8,-4) {R2};
+				\draw[inf arrow, streamlinegreen, visible on = <6>] (r2) -- (y);
+			\end{scope}
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
+\section{Empirical Setting}
+
 \begin{frame}{Search Coaching}
-    \begin{itemize}
-        \item In this work, we explore a particular way to gradually instill knowledge to an agent about both \emph{what} and \emph{how} to look for $g$.
+    \begin{itemize}[<+->]
+        \item In this work, we use Machine Coaching to gradually instill knowledge to an agent about both \emph{what} and \emph{how} to look for a goal state $g$.
+        \item We explore the highly structured problem of sorting a randomly permuted list of $n$ integers by gradually providing advice, based on some common sorting algorithms.
+        \item Our goal is to explore:
+        \begin{itemize}[<+->]
+	        \item whether the agent learns how to sort (the \emph{what});
+        	\item whether the agent sorts faithfully to its coach's policy (the \emph{how}), and;
+        	\item how efficient the learning process is.
+        \end{itemize}
     \end{itemize}
 \end{frame}
 
@@ -66,18 +287,29 @@
     \include{assets/tikz/coaching_styles}
 \end{frame}
 
-\section{Empirical Setting}
+\begin{frame}[fragile]{Coaching Process}
+%	\begin{algorithm}
+		\KwData{$s$, $g$, $\learner$, $\coach$}
+		\KwResult{$\learner$ with updated search policy; $path$ from $s$ to $g$.}
+		%	$advice\gets\NULL$\;
+		\Do{advice is not \NULL}{%
+			$path \gets \learner.\searchpath{s}{g}$;\\
+			$advice \gets \coach.\evaluate{path}{s}{g}$;\\
+			$\learner.\updatehypothesis{advice}$;
+		}
+%	\end{algorithm}
+\end{frame}
 
 \begin{frame}{Definitions}
-    \begin{itemize}
-        \item Advice coverage
-        \item Memory
-        \item Coaching conformity
-        \item Coaching step
+    \begin{itemize}[<+->]
+    	\item A \emph{coaching step} is a single advice exchange between the coach and the agent.
+        \item \emph{Advice coverage} is defined to be the percentage of information included in a rule's body compared to state size, $n$.
+        \item \emph{Memory} in our context corresponds to the ability of the agent to recall previous from potentially structurally different settings.
+        \item \emph{Coaching conformity} is the extent to which the agent's optimal path $p$ corresponds to what the coaching policy would yield as an optimal path within a coaching session.
     \end{itemize}
 \end{frame}
 
-\begin{frame}{Empirical Setting}
+\begin{frame}{Experiments Run}
     ~\vfill
     \centering
     % \rowcolors{1}{white}{streamlinegray}
@@ -98,33 +330,343 @@
 \section{Results}
 
 \begin{frame}{Series A: Full Advice Coaching Steps}
-    
+    \begin{figure}
+    	\centering
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/a_20_100_full.pdf}
+    		\caption{Reactive}
+    	\end{subfigure}\hfill
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/r_20_100_full.pdf}
+    		\caption{Reflexive}
+    	\end{subfigure}
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/p_20_100_full.pdf}
+    		\caption{Proactive}
+    	\end{subfigure}
+    \end{figure}
 \end{frame}
 
 \begin{frame}{Series A: Partial Advice Coaching Steps}
-    
+    \begin{figure}
+    	\centering
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/a_20_100_partial.pdf}
+    		\caption{Reactive}
+    	\end{subfigure}\hfill
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/r_20_100_partial.pdf}
+    		\caption{Reflexive}
+    	\end{subfigure}\hfill
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/p_20_100_partial.pdf}
+    		\caption{Proactive}
+    	\end{subfigure}
+    \end{figure}
 \end{frame}
 
-\begin{frame}{Series B: Coaching Conformity vs $n$}
-    
+\begin{frame}{Series B: Coaching Conformity vs State Size, $n$}
+    \begin{figure}
+    	\centering
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_a.pdf}
+    		\caption{Reactive}
+    	\end{subfigure}\hfill
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_r.pdf}
+    		\caption{Reflexive}
+    	\end{subfigure}\hfill
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_p.pdf}
+    		\caption{Proactive}
+    	\end{subfigure}
+    \end{figure}
 \end{frame}
 
 \begin{frame}{Series B: Coaching Conformity vs Advice Coverage}
-    
+    \begin{figure}
+    	\centering
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/pper_fidelity_test_N20_reps20_step5_coaches3_partial_2_20_coach_a.pdf}
+    		\caption{Reactive}
+    	\end{subfigure}\hfill
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/pper_fidelity_test_N20_reps20_step5_coaches3_partial_2_20_coach_r.pdf}
+    		\caption{Reflexive}
+    	\end{subfigure}\hfill
+    	\begin{subfigure}{0.33\textwidth}
+    		\includegraphics[width=\textwidth]{assets/images/pper_fidelity_test_N20_reps20_step5_coaches3_partial_2_20_coach_p.pdf}
+    		\caption{Proactive}
+    	\end{subfigure}
+    \end{figure}
 \end{frame}
 
 \section{Discussion \& Future Work}
 
-\begin{frame}{Discussion}
-    
+\begin{frame}{Discussion \& Future Work}
+    \begin{itemize}[<+->]
+    	\item In our exploration, effectively coaching an agent to perform a certain sorting task using purely symbolic means has proven to be feasible.
+    	\item Moreover, we have demonstrated that under the coaching paradigm, one can fine tune the agent's behavioral conformity by properly adjusting the coaching protocol.
+    	\item Next steps in this exploration might include but not restrict to:
+    	\begin{itemize}[<+->]
+    		\item the exploration of other toy examples of higher complexity;
+    		\item comparison with other Machine Learning approaches, e.g., Reinforcement Learning;
+    		\item application in realistic settings.
+    	\end{itemize}
+    \end{itemize}
 \end{frame}
 
-\begin{frame}{Future Work}
-    
+\section{Appendix}
+
+\sectionframe
+
+\begin{frame}[fragile]{How to play Othello?}
+	\begin{figure}
+		\begin{tikzpicture}[cell/.style n args={2}{rectangle, minimum size=#2cm, draw=white, fill=#1}, piece/.style n args={2}{circle, solid, draw=#1, fill=#1, minimum size=#2cm}, legal/.style n args={1}{circle, densely dashed, draw=black, fill=black!80, fill opacity=0.3, minimum size=#1cm}, legend/.style={rectangle, rounded corners=5mm, dashed, draw=black, fill=streamlineorange!20!white, inner sep=4pt}, last move/.style={circle, minimum size=0.1cm, inner sep=0pt,  draw=streamlineorange, fill=streamlineorange}]
+			\pgfmathsetmacro{\size}{0.7}
+			\pgfmathsetmacro{\psize}{0.8*\size}
+			\foreach \i in {1,...,8} {
+				\foreach \j in {1,...,8} {
+					\pgfmathsetmacro{\x}{\i*\size}
+					\pgfmathsetmacro{\y}{\j*\size}
+					\node[cell={othelloGreen}{\size}] (\i\j) at (\x,\y){};
+				}
+			}
+			\node[piece={white}{\psize}, visible on=<-1>] (p45) at (45.center){};
+			\node[piece={black}{\psize}] (p55) at (55.center){};
+			\node[piece={white}{\psize}] (p54) at (54.center){};
+			\node[piece={black}{\psize}, visible on=<1-2>] (p44) at (44.center){};
+			\node[legal={\psize}, visible on=<1>] (l35) at (35.center){};
+			\node[legal={\psize}, visible on=<1>] (l46) at (46.center){};
+			\node[legal={\psize}, visible on=<1>] (l53) at (53.center){};
+			\node[legal={\psize}, visible on=<1>] (l64) at (64.center){};
+			\node[legend, right = of 88.north east, anchor = north west, text width = 4cm] (legend node) {\begin{tikzpicture}
+					\node[piece={white}{\psize}, label={right}:{White piece}] (wp) at (0,0){};
+					\node[piece={black}{\psize}, label={right}:{Black piece}, below = 0.2cm of wp.south] (bp){};
+					\node[legal={\psize}, label={right}:{Legal move}, below = 0.2cm of bp.south] (lm){};
+			\end{tikzpicture}};
+			\node[below = 2.1cm of legend node.south west, anchor = west] (rules) {\begin{minipage}{0.5\textwidth}
+					\textbf{Rules}
+					\scriptsize
+					\begin{itemize}
+						\item Black plays first.
+						\item Any new piece may be placed so as to enclose consecutive opponent pieces within friendly ones on the same row/column/diagonal.
+						\item Any enclosed pieces are ``converted'' to the opponent's color.
+						\item The player with the most pieces once the board is full or no more legal moves are allowed for any side wins.
+					\end{itemize}
+			\end{minipage}};
+			% First black move
+			\node[piece={black}{\psize}, visible on=<2->] (p45) at (45.center){};
+			\node[piece={black}{\psize}, visible on=<2->] (p46) at (46.center){};
+			\node[legal={\psize}, visible on=<2>] (l36) at (36.center){};
+			\node[legal={\psize}, visible on=<2>] (l34) at (34.center){};
+			\node[legal={\psize}, visible on=<2>] (l55) at (56.center){};
+			\node[last move, visible on=<2>] (current move) at (46.center){};
+			% First white move
+			\node[piece={white}{\psize}, visible on=<3>] (p34) at (34.center){};
+			\node[piece={white}{\psize}, visible on=<3>] (p44) at (44.center){};
+			\node[legal={\psize}, visible on=<3>] (l23) at (23.center){};
+			\node[legal={\psize}, visible on=<3>] (l33) at (33.center){};
+			\node[legal={\psize}, visible on=<3>] (l43) at (43.center){};
+			\node[legal={\psize}, visible on=<3>] (l53) at (53.center){};
+			\node[legal={\psize}, visible on=<3>] (l63) at (63.center){};
+			\node[last move, visible on=<3>] (current move) at (34.center){};
+		\end{tikzpicture}
+	\end{figure}
 \end{frame}
 
-\begin{frame}{Coachello}
-    
+\begin{frame}[fragile]{Othello's Language}
+	\begin{figure}
+		\begin{tikzpicture}[cell/.style n args={2}{rectangle, minimum size=#2cm, draw=white, fill=#1, outer sep=1pt}, piece/.style n args={2}{circle, solid, draw=#1, fill=#1, minimum size=#2cm, outer sep=1pt}, legal/.style n args={1}{circle, densely dashed, draw=black, fill=black!80, fill opacity=0.3, minimum size=#1cm, outer sep=1pt}, arrow/.style={streamlineorange, thick, dashed, ->}]
+			\pgfmathsetmacro{\ystep}{0.2}
+			\pgfmathsetmacro{\size}{0.7}
+			\pgfmathsetmacro{\psize}{0.8*\size}
+			\foreach \i in {1,...,8} {
+				\foreach \j in {1,...,8} {
+					\pgfmathsetmacro{\x}{\i*\size}
+					\pgfmathsetmacro{\y}{\j*\size}
+					\node[cell={othelloGreen}{\size}] (\i\j) at (\x,\y){};
+				}
+			}
+			\node[piece={white}{\psize}] (p45) at (45.center){};
+			\node[piece={black}{\psize}] (p55) at (55.center){};
+			\node[piece={white}{\psize}] (p54) at (54.center){};
+			\node[piece={black}{\psize}] (p44) at (44.center){};
+			\node[legal={\psize}] (l35) at (35.center){};
+			\node[legal={\psize}] (l46) at (46.center){};
+			\node[legal={\psize}] (l53) at (53.center){};
+			\node[legal={\psize}] (l64) at (64.center){};
+			\node[right = of 88.north east, anchor=north west] (context) {\texttt{Context}};
+			\node[below = \ystep cm of context.south west, anchor=west] (33) {\texttt{cell(3, 3, 1);}};
+			\node[below = \ystep cm of 33.south west, anchor=west] (44) {\texttt{cell(4, 4, 1);}};
+			\node[below = \ystep cm of 44.south west, anchor=west] (34) {\texttt{cell(3, 4, -1);}};
+			\node[below = \ystep cm of 34.south west, anchor=west] (43) {\texttt{cell(4, 3, -1);}};
+			\node[below = \ystep cm of 43.south west, anchor=west] (32) {\texttt{legalMove(2, 3);}};
+			\node[below = \ystep cm of 32.south west, anchor=west] (23) {\texttt{legalMove(3, 2);}};
+			\node[below = \ystep cm of 23.south west, anchor=west] (54) {\texttt{legalMove(4, 5);}};
+			\node[below = \ystep cm of 54.south west, anchor=west] (45) {\texttt{legalMove(5, 4);}};
+			\node[below = \ystep cm of 45.south west, anchor=west] (rest) {\texttt{cell(0, 0, 0); ...; cell(7, 7, 0);}};
+			% Animated Arrows
+			\draw[arrow, visible on=<2>] (33.west) to[bend right] (p45);
+			\draw[arrow, visible on=<2>] (44.west) to[bend left] (p54);
+			\draw[arrow, visible on=<3>] (34.west) to[bend right] (p44);
+			\draw[arrow, visible on=<3>] (43.west) to[bend left] (p55);
+			\draw[arrow, visible on=<4>] (32.west) to[bend right] (l46);
+			\draw[arrow, visible on=<4>] (23.west) to[bend left] (l35);
+			\draw[arrow, visible on=<5>] (54.west) to[bend right] (l64);
+			\draw[arrow, visible on=<5>] (45.west) to[bend left] (l53);
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{A Dummy Policy}
+	\begin{figure}
+		\begin{tikzpicture}[cell/.style n args={2}{rectangle, minimum size=#2cm, draw=white, fill=#1, outer sep=1pt}, piece/.style n args={2}{circle, solid, draw=#1, fill=#1, minimum size=#2cm, outer sep=1pt}, legal/.style n args={1}{circle, densely dashed, draw=black, fill=black!80, fill opacity=0.3, minimum size=#1cm, outer sep=1pt}, arrow/.style={streamlineorange, thick, dashed, ->}]
+			\pgfmathsetmacro{\ystep}{0.2}
+			\pgfmathsetmacro{\dystep}{0.5}
+			\pgfmathsetmacro{\size}{0.7}
+			\pgfmathsetmacro{\psize}{0.8*\size}
+			\foreach \i in {1,...,8} {
+				\foreach \j in {1,...,8} {
+					\pgfmathsetmacro{\x}{\i*\size}
+					\pgfmathsetmacro{\y}{\j*\size}
+					\node[cell={othelloGreen}{\size}] (\i\j) at (\x,\y){};
+				}
+			}
+			\node[piece={white}{\psize}] (p45) at (45.center){};
+			\node[piece={black}{\psize}] (p55) at (55.center){};
+			\node[piece={white}{\psize}] (p54) at (54.center){};
+			\node[piece={black}{\psize}] (p44) at (44.center){};
+			\node[legal={\psize}] (l35) at (35.center){};
+			\node[legal={\psize}] (l46) at (46.center){};
+			\node[legal={\psize}] (l53) at (53.center){};
+			\node[legal={\psize}] (l64) at (64.center){};
+			\node[right = of 88.north east, anchor=north west] (context) {\texttt{@Knowledge}};
+			\node[below = \ystep cm of context.south west, anchor = west, text width = 8cm] (d1) {\small\texttt{D1 :: legalMove(X,Y) implies move(X,Y);}};
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Simple Heuristics}
+	\begin{figure}
+		\begin{tikzpicture}[cell/.style n args={2}{rectangle, minimum size=#2cm, draw=white, fill=#1, outer sep=1pt}, piece/.style n args={2}{circle, solid, draw=#1, fill=#1, minimum size=#2cm, outer sep=1pt}, legal/.style n args={1}{circle, densely dashed, draw=black, fill=black!80, fill opacity=0.3, minimum size=#1cm, outer sep=1pt}, arrow/.style={streamlineorange, thick, dashed, ->}, rule node/.style n args={3}{below = #1cm of #2.south west, anchor = west, text width = 8cm, execute at begin node=\setlength{\baselineskip}{3ex}, visible on = <#3>}]
+			\pgfmathsetmacro{\ystep}{0.2}
+			\pgfmathsetmacro{\dystep}{0.5}
+			\pgfmathsetmacro{\tystep}{0.7}
+			\pgfmathsetmacro{\size}{0.7}
+			\pgfmathsetmacro{\psize}{0.8*\size}
+			\foreach \i in {1,...,8} {
+				\foreach \j in {1,...,8} {
+					\pgfmathsetmacro{\x}{\i*\size}
+					\pgfmathsetmacro{\y}{\j*\size}
+					\node[cell={othelloGreen}{\size}] (\i\j) at (\x,\y){};
+				}
+			}
+			\node[piece={white}{\psize}] (p45) at (45.center){};
+			\node[piece={black}{\psize}] (p55) at (55.center){};
+			\node[piece={white}{\psize}] (p54) at (54.center){};
+			\node[piece={black}{\psize}] (p44) at (44.center){};
+			\node[legal={\psize}] (l35) at (35.center){};
+			\node[legal={\psize}] (l46) at (46.center){};
+			\node[legal={\psize}] (l53) at (53.center){};
+			\node[legal={\psize}] (l64) at (64.center){};
+			\node[right = of 88.north east, anchor=north west] (context) {\texttt{@Knowledge}};
+			\node[below = \ystep cm of context.south west, anchor = west, text width=8cm] (d1) {\small\texttt{D1 :: legalMove(X,Y) implies move(X,Y);}};
+			\node[rule node={\ystep}{d1}{-2}] (d2) {\small\texttt{D2 :: legalMove(X,Y) implies -move(X,Y);}};
+			\node[rule node={\tystep}{d1}{3}] (d2) {\small\texttt{D2 :: legalMove(X,Y), legalMove(Z,W),\\\hphantom{D1 :: }corner(Z,W), -?=(X,Z), -?=(Y,W)\\\hphantom{D2 :: }implies -move(X,Y);}};
+			\node[rule node={\ystep}{d2}{1}] (r1) {\small\texttt{R1 :: legalMove(0,0) implies move(0,0);}};
+			\node[rule node={\ystep}{r1}{1}] (r2) {\small\texttt{R2 :: legalMove(0,7) implies move(0,7);}};
+			\node[rule node={\ystep}{r2}{1}] (r3) {\small\texttt{R3 :: legalMove(7,0) implies move(7,0);}};
+			\node[rule node={\ystep}{r3}{1}] (r4) {\small\texttt{R4 :: legalMove(7,7) implies move(7,7);}};
+			% Animated new rules
+			\node[rule node={\ystep}{d2}{2-}] (r1) {\small\texttt{C1 :: implies corner(0,0);}};
+			\node[rule node={\ystep}{r1}{2-}] (r2) {\small\texttt{C2 :: implies corner(0,7);}};
+			\node[rule node={\ystep}{r2}{2-}] (r3) {\small\texttt{C3 :: implies corner(7,0);}};
+			\node[rule node={\ystep}{r3}{2-}] (r4) {\small\texttt{C4 :: implies corner(7,7);}};
+			\node[rule node={\dystep}{r4}{3}] (r5) {\small\texttt{R1 :: legalMove(X,Y), corner(X,Y) implies\\\hphantom{R1 :: }move(X,Y);}};
+			% End of animated new rules
+			\draw[arrow] (r1.west) to[bend right] (18.center);
+			\draw[arrow] (r2.west) to[bend left] (88.center);
+			\draw[arrow] (r3.west) to[bend right] (11.center);
+			\draw[arrow] (r4.west) to[bend right] (81.center);
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{More Complex Heuristics}
+	\begin{figure}
+		\begin{tikzpicture}[cell/.style n args={2}{rectangle, minimum size=#2cm, draw=white, fill=#1, outer sep=1pt}, piece/.style n args={2}{circle, solid, draw=#1, fill=#1, minimum size=#2cm, outer sep=1pt}, legal/.style n args={1}{circle, densely dashed, draw=black, fill=black!80, fill opacity=0.3, minimum size=#1cm, outer sep=1pt}, arrow/.style={streamlineorange, thick, dashed, ->}, danger/.style n args={1}{minimum size=#1cm, draw=white, pattern=north west lines, pattern color=white}, rule node/.style n args={3}{below = #1cm of #2.south west, anchor = west, text width = 8cm, execute at begin node=\setlength{\baselineskip}{3ex}, visible on = <#3>}]
+			\pgfmathsetmacro{\ystep}{0.2}
+			\pgfmathsetmacro{\dystep}{0.5}
+			\pgfmathsetmacro{\tystep}{0.7}
+			\pgfmathsetmacro{\size}{0.7}
+			\pgfmathsetmacro{\psize}{0.8*\size}
+			\foreach \i in {1,...,8} {
+				\foreach \j in {1,...,8} {
+					\pgfmathsetmacro{\x}{\i*\size}
+					\pgfmathsetmacro{\y}{\j*\size}
+					\node[cell={othelloGreen}{\size}] (\i\j) at (\x,\y){};
+				}
+			}
+			\foreach \i/\j in {2/1, 2/2, 1/2, 7/1, 7/2, 8/2, 1/7, 2/7, 2/8, 7/8, 7/7, 8/7} {
+				\node[danger={\size}] at (\i\j.center){};
+			}
+			\node[piece={white}{\psize}] (p45) at (45.center){};
+			\node[piece={black}{\psize}] (p55) at (55.center){};
+			\node[piece={white}{\psize}] (p54) at (54.center){};
+			\node[piece={black}{\psize}] (p44) at (44.center){};
+			\node[legal={\psize}] (l35) at (35.center){};
+			\node[legal={\psize}] (l46) at (46.center){};
+			\node[legal={\psize}] (l53) at (53.center){};
+			\node[legal={\psize}] (l64) at (64.center){};
+			\node[right = of 88.north east, anchor=north west] (context) {\texttt{@Knowledge}};
+			\node[below = \ystep cm of context.south west, anchor = west] (dots) {\small\texttt{\ldots}};
+			\node[rule node={\dystep}{dots}{1-4}] (a1) {\small\texttt{A1 :: corner(X,Y), ?=(Z,X+1), ?=(W,Y+1)\\\hphantom{A1 :: }implies adjC(Z,W);}};
+			\node[rule node={\dystep}{a1}{2-4}] (a2) {\small\texttt{A2 :: corner(X,Y), ?=(Z,X+1), ?=(W,Y)\\\hphantom{A2 :: }implies adjC(Z,W);}};
+			\node[rule node={\dystep}{a2}{3-4}] (a3) {\small\texttt{A3 :: corner(X,Y), ?=(Z,X+1), ?=(W,Y-1)\\\hphantom{A3 :: }implies adjC(Z,W);}};
+			\node[rule node={\ystep}{a3}{4}] (ldots) {\small\texttt{\ldots}};
+			\draw[arrow, visible on=<1>] (a1.north west) to[bend right] (27.center);
+			\draw[arrow, visible on=<2>] (a2.176) to[bend left] (17.center);
+			\draw[arrow, visible on=<2>] (a2.176) to[bend left] (87.center);
+			\draw[arrow, visible on=<3>] (a3.175) to[bend left] (77.center);
+			% Procedural heuristics
+			\node[rule node={\ystep}{dots}{5-6}] (procedures) {\small\texttt{@Procedures}};
+			\node[rule node={\ystep}{procedures}{5-6}] (l1) {\small\texttt{function isAdj(x,y,z,w) \{}};
+			\node[rule node={\ystep}{l1}{5-6}] (l2) {\small\texttt{\qquad const X = parseInt(x);}};
+			\node[rule node={\ystep}{l2}{5-6}] (l3) {\small\texttt{\qquad const Y = parseInt(y);}};
+			\node[rule node={\ystep}{l3}{5-6}] (l4) {\small\texttt{\qquad const Z = parseInt(z);}};
+			\node[rule node={\ystep}{l4}{5-6}] (l5) {\small\texttt{\qquad const W = parseInt(w);}};
+			\node[rule node={\dystep}{l5}{5-6}] (l6) {\small\texttt{\qquad return Z-X < 2 \&\& X-Z < 2 \&\& W-Y < 2 \&\&\\\qquad Y-W < 2 \&\& (X != Z || Y != W);}};
+			\node[rule node={\ystep}{l6}{5-6}] (l7) {\small\texttt{\}}};
+			\begin{pgfonlayer}{bg}
+				\draw[thick, dashed, fill=streamlineorange!10, draw=streamlineorange, visible on=<6>] ($(l1.north west) + (0,-0.05)$) rectangle (14.5,0.5) node[pos=0.3, xshift=4cm]{\textbf{JavaScript}};
+			\end{pgfonlayer}
+			% Final heuristics
+			\node[rule node={\dystep}{dots}{7-}] (ad) {\small\texttt{R2 :: corner(X,Y), legalMove(Z,W),\\\hphantom{R2 :: }?isAdj(X,Y,Z,W) implies -move(Z,W);}};
+			\node[rule node={\ystep}{ad}{7-}] (ldots) {\small\texttt{\ldots}};
+			\node[rule node={\ystep}{ldots}{7-}] (procedures) {\small\texttt{@Procedures}};
+			\node[rule node={\ystep}{procedures}{7-}] (lldots) {\small\texttt{\ldots}};
+			\foreach \i/\j in {2/1, 2/2, 1/2, 7/1, 7/2, 8/2, 1/7, 2/7, 2/8, 7/8, 7/7, 8/7} {
+				\ifthenelse{\j > 6}{
+					\draw[arrow, visible on=<8->] (ad.176) to (\i\j.center);
+				}{
+					\draw[arrow, visible on=<8->] (ad.176) to (\i\j.center);
+				}
+			}
+			\node[rule node={1.5}{lldots}{9}] (benefits) {\begin{minipage}{0.8\textwidth}
+					\textbf{Benefits}:
+					\begin{itemize}
+						\item More compact representation.
+						\item Faster compilation.
+					\end{itemize}
+			\end{minipage}};
+		\end{tikzpicture}
+	\end{figure}
+\end{frame}
+
+\begin{frame}{Thank You!}
+	\centering
+	\textbf{Any Questions?}
 \end{frame}
 
 \end{document}
