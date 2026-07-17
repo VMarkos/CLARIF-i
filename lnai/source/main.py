@@ -1,13 +1,15 @@
 # main.py
 
-import gymnasium as gym
 from gymnasium.wrappers import RecordEpisodeStatistics
-from lnai.api.State import State
 from lnai.rl.SortingEnv import SortingEnv
-from lnai.rl.SortingAgent import SortingAgent
+from lnai.rl.SortingCallback import SortingCallback
 from plotters import plot_rolling_reward_plot
 from parsers import get_ql_parser
 from stable_baselines3 import PPO
+from sb3_contrib import MaskablePPO
+# from sb3_contrib.common.maskable.utils import get_action_masks
+from sb3_contrib.common.maskable.env import MaskableEnvWrapper
+# from stable_baselines3.common.env_util import make_vec_env
 
 
 def main():
@@ -16,14 +18,15 @@ def main():
     n = args.n
     n_timesteps = args.s
     load = args.l
-    env = SortingEnv(n)
+    env = MaskableEnvWrapper(SortingEnv(n))
     # env = gym.make('CartPole-v1', render_mode='human')
     env = RecordEpisodeStatistics(env, n_timesteps)
+    callback = SortingCallback(end_n=n)
     # Create and train PPO model
     if load:
         model = PPO.load(load, env=env)
     else:
-        model = PPO('MlpPolicy', env, verbose=1)
+        model = MaskablePPO('MlpPolicy', env, verbose=1)
         model.learn(total_timesteps=n_timesteps)
         model.save(f'ppo_{n}_{n_timesteps}.zip')
         # Plot learning outputs

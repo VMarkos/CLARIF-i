@@ -12,7 +12,7 @@ import random
 
 
 class SortingEnv(Env):
-    def __init__(self, n: int, target_steps: int | None=None) -> None:
+    def __init__(self, max_n: int, start_size: int=4, target_steps: int | None=None) -> None:
         super(SortingEnv, self).__init__()
         
         # Instance "globals"
@@ -22,7 +22,8 @@ class SortingEnv(Env):
         self.GOAL = State(dict(zip(range(n), range(n))))
 
         # Initialize object fields
-        self.n = n
+        self.n = start_size
+        self.max_n = max_n
         self._ticks = 0
         if target_steps is None:
             self._target_steps = self.n * np.log(n)
@@ -84,3 +85,12 @@ class SortingEnv(Env):
         self._prev_inv = inv
         return reward
 
+
+    def set_n(self, new_n: int) -> None:
+        self.n = min(new_n, self.max_n)
+
+
+    def action_masks(self) -> np.ndarray:
+        masks_i = np.zeros(self.max_n, dtype=bool)
+        masks_i[:self.max_n] = True
+        return np.concatenate([masks_i, masks_i])
