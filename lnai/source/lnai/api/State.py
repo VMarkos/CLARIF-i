@@ -34,6 +34,21 @@ class State:
         other_values = [other.state[k] for k in sorted(other.state.keys())]
         return kendalltau(self_values, other_values).statistic
 
+
+    
+    def inversions_ratio(self) -> int:
+        # FIXME: There surely is a n*logn way to do this
+        inversions = 0
+        n = len(self.state)
+        keys = list(sorted(self.state.keys()))
+        for i in keys[:-1]:
+            for j in keys[i + 1:]:
+                if self.state.get(i) > self.state.get(j):
+                    inversions += 1
+        return 2 * inversions / (n * (n - 1))
+
+
+
     def permute(self, permutation: "bidict") -> None:
         self.state = {
             k: permutation[v] if v in permutation else v for k, v in self.state.items()

@@ -44,6 +44,7 @@ class SortingEnv(Env):
         _rand_state_dict = dict(zip(range(self.n), random.sample(range(self.n), k=self.n)))
         self.state: State = State(_rand_state_dict)
         self._ticks = 0
+        self._prev_inv = self.state.inversions_ratio()
 
 
 
@@ -66,19 +67,20 @@ class SortingEnv(Env):
         self.state.swap(*action)
         reward = self.__get_reward(action)
         terminated = self.state == self.GOAL
-        truncated = False
+        truncated = False # self._ticks > 4_000
         self._ticks += 1
         return self.state.as_ndarray(), reward, terminated, truncated, dict()
 
 
     def __get_reward(self, action) -> float:
-        tau = self.state.kendall_tau(self.GOAL)
-        if np.isnan(tau):
-            tau = -1.0
-        reward = tau - 1.0 * self._ticks / self._target_steps
+        if action[0] == action[1]:
+            return -0.5
+        # tau = self.state.kendall_tau(self.GOAL)
+        inv = self.state.inversions_ratio()
+        delta = inv - self._prev_inv
+        reward = 2.0 * delta - 0.1 * self._ticks / self._target_steps
         if self.state == self.GOAL:
             reward += 10.0
-        if action[0] == action[1]:
-            reward = -0.5
+        self._prev_inv = inv
         return reward
 

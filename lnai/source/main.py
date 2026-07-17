@@ -25,9 +25,9 @@ def main():
     else:
         model = PPO('MlpPolicy', env, verbose=1)
         model.learn(total_timesteps=n_timesteps)
-        model.save('test_ppo.zip')
+        model.save(f'ppo_{n}_{n_timesteps}.zip')
         # Plot learning outputs
-        plot_rolling_reward_plot(env, rolling_length=500)
+        plot_rolling_reward_plot(env, rolling_length=500, fname=f'ppo_{n}_{n_timesteps}.pdf')
 
 
     # Test model

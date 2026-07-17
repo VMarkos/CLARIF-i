@@ -19,6 +19,7 @@ def get_rolling_avg(arr, window, convolution_mode) -> np.ndarray:
 def plot_rolling_reward_plot(
         env,
         rolling_length: int=500,
+        fname: str='output.pdf',
     ) -> None:
     fig, ax = plt.subplots(ncols=2, figsize=(12, 5))
     
@@ -56,5 +57,5 @@ def plot_rolling_reward_plot(
     # ax[2].set_xlabel('Step')
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig(fname)
     
