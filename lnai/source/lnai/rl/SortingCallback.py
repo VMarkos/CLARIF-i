@@ -23,7 +23,7 @@ class SortingCallback(BaseCallback):
                 if m_r > self.reward_thresh and self.stage_count < len(self.stages) - 1:
                     self.stage_count += 1
                     new_n = self.stages[self.stage_count]
-                    self.training_eng.env_method('set_n', new_n)
+                    self.training_env.env_method('set_n', new_n)
                     if self.verbose > 0:
                         print(f'Advancing to stage n={new_n}.')
         return True

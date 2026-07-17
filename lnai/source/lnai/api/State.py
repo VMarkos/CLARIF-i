@@ -55,6 +55,11 @@ class State:
         }
 
 
+    def sorted(self) -> 'State':
+        sorted_dict = { k: v for k, v in zip(self.state.keys(), sorted(self.state.values())) }
+        return State(sorted_dict)
+
+
     def as_ndarray(self) -> ndarray:
         return array([ self.state.get(i) for i in self.state.keys() ]).flatten()
 
@@ -68,6 +73,19 @@ class State:
     def __deepcopy__(self, memo) -> "State":
         copycat: "State" = State(self.state.copy())
         return copycat
+
+
+    def __getitem__(self, val) -> object:
+        if isinstance(val, slice):
+            keys = list(self.state.keys())[val.start:val.stop:val.step]
+            sliced_dict = { k: self.state.get(k) for k in keys }
+            return State(sliced_dict)
+
+
+    def __add__(self, other) -> 'State':
+        sum_state = self.state | other.state
+        return State(sum_state)
+
 
     def __le__(self, other: "State") -> bool:
         if not isinstance(other, State):
