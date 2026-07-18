@@ -8,7 +8,7 @@ from stable_baselines3.common.callbacks import BaseCallback
 
 
 class SortingCallback(BaseCallback):
-    def __init__(self, start_n: int=4, end_n: int=20, eval_freq: int=10_000, reward_thresh: float=10.5, verbose=0) -> None:
+    def __init__(self, start_n: int=4, end_n: int=20, eval_freq: int=1_000, reward_thresh: float=10.5, verbose=0) -> None:
         super().__init__(verbose)
         self.eval_freq = eval_freq
         self.reward_thresh = reward_thresh

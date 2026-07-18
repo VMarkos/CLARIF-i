@@ -3,7 +3,7 @@
 import numpy as np
 from gymnasium import Env, spaces
 from matplotlib import pyplot as plt
-from lnai.api.State import State
+from scipy.stats import kendalltau
 
 import random
 
@@ -22,14 +22,14 @@ class SortingEnv(Env):
         self.n = start_size
         self.max_n = max_n
         self._ticks = 0
-        if target_steps is None:
-            self._target_steps = self.n * np.log(self.n)
-        else:
-            self._target_steps = target_steps
+        self._max_steps = max(self.n ** 2, 100)
+        #if target_steps is None:
+        #    self._target_steps = self.n ** 2 // 2 # self.n * np.log(self.n)
+        #else:
+        #    self._target_steps = target_steps
 
         # Initialize state
-        self.__init_state()
-
+        #self.__init_state()
 
         # Discrete obesrvation space containing n^n (not all valid) different objects
         self.observation_space = spaces.MultiDiscrete([max_n] * max_n)
@@ -38,26 +38,48 @@ class SortingEnv(Env):
         self.action_space = spaces.MultiDiscrete([max_n, max_n])
 
 
-
+    '''
     def __init_state(self) -> None:
         """Initialize state to a random state"""
         _rand_state_dict = dict(zip(range(self.max_n), random.sample(range(self.max_n), k=self.max_n)))
         self.state: State = State(_rand_state_dict)
         self._ticks = 0
         # self._prev_inv = self.state.inversions_ratio()
-        self._target_steps = self.n * np.log(self.n)
+        self._target_steps = self.n ** 2 // 2 # self.n * np.log(self.n)
 
         # Initialize GOAL
         _sorted = self.state[:self.n].sorted()
         self.GOAL = _sorted[:self.n] + self.state[self.n:]
+        self._prev_tau = self.state[:self.n].kendall_tau(self.GOAL[:self.n])
+    '''
 
 
-
-    def reset(self, seed=None, options=None) -> tuple[State, dict]:
+    def reset(self, seed=None, options=None) -> tuple[np.ndarray, dict]:
         """Resets internal state"""
         super().reset(seed=seed, options=options)
-        self.__init_state()
-        return self.state.as_ndarray(), dict()
+
+        # State is an ndarray
+        self.state = np.arange(self.max_n)
+        active = np.random.permutation(self.n)
+        self.state[:self.n] = active
+
+        # GOAL is a sorted ndarray
+        self.GOAL = np.arange(self.max_n)
+
+        # Previous tau value
+        self._prev_tau = self._get_tau()
+
+        self._ticks = 0
+        self._max_steps = max(self.n ** 2, 100)
+
+        return self.state.copy(), dict()
+
+
+
+    def _get_tau(self) -> float:
+        '''Failsafe kendall's tau computation'''
+        tau, _ = kendalltau(self.state[:self.n], self.GOAL[:self.n])
+        return -1.0 if np.isnan(tau) else tau
 
 
     def render(self) -> str | None:
@@ -68,30 +90,30 @@ class SortingEnv(Env):
 
     def step(self, action) -> tuple:
         """Makes a step forward by applying an action to the current setting"""
-        action = np.array(action).flatten()
-        self.state.swap(*action)
-        reward = self.__get_reward(action)
+        i, j = action[0], action[1]
+        self.state[i], self.state[j] = self.state[j], self.state[i]
+        reward = self.__get_reward(i, j)
         terminated = self.__is_terminated()
-        truncated = False # self._ticks > 4_000
+        truncated = self._ticks > self._max_steps
         self._ticks += 1
-        return self.state.as_ndarray(), reward, terminated, truncated, dict()
+        return self.state.copy(), reward, terminated, truncated, dict()
 
 
     def __is_terminated(self) -> bool:
-        return self.state == self.GOAL
+        return np.array_equal(self.state[:self.n], self.GOAL[:self.n])
 
 
-    def __get_reward(self, action) -> float:
-        if action[0] == action[1]:
-            return -0.5
-        tau = self.state.kendall_tau(self.GOAL)
-        #inv = self.state.inversions_ratio()
-        #delta = inv - self._prev_inv
-        reward = tau - 1.0 * self._ticks / self._target_steps
-        if self.state == self.GOAL:
+    def __get_reward(self, i: int, j: int) -> float:
+        if i == j:
+            return -0.25
+        tau = self._get_tau()
+        delta = tau - self._prev_tau
+        reward = delta * 1.0
+        reward -= 0.05 # Time penalty
+        if self.__is_terminated():
             reward += 10.0
-        # self._prev_inv = inv
-        return reward
+        self._prev_tau = tau
+        return float(reward)
 
 
     def set_n(self, new_n: int) -> None:
