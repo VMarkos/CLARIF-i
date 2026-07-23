@@ -11,7 +11,7 @@ class AlgorithmicSortingEnv(SortingEnv):
     def __init__(self, algorithm: Callable[[ndarray], ndarray], *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.coach = SortingCoach(algorithm)
-        self.out_of_policy_penalty = -0.1
+        self.out_of_algorithm_penalty = -0.1
         
 
     def reset(self, seed=None, options=None) -> tuple[ndarray, dict]:
@@ -36,14 +36,12 @@ class AlgorithmicSortingEnv(SortingEnv):
         reward = super()._get_reward(i, j)
         advice = self.coach.get_advice(self.state)
         if advice is None:
-            return reward + self.out_of_policy_penalty
-        if abs(i - j) != 1:
-            reward -= 0.5
+            return reward + self.out_of_algorithm_penalty
         dist = abs(min(advice) - min(i, j)) + abs(max(advice) - max(i, j))
-        reward += 3.0 / (1 + dist)
+        reward += 1.0 / (1 + dist)
         return reward
 
 
     def set_n(self, new_n: int) -> None:
         super().set_n(new_n)
-        self.out_of_policy_penalty = -1.0 + 1 / self.n
+        self.out_of_algorithm_penalty = -1.0 + 1 / self.n

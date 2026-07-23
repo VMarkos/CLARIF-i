@@ -78,13 +78,13 @@ class SortingEnv(Env):
         i, j = action[0], action[1]
         self.state[i], self.state[j] = self.state[j], self.state[i]
         reward = self._get_reward(i, j)
-        terminated = self.__is_terminated()
+        terminated = self._is_terminated()
         truncated = self._ticks > self._max_steps
         self._ticks += 1
         return self.state.copy(), reward, terminated, truncated, dict()
 
 
-    def __is_terminated(self) -> bool:
+    def _is_terminated(self) -> bool:
         return np.array_equal(self.state[:self.n], self.GOAL[:self.n])
 
 
@@ -95,7 +95,7 @@ class SortingEnv(Env):
         delta = tau - self._prev_tau
         reward = delta * 1.0
         reward -= 0.005 # Time penalty
-        if self.__is_terminated():
+        if self._is_terminated():
             reward += 10.0
         self._prev_tau = tau
         return float(reward)

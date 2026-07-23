@@ -2,13 +2,12 @@
 
 from gymnasium.wrappers import RecordEpisodeStatistics
 from lnai.rl.SortingEnv import SortingEnv
-from lnai.rl.AlgorithmicSortingEnv import AlgorithmicSortingEnv
+from lnai.rl.BubbleSortEnv import BubbleSortEnv
 from lnai.rl.SortingCallback import SortingCallback
 from plotters import plot_rolling_reward_plot
 from parsers import get_ql_parser
 from stable_baselines3 import PPO
 from sb3_contrib import MaskablePPO
-from utils import bubble_sort
 
 
 def main():
@@ -18,7 +17,7 @@ def main():
     n_timesteps = args.s
     load = args.l
     # env = gym.make('CartPole-v1', render_mode='human')
-    env = AlgorithmicSortingEnv(bubble_sort, n)
+    env = BubbleSortEnv(n)
     env = RecordEpisodeStatistics(env, n_timesteps)
     callback = SortingCallback(end_n=n, verbose=1)
     # Create and train PPO model
