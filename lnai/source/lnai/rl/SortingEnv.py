@@ -20,6 +20,7 @@ class SortingEnv(Env):
 
         # Initialize object fields
         self.n = start_size
+        self._start_size = start_size
         self.max_n = max_n
         self._ticks = 0
         self._max_steps = max(self.n ** 2, 100)
@@ -76,11 +77,11 @@ class SortingEnv(Env):
     def step(self, action) -> tuple:
         """Makes a step forward by applying an action to the current setting"""
         i, j = action[0], action[1]
+        self._ticks += 1
         self.state[i], self.state[j] = self.state[j], self.state[i]
         reward = self._get_reward(i, j)
         terminated = self._is_terminated()
         truncated = self._ticks > self._max_steps
-        self._ticks += 1
         return self.state.copy(), reward, terminated, truncated, dict()
 
 

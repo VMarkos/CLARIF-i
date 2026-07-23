@@ -12,6 +12,7 @@ class BubbleSortEnv(AlgorithmicSortingEnv):
         super().__init__(bubble_sort, *args, **kwargs)
         # Each action `i` corresponds to the swap ``i`` <-> `i + 1`
         self.action_space = spaces.Discrete(self.max_n - 1)
+        self._accurate_steps = 0
 
 
     def step(self, action: int) -> tuple:
@@ -31,17 +32,22 @@ class BubbleSortEnv(AlgorithmicSortingEnv):
         self._prev_tau = tau
         reward = delta
         if self._is_terminated():
-            reward += 10.0
+            reward += (12.0 - (self.n - self._start_size) / (self.max_n - self._start_size))# * self._accurate_steps / self._ticks
+            return reward
         reward -= 0.05
-        advice = self.coach.get_advice(self.state)
+        prev_state = self.state.copy()
+        prev_state[i], prev_state[j] = prev_state[i], prev_state[j]
+        advice = self.coach.get_advice(prev_state)
         if advice is None:
             return reward - 0.5
         if delta > 0 and i in advice and j in advice:
             reward += 1.0
+            self._accurate_steps += 1
         return reward
 
 
     def reset(self, seed=None, options=None) -> tuple:
         obs, info = super().reset(seed, options)
         self._max_steps = self.n * (self.n - 1) // 2 + 5
+        self._accurate_steps = 0
         return obs, info
