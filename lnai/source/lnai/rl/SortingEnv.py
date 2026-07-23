@@ -38,21 +38,6 @@ class SortingEnv(Env):
         self.action_space = spaces.MultiDiscrete([max_n, max_n])
 
 
-    '''
-    def __init_state(self) -> None:
-        """Initialize state to a random state"""
-        _rand_state_dict = dict(zip(range(self.max_n), random.sample(range(self.max_n), k=self.max_n)))
-        self.state: State = State(_rand_state_dict)
-        self._ticks = 0
-        # self._prev_inv = self.state.inversions_ratio()
-        self._target_steps = self.n ** 2 // 2 # self.n * np.log(self.n)
-
-        # Initialize GOAL
-        _sorted = self.state[:self.n].sorted()
-        self.GOAL = _sorted[:self.n] + self.state[self.n:]
-        self._prev_tau = self.state[:self.n].kendall_tau(self.GOAL[:self.n])
-    '''
-
 
     def reset(self, seed=None, options=None) -> tuple[np.ndarray, dict]:
         """Resets internal state"""
@@ -70,7 +55,7 @@ class SortingEnv(Env):
         self._prev_tau = self._get_tau()
 
         self._ticks = 0
-        self._max_steps = max(self.n ** 2, 100)
+        # self._max_steps = self.n * (self.n - 1) // 2 + 5#max(self.n ** 2, 100)
 
         return self.state.copy(), dict()
 
@@ -92,7 +77,7 @@ class SortingEnv(Env):
         """Makes a step forward by applying an action to the current setting"""
         i, j = action[0], action[1]
         self.state[i], self.state[j] = self.state[j], self.state[i]
-        reward = self.__get_reward(i, j)
+        reward = self._get_reward(i, j)
         terminated = self.__is_terminated()
         truncated = self._ticks > self._max_steps
         self._ticks += 1
@@ -103,13 +88,13 @@ class SortingEnv(Env):
         return np.array_equal(self.state[:self.n], self.GOAL[:self.n])
 
 
-    def __get_reward(self, i: int, j: int) -> float:
+    def _get_reward(self, i: int, j: int) -> float:
         if i == j:
             return -0.25
         tau = self._get_tau()
         delta = tau - self._prev_tau
         reward = delta * 1.0
-        reward -= 0.05 # Time penalty
+        reward -= 0.005 # Time penalty
         if self.__is_terminated():
             reward += 10.0
         self._prev_tau = tau
