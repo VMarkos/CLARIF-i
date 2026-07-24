@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # main.py
 
 from gymnasium.wrappers import RecordEpisodeStatistics
@@ -48,3 +49,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+=======
+>>>>>>> e9908ea (Hotfix commit)
