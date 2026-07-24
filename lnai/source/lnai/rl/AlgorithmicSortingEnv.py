@@ -48,14 +48,13 @@ class AlgorithmicSortingEnv(SortingEnv):
         return concatenate([self.state, self._get_advice_vector()])
 
 
-    '''
     def _get_reward(self, i: int, j: int) -> float:
-        reward = super()._get_reward(i, j)
-        advice = self.coach.get_advice(self.state)
-        if advice is None:
-            return reward + self.out_of_algorithm_penalty
-        dist = abs(min(advice) - min(i, j)) + abs(max(advice) - max(i, j))
-        reward += 1.0 / (1 + dist)
-        return reward
-    '''
+        # reward = super()._get_reward(i, j)
+        if self._is_terminated():
+            return 1.0
+        advice = self.coach.get_advice(self.state[:self.n])
+        if advice is not None:
+            if i in advice and j in advice:
+                return 0.0
+        return -0.05
 

@@ -18,9 +18,9 @@ def main():
     n_timesteps = args.s
     load = args.l
     # env = gym.make('CartPole-v1', render_mode='human')
-    env = AlgorithmicSortingEnv(bubble_sort, 0.8, n)
+    env = AlgorithmicSortingEnv(bubble_sort, 0.8, n, start_size=2)
     env = RecordEpisodeStatistics(env, n_timesteps)
-    callback = SortingCallback(end_n=n, verbose=1)
+    callback = SortingCallback(end_n=n, verbose=1, reward_thresh=0.98)
     # Create and train PPO model
     if load:
         model = MaskablePPO.load(load, env=env)
