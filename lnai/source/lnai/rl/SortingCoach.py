@@ -28,7 +28,7 @@ class SortingCoach:
 
 
     def get_advice(self, state: ndarray) -> tuple | None:
-        '''Returns an ndarray of shape (2,) with the suggested swap or None in case no such state should have been encountered.'''
+        '''Returns a tuple with the suggested swap or None in case no such state should have been encountered.'''
         return self.__swaps.get(tuple(state.flatten()), None)
 
 

@@ -1,9 +1,8 @@
-<<<<<<< HEAD
 # main.py
 
 from gymnasium.wrappers import RecordEpisodeStatistics
 from lnai.rl.SortingEnv import SortingEnv
-from lnai.rl.CoachedSortingEnv import CoachedSortingEnv
+from lnai.rl.AlgorithmicSortingEnv import AlgorithmicSortingEnv
 from lnai.rl.SortingCallback import SortingCallback
 from plotters import plot_rolling_reward_plot
 from parsers import get_ql_parser
@@ -19,12 +18,12 @@ def main():
     n_timesteps = args.s
     load = args.l
     # env = gym.make('CartPole-v1', render_mode='human')
-    env = CoachedSortingEnv(bubble_sort, n)
+    env = AlgorithmicSortingEnv(bubble_sort, 0.8, n)
     env = RecordEpisodeStatistics(env, n_timesteps)
     callback = SortingCallback(end_n=n, verbose=1)
     # Create and train PPO model
     if load:
-        model = PPO.load(load, env=env)
+        model = MaskablePPO.load(load, env=env)
     else:
         model = MaskablePPO('MlpPolicy', env, verbose=1)
         model.learn(total_timesteps=n_timesteps, callback=callback)
@@ -34,6 +33,7 @@ def main():
 
 
     # Test model
+    env = AlgorithmicSortingEnv(bubble_sort, 0.0, n, start_size=n)
     obs, info = env.reset()
     # obs = State(dict(zip(range(n),range(n-1,-1,-1)))).as_ndarray()
     env.render()
@@ -49,5 +49,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-=======
->>>>>>> e9908ea (Hotfix commit)
