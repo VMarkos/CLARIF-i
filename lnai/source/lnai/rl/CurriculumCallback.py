@@ -66,7 +66,9 @@ class CurriculumCallback(BaseCallback):
         # Check threshold trigger
         if success_rate >= self.success_threshold:
             new_n = current_n + 1
-            training_env.set_curriculum_level(new_n)
+            if new_n >= 6:
+                self.model.ent_coef = 0.05
+            self.training_env.env_method('set_curriculum_level', new_n)
             
             # Log curriculum metric to tensorboard/logger
             self.logger.record("curriculum/level", new_n)

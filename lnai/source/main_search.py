@@ -3,7 +3,7 @@
 # temp script
 
 from sb3_contrib import MaskablePPO
-from sb3_contrib.common.maskable.policies import MaskableActorCriticPolicy
+from sb3_contrib.common.maskable.policies import MaskableMultiInputActorCriticPolicy
 
 # Import the CurriculumPathSearchEnv implemented earlier
 # from env import CurriculumPathSearchEnv
@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     # 2. Instantiate MaskablePPO
     model = MaskablePPO(
-        MaskableActorCriticPolicy,
+        MaskableMultiInputActorCriticPolicy,
         env,
         learning_rate=3e-4,
         n_steps=512,
