@@ -13,7 +13,11 @@ class SortingCallback(BaseCallback):
         self.eval_freq = eval_freq
         self.reward_thresh = reward_thresh
         self.stage_count = 0
-        self.stages = [x for x in range(start_n, end_n + 1)]
+        self.stages = [
+            (n, k)
+            for n in range(start_n, end_n + 1)
+                for k in range(1, n * (n - 1) // 2 + 1)
+        ]
 
 
     def _on_step(self) -> bool:
@@ -22,8 +26,8 @@ class SortingCallback(BaseCallback):
                 m_r = np.mean([ep['r'] for ep in self.model.ep_info_buffer])
                 if m_r > self.reward_thresh and self.stage_count < len(self.stages) - 1:
                     self.stage_count += 1
-                    new_n = self.stages[self.stage_count]
-                    self.training_env.env_method('set_n', new_n)
+                    new_stage = self.stages[self.stage_count]
+                    self.training_env.env_method('set_n', new_stage)
                     if self.verbose > 0:
-                        print(f'Advancing to stage n={new_n}.')
+                        print(f'Advancing to stage (n, k)={new_stage}.')
         return True

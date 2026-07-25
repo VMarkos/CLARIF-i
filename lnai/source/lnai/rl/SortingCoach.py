@@ -22,6 +22,8 @@ class SortingCoach:
         intermediate_states = next(iter(self.__log.values()))[::2] # Assuming just one key is present
         for prev_state, next_state in zip(intermediate_states[:-1], intermediate_states[1:]):
             swap = tuple(int(x) for x in flatnonzero(next_state - prev_state))
+            if swap == ():
+                continue
             if len(swap) != 2:
                 raise ValueError(f'Expected 2 indices to swap, not {",".join(map(str, swap))}')
             self.__swaps[tuple(prev_state.flatten())] = swap
@@ -30,6 +32,13 @@ class SortingCoach:
     def get_advice(self, state: ndarray) -> tuple | None:
         '''Returns a tuple with the suggested swap or None in case no such state should have been encountered.'''
         return self.__swaps.get(tuple(state.flatten()), None)
+
+
+    def get_state_at(self, state: ndarray, k: int) -> ndarray:
+        sorted_state = self.algorithm(deepcopy(state))
+        intermediate_states = next(iter(self.__log.values()))[::2]
+        k = min(k, len(intermediate_states) - 1)
+        return intermediate_states[-k-1]
 
 
 

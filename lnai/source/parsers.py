@@ -29,4 +29,16 @@ def get_ql_parser() -> ArgumentParser:
         default='',
         help='Path for pre-trained model to load, Defaults to \'\'.'
     )
+    parser.add_argument(
+        '-p',
+        type=float,
+        default=0.05,
+        help='Absolute penalty that should be applied in non-conformant actions. Defaults to 0.05.'
+    )
+    parser.add_argument(
+        '-a',
+        type=str,
+        default='b',
+        help='Algorithm to use. Defaults to "b".'
+    )
     return parser

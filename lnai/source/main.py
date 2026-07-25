@@ -8,7 +8,7 @@ from plotters import plot_rolling_reward_plot
 from parsers import get_ql_parser
 from stable_baselines3 import PPO
 from sb3_contrib import MaskablePPO
-from utils import bubble_sort
+from utils import bubble_sort, quick_sort
 
 
 def main():
@@ -17,25 +17,29 @@ def main():
     n = args.n
     n_timesteps = args.s
     load = args.l
-    # env = gym.make('CartPole-v1', render_mode='human')
-    env = AlgorithmicSortingEnv(bubble_sort, 0.8, n, start_size=2)
+    p = args.p
+    algo = args.a
+    if algo == 'b':
+        alg = bubble_sort
+    else:
+        alg = quick_sort
+    env = AlgorithmicSortingEnv(alg, p, n, start_size=2)
     env = RecordEpisodeStatistics(env, n_timesteps)
-    callback = SortingCallback(end_n=n, verbose=1, reward_thresh=0.98)
+    callback = SortingCallback(end_n=n, verbose=1, reward_thresh=0.98, start_n=3)
     # Create and train PPO model
     if load:
         model = MaskablePPO.load(load, env=env)
     else:
         model = MaskablePPO('MlpPolicy', env, verbose=1)
         model.learn(total_timesteps=n_timesteps, callback=callback)
-        model.save(f'algo_ppo_{n}_{n_timesteps}.zip')
+        model.save(f'{algo}_ppo_{n}_{n_timesteps}_{p}.zip')
         # Plot learning outputs
-        plot_rolling_reward_plot(env, rolling_length=500, fname=f'algo_ppo_{n}_{n_timesteps}.pdf')
+        plot_rolling_reward_plot(env, rolling_length=500, fname=f'{algo}_ppo_{n}_{n_timesteps}_{p}.pdf')
 
 
     # Test model
-    env = AlgorithmicSortingEnv(bubble_sort, 0.0, n, start_size=n)
+    env = AlgorithmicSortingEnv(bubble_sort, p, n, start_size=n)
     obs, info = env.reset()
-    # obs = State(dict(zip(range(n),range(n-1,-1,-1)))).as_ndarray()
     env.render()
     for i in range(1000):
         action, _states = model.predict(obs, deterministic=True)
