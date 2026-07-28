@@ -9,10 +9,15 @@ class CurriculumPathSearchEnv(gym.Env):
         self.max_path_len = max_path_len
         self.current_n = min(current_n, max_n)
 
-        self.max_swaps = max_n - 1
+        self.max_swaps = max_n * (max_n - 1) // 2
         self.action_space = spaces.Discrete(self.max_swaps + 1)
         self.BACKTRACK_ACTION = self.max_swaps
-        self.all_swaps = [(i, i + 1) for i in range(max_n - 1)]
+        self.all_swaps = [
+            (i, j)
+            for j in range(1, max_n)
+                for i in range(j)
+        ]
+        self.current_swaps = self.current_n * (self.current_n - 1) // 2
 
         self.observation_space = spaces.Dict({
             "current_array": spaces.Box(low=-1, high=max_n-1, shape=(max_n,), dtype=np.int32),
@@ -27,6 +32,7 @@ class CurriculumPathSearchEnv(gym.Env):
         new_n = min(new_n, self.max_n)
         if new_n != self.current_n:
             self.current_n = new_n
+            self.current_swaps = self.current_n * (self.current_n - 1) // 2
             self.reset()  # Resets path_stack, target_state, and exploration memory to match new_n
 
 
@@ -157,3 +163,9 @@ class CurriculumPathSearchEnv(gym.Env):
             truncated = True
 
         return self._get_obs(), reward, terminated, truncated, {}
+
+
+    def render(self) -> None:
+        print(
+            ' -> '.join(map(str, self.path_stack))
+        )

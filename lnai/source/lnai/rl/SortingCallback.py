@@ -13,11 +13,13 @@ class SortingCallback(BaseCallback):
         self.eval_freq = eval_freq
         self.reward_thresh = reward_thresh
         self.stage_count = 0
+        self.stages = [ x for x in range(start_n, end_n + 1) ]
+        '''
         self.stages = [
             (n, k)
             for n in range(start_n, end_n + 1)
                 for k in range(1, n * (n - 1) // 2 + 1)
-        ]
+        ]'''
 
 
     def _on_step(self) -> bool:

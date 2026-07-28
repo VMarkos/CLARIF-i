@@ -23,7 +23,8 @@ def main():
         alg = bubble_sort
     else:
         alg = quick_sort
-    env = AlgorithmicSortingEnv(alg, p, n, start_size=2)
+    env = SortingEnv(n)
+    # env = AlgorithmicSortingEnv(alg, p, n, start_size=2)
     env = RecordEpisodeStatistics(env, n_timesteps)
     callback = SortingCallback(end_n=n, verbose=1, reward_thresh=0.98, start_n=3)
     # Create and train PPO model
@@ -38,7 +39,7 @@ def main():
 
 
     # Test model
-    env = AlgorithmicSortingEnv(bubble_sort, p, n, start_size=n)
+    # env = AlgorithmicSortingEnv(bubble_sort, p, n, start_size=n)
     obs, info = env.reset()
     env.render()
     for i in range(1000):

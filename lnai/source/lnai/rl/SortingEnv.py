@@ -40,14 +40,16 @@ class SortingEnv(Env):
 
 
 
-    def reset(self, seed=None, options=None) -> tuple[np.ndarray, dict]:
+    def reset(self, start_state: np.ndarray | None=None, seed=None, options=None) -> tuple[np.ndarray, dict]:
         """Resets internal state"""
         super().reset(seed=seed, options=options)
-
-        # State is an ndarray
-        self.state = np.arange(self.max_n)
-        active = np.random.permutation(self.n)
-        self.state[:self.n] = active
+        if start_state is None:
+            # State is an ndarray
+            self.state = np.arange(self.max_n)
+            active = np.random.permutation(self.n)
+            self.state[:self.n] = active
+        else:
+            self.state = start_state
 
         # GOAL is a sorted ndarray
         self.GOAL = np.arange(self.max_n)
