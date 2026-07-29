@@ -1,0 +1,174 @@
+% !TeX document-id = {1ccb3ec0-e2ca-46a7-8a74-05b20a6a54d6}
+% !TeX spellcheck = en_US
+% !BIB program = bibtex 
+\documentclass[a4paper,twoside]{article}
+
+\usepackage{epsfig}
+\usepackage{subcaption}
+\usepackage{calc}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{multicol}
+\usepackage{pslatex}
+\usepackage{apalike}
+\usepackage{algorithm2e}
+\usepackage[bottom]{footmisc}
+
+% Local packages
+\usepackage[inline]{enumitem}
+\usepackage{pifont}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{xfrac}
+
+\usepackage{SCITEPRESS}     % Please add other packages that you may need BEFORE the SCITEPRESS.sty package.
+
+% tikz libraries
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{bbox}
+
+%%%% Local definitions %%%%
+\newcommand{\bubblecoach}{\ensuremath{\texttt{P}_{\rm bubble}}\,}
+\newcommand{\quickcoach}{\ensuremath{\texttt{P}_{\rm quick}}\,}
+\newcommand{\learner}{learner}
+\newcommand{\coach}{coach}
+\newcommand{\NULL}{{\rm\texttt{null}}}
+\newcommand{\learnerpolicy}{\texttt{P}_{\learner}}
+\newcommand{\coachpolicy}{\texttt{P}_{\coach}}
+\newcommand{\qmark}{\texttt{\textbf{?}}}
+\newcommand{\ttus}{\char`_}
+
+\newcommand{\searchpath}[2]{{search\_path(#1, #2)}}
+\newcommand{\evaluate}[3]{{evaluate(#1, #2, #3)}}
+\newcommand{\updatehypothesis}[1]{{update\_hypothesis(#1)}}
+
+\newcommand{\partialadvice}[1]{partial@{#1}}
+
+%%%% Color definitions
+\definecolor{correctColor}{HTML}{19aa50}
+\definecolor{wrongColor}{HTML}{aa1950}
+\definecolor{adviceColor}{HTML}{1950aa}
+\definecolor{unknownColor}{HTML}{ca8520}
+
+\definecolor{bubbleColor}{HTML}{19aa50}
+\definecolor{quickColor}{HTML}{aa1950}
+
+%%%% algorithm2e macros
+\SetKwRepeat{Do}{do}{while}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% Editor's commands %%%%
+\newcommand{\edcom}[1]{{\sf\color{red}$>>>$ #1}}
+\newcommand{\tbc}{\edcom{To be completed\ldots}}
+\setlength\marginparwidth{2cm}
+\newcommand{\ednote}[1]{\marginpar{\flushleft\tiny\sf\color{red}{#1}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{Background and Preliminaries}\label{sec:background and preliminaries}
+%
+Building on the learning semantics introduced in earlier work on Machine Coaching \cite{michaelMachineCoaching2019,prudens2022}, we empirically investigate their application to search coaching. A machine learner repeatedly requests advice from a machine coach that emulates a human coach, as in \cite{proxyCoaching2022}, with the goal of progressively strengthening its search capacity under the coach's explicit search policy. Given a fixed goal state, $g$, the learner applies its search policy, $\learnerpolicy$, to find a path, $p$, that begins at an arbitrary state, $s$, and terminates at a goal state, $g$. Whenever knowledge is lacking, the learner asks its coach for advice; the coach replies according to its own policy, $\coachpolicy$, by returning a single piece of advice. Each piece of advice takes the form of an ``if-then'' rule whose \emph{body} (the ``if'' part) depends on the state and whose \emph{head} (the ``then'' part) is always an action to be taken by the learner. As in prior work \cite{proxyCoaching2022,prudens2022,ioannouKnowledgeBasedTranslationNatural2021}, the coach assigns priorities to rules so that, by default, later advice overrides earlier advice in $\learnerpolicy$, unless the coach specifies otherwise. In this setting, a \emph{coaching step} consists of one learner request for advice together with the matching coach response, whereas a \emph{coaching session} spans the entire learning cycle and ends once the learner has constructed a path as required (cf.\ Algorithm~\ref{alg:coaching process}). In every case, the learner requests advice when it lacks knowledge for continuing the search, and returns a partial path $p$ starting from $s$.
+
+\begin{figure}[!tb]
+	\centering
+	\input{assets/tikz/sorting_rules.tex}
+	\caption{Examples of full (\texttt{f}) and partial (\texttt{p}) advice from \bubblecoach (\texttt{b}) and \quickcoach (\texttt{q}) on state $(3,4,1,5,2)$.}
+	\label{fig:sorting rules}
+\end{figure}
+
+
+\begin{algorithm}
+	\caption{Search coaching process. $s$, $g$ denote the start and goal states, respectively.}%
+	\label{alg:coaching process}
+	\KwData{$s$, $g$, $\learner$, $\coach$}
+	\KwResult{$\learner$ with updated search policy; $path$ from $s$ to $g$.}
+%	$advice\gets\NULL$\;
+	\Do{advice is not \NULL}{%
+		$path \gets \learner.\searchpath{s}{g}$\;
+		$advice \gets \coach.\evaluate{path}{s}{g}$\;
+		$\learner.\updatehypothesis{advice}$\;
+	}
+\end{algorithm}
+
+We consider the special case of sorting cast as a search problem, and implement two coaching \emph{policies}: \bubblecoach, grounded in bubble sort, and \quickcoach, grounded in quicksort. In both cases, advice corresponds to the next step of the algorithm embodied by the coaching policy. A state of size $n$ is any permutation of $\{1,2,\ldots,n\}$; start states are chosen arbitrarily among all states of that size, while the goal state is invariably $(1,2,\ldots,n)$. Rules then take as their body a potentially partial permutation of $\{1,2,\ldots,n\}$ and as their head a swap of two items in that permutation, as illustrated in Figure~\ref{fig:sorting rules}.
+
+\begin{figure}[!tb]
+	\centering
+	\input{assets/tikz/coaching_styles.tex}
+	\caption{Different coaching styles used in the experimental setup. Upon the learner reaching a state from where there is no knowledge on how to proceed (\textcolor{unknownColor}{\qmark}), a reactive piece of advice resolves this lack of knowledge, a proactive piece of advice addresses the first wrong decision in the learner's search path, while a reflexive piece of advice addresses a random mistake / lack of knowledge of the learner.}
+	\label{fig:coaching styles}
+\end{figure}
+
+Within this setting, two advice types are distinguished:
+\begin{enumerate*}[label=(A\arabic*)]
+	\item \emph{full advice}, in which each piece of advice depends on the entire state, and;
+	\item \emph{partial advice}, in which each piece of advice depends on the particular portion of the state that is to be improved.
+\end{enumerate*}
+Furthermore, for each advice type three learner configurations concerning advice memorization have been examined:
+\begin{enumerate*}[label=(M\arabic*)]
+	\item \emph{no memory} across distinct iterations for a fixed state size, $n$, so that coaching sessions and the associated learned policies are pairwise independent;
+	\item \emph{short memory} across distinct iterations for a fixed state size, $n$, so that coaching sessions for different values of $n$ are independent, whereas those for the same value of $n$ are not, and;
+	\item \emph{long memory} across all values of state size, $n$, so that every coaching session is correlated and knowledge is built incrementally from all preceding test cases.
+\end{enumerate*}
+A coach may follow one of the \emph{coaching styles} depicted in Figure~\ref{fig:coaching styles}:
+\begin{enumerate*}[label=(C\arabic*)]
+	\item \emph{reactive} coaching, in which the coach advises on the learner's last wrong decision in $p$;
+	\item \emph{reflexive} coaching, in which the coach advises on a randomly chosen wrong decision in $p$, and;
+	\item \emph{proactive} coaching, in which the coach advises on the learner's earliest wrong decision in $p$.
+\end{enumerate*}
+
+\begin{figure*}[!tb]
+	\centering%
+	\hfill%
+	\begin{subfigure}[t]{0.33\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/a_20_100_full.pdf}
+		\caption{Full advice, reactive coaching}
+		\label{fig:full sorting coaching results a}
+	\end{subfigure}%
+	\hfill%
+	\begin{subfigure}[t]{0.33\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/r_20_100_full.pdf}
+		\caption{Full advice, reflexive coaching}
+		\label{fig:full sorting coaching results r}
+	\end{subfigure}%
+	\hfill%
+	\begin{subfigure}[t]{0.33\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/p_20_100_full.pdf}
+		\caption{Full advice, proactive coaching}
+		\label{fig:full sorting coaching results p}
+	\end{subfigure}%
+	\hfill\\[1em]%
+	\hfill%
+	\begin{subfigure}[t]{0.33\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/a_20_100_partial.pdf}
+		\caption{Partial advice, reactive coaching}
+		\label{fig:partial sorting coaching results a}
+	\end{subfigure}%
+	\hfill%
+	\begin{subfigure}[t]{0.33\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/r_20_100_partial.pdf}
+		\caption{Partial advice, reflexive coaching}
+		\label{fig:partial sorting coaching results r}
+	\end{subfigure}%
+	\hfill%
+	\begin{subfigure}[t]{0.33\textwidth}
+		\centering
+		\includegraphics[width=\linewidth]{assets/images/p_20_100_partial.pdf}
+		\caption{Partial advice, proactive coaching}
+		\label{fig:partial sorting coaching results p}
+	\end{subfigure}%
+	\hfill\\[1em]%
+	\caption{Coaching steps as a function of state size, $n$. Full and partial advice (top and bottom, respectively) with reactive, reflexive and proactive coaching styles are considered (left, middle, and right, respectively), with all possible coach (\bubblecoach, \quickcoach) and memory (none, short, long) combinations are shown.}
+	\label{fig:full and partial sorting coaching results}
+\end{figure*}
+
+\end{document}

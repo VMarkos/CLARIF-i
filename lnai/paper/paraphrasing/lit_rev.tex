@@ -1,0 +1,86 @@
+% !TeX document-id = {1ccb3ec0-e2ca-46a7-8a74-05b20a6a54d6}
+% !TeX spellcheck = en_US
+% !BIB program = bibtex 
+\documentclass[a4paper,twoside]{article}
+
+\usepackage{epsfig}
+\usepackage{subcaption}
+\usepackage{calc}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{multicol}
+\usepackage{pslatex}
+\usepackage{apalike}
+\usepackage{algorithm2e}
+\usepackage[bottom]{footmisc}
+
+% Local packages
+\usepackage[inline]{enumitem}
+\usepackage{pifont}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{xfrac}
+
+\usepackage{SCITEPRESS}     % Please add other packages that you may need BEFORE the SCITEPRESS.sty package.
+
+% tikz libraries
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{bbox}
+
+%%%% Local definitions %%%%
+\newcommand{\bubblecoach}{\ensuremath{\texttt{P}_{\rm bubble}}\,}
+\newcommand{\quickcoach}{\ensuremath{\texttt{P}_{\rm quick}}\,}
+\newcommand{\learner}{learner}
+\newcommand{\coach}{coach}
+\newcommand{\NULL}{{\rm\texttt{null}}}
+\newcommand{\learnerpolicy}{\texttt{P}_{\learner}}
+\newcommand{\coachpolicy}{\texttt{P}_{\coach}}
+\newcommand{\qmark}{\texttt{\textbf{?}}}
+\newcommand{\ttus}{\char`_}
+
+\newcommand{\searchpath}[2]{{search\_path(#1, #2)}}
+\newcommand{\evaluate}[3]{{evaluate(#1, #2, #3)}}
+\newcommand{\updatehypothesis}[1]{{update\_hypothesis(#1)}}
+
+\newcommand{\partialadvice}[1]{partial@{#1}}
+
+%%%% Color definitions
+\definecolor{correctColor}{HTML}{19aa50}
+\definecolor{wrongColor}{HTML}{aa1950}
+\definecolor{adviceColor}{HTML}{1950aa}
+\definecolor{unknownColor}{HTML}{ca8520}
+
+\definecolor{bubbleColor}{HTML}{19aa50}
+\definecolor{quickColor}{HTML}{aa1950}
+
+%%%% algorithm2e macros
+\SetKwRepeat{Do}{do}{while}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% Editor's commands %%%%
+\newcommand{\edcom}[1]{{\sf\color{red}$>>>$ #1}}
+\newcommand{\tbc}{\edcom{To be completed\ldots}}
+\setlength\marginparwidth{2cm}
+\newcommand{\ednote}[1]{\marginpar{\flushleft\tiny\sf\color{red}{#1}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{Related Literature}\label{sec:related-literature}
+%
+Several lines of work have examined how knowledge can pass between a machine learner and a human coach. One such line is eXplainable Interactive Learning (XIL) \cite{tesoKerstingIML2019}, in which a human supervisor acts as a learning ``coach'' and supplies advice that either corrects mislabeled data or revises incorrect explanations that the learner has offered for otherwise correct predictions. In Machine Coaching, by contrast, coach advice can be inserted directly into the learner's knowledge base in an elaboration-tolerant fashion \cite{mccarthyElaborationTolerance1998}, whereas XIL treats an active learning algorithm as a black-box \cite{Settles2009ActiveLL} together with a local post-hoc explainer \cite{ribeiro2016}. The resulting explanations are then used to produce further labeled data that help the learner resolve misunderstandings.
+
+User feedback can likewise be employed to reduce, in advance, the amount of data-point labeling that is required, as illustrated for Support Vector Machines in \cite{raghavanAllan2007}. Along related lines, \cite{settles-2011-closing} introduces an interactive setting in which users label selected data points so as to refine the training of a document classifier, while \cite{zaidan2007using} puts forward a machine learning approach that relies on user-provided explanations to lower learning complexity. Notably, \cite{zaidan2007using} emphasizes that, as an alternative to relying on large volumes of data for better performance, one may seek \emph{data richness}, that is, more informative data such as a correct label accompanied by an explanation. \emph{Coactive Learning}, introduced in \cite{shivaswamyJoachims2015}, is a further interactive Machine Learning framework in which the learner obtains user advice that is, by design, only ``slightly better'' than the learner's current prediction. As shown in \cite{shivaswamyJoachims2015}, a principal advantage of this approach is that it can be incorporated into many existing black-box methodologies.
+
+Beyond supporting faithfulness and fostering user trust \cite{BARREDOARRIETA202082}, embedding explanations during model training has been found to raise testing performance \cite{Selvaraju_2019}. In addition, bilateral explanations---from the learner to the coach and from the coach to the learner---can accelerate learning still further \cite{dongSu2017}, and comparable gains arise when models are retrained with extra explanations for decisions that are wrong, or that are correct but for the wrong reasons \cite{riegerSingh2019}. Finally, post-hoc fine tuning of models also yields performance gains \cite{ribeiro2016}.
+
+In light of the recent surge in the use of Large Language Models (LLMs) across nearly every domain, methods for human--machine interaction that leverage human expertise to refine an LLM have been put forward. \cite{welz2024} presents a human knowledge infusion approach in which expert users contribute domain-specific knowledge that populates a knowledge base, which the system then combines with the LLM when answering user queries. Analogously, \cite{wang2024} describes a human--LLM collaborative data annotation scheme in which the human supervises the LLM by revising and correcting erroneous data labels and/or the associated LLM explanations, in the spirit of \cite{tesoKerstingIML2019}. In \cite{kim2024megannohumanllmcollaborativeannotation}, human--LLM collaboration is studied in a setting where the user may freely explore, correct, and interact with LLM responses via suitable programmatic interfaces or interface widgets. A related variant, in which human supervisors freely inspect and correct LLM annotations in PDF files, is proposed in \cite{tang2024}. In robotics, human robot teleoperators have been assigned coaching roles in hybrid robot--LLM systems so as to verify system decisions \cite{liu2023llmbasedhumanrobotcollaborationframework}. For generative design customization, passive, assistive, and proactive human--LLM collaboration schemes have been suggested \cite{WANG2025425}, each geared toward users with different levels of expertise.
+
+It is worth recalling that knowledge exchange between a coach and a machine learner---in the form of context-driven advice predicated on the learner's decisions---was already described in \cite{mccarthyProgramsCommonSense1959}. More recently, it has been formalized under the heading of \emph{Machine Coaching} \cite{michaelAdviceTaker2017,michaelMachineCoaching2019} within the Probably Approximately Correct (PAC) model \cite{valiantPAC1984}.
+
+Although AI system verification and faithful embedding of human expertise have received substantial attention, the focus is typically on what the machine learner can ultimately achieve and how successful it is. Yet there are many applications in which this desideratum is secondary to \emph{``how''} the machine learner attains its goals. Deep neural architectures and LLMs, despite their prevalence in most applications owing to their efficiency and efficacy, are not necessarily the most suitable vehicles for exact human knowledge representation, partly because they lack solid formal guarantees on their behavior. Argumentation-based approaches \cite{DUNG1995321,prakkenAnAbstractFrameworkFA2010}, by contrast, come with such guarantees ``out-of-the-box'', and may therefore serve as a useful instrument in the design of cognitive agents in such settings.
+
+\end{document}
