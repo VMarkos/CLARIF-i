@@ -2,9 +2,11 @@
 #
 # General utilities
 
+import numpy as np
 import inspect
 from functools import wraps
 from copy import deepcopy
+from lnai.rl.CurriculumSortEnv import CurriculumSortEnv
 
 
 class SequenceMonitor:
@@ -113,3 +115,32 @@ def _partition(arr, low, high):
     # Place the pivot in its correct sorted position
     arr[i + 1], arr[high] = arr[high], arr[i + 1]
     return i + 1
+
+
+def test_agent(model, stage: int = 5, max_n: int = 10):
+    print(f"\n--- Testing Agent on Stage N = {stage} ---")
+    env = CurriculumSortEnv(max_n=max_n)
+    env.set_max_stage(stage)
+
+    obs, _ = env.reset()
+    env.current_n = stage
+    env.state[:stage] = np.array([0.8, -0.4, 0.2, -0.9, 0.5])[:stage]
+    obs = np.append(env.state, -1.0 / len(env.swap_pairs)).astype(np.float32)
+
+    print(f"Initial Vector: {env.state[:stage] * 10.0}")
+
+    done = False
+    step_count = 0
+    info = dict()
+    while not done and step_count < 20:
+        action, _ = model.predict(obs, deterministic=True)
+        i, j = env.swap_pairs[action]
+        obs, reward, terminated, truncated, info = env.step(action)
+        done = terminated or truncated
+        step_count += 1
+        print(f"Step {step_count}: Swapped ({i}, {j}) -> State: {env.state[:stage] * 10.0}")
+
+    if info.get("is_success", False):
+        print("[TEST RESULT]: SUCCESS! Vector successfully sorted.")
+    else:
+        print("[TEST RESULT]: FAILED.")
