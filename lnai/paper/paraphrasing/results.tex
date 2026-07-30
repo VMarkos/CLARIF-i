@@ -1,0 +1,106 @@
+% !TeX document-id = {1ccb3ec0-e2ca-46a7-8a74-05b20a6a54d6}
+% !TeX spellcheck = en_US
+% !BIB program = bibtex 
+\documentclass[a4paper,twoside]{article}
+
+\usepackage{epsfig}
+\usepackage{subcaption}
+\usepackage{calc}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{multicol}
+\usepackage{pslatex}
+\usepackage{apalike}
+\usepackage{algorithm2e}
+\usepackage[bottom]{footmisc}
+
+% Local packages
+\usepackage[inline]{enumitem}
+\usepackage{pifont}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage{xfrac}
+
+\usepackage{SCITEPRESS}     % Please add other packages that you may need BEFORE the SCITEPRESS.sty package.
+
+% tikz libraries
+\usetikzlibrary{calc}
+\usetikzlibrary{positioning}
+\usetikzlibrary{bbox}
+
+%%%% Local definitions %%%%
+\newcommand{\bubblecoach}{\ensuremath{\texttt{P}_{\rm bubble}}\,}
+\newcommand{\quickcoach}{\ensuremath{\texttt{P}_{\rm quick}}\,}
+\newcommand{\learner}{learner}
+\newcommand{\coach}{coach}
+\newcommand{\NULL}{{\rm\texttt{null}}}
+\newcommand{\learnerpolicy}{\texttt{P}_{\learner}}
+\newcommand{\coachpolicy}{\texttt{P}_{\coach}}
+\newcommand{\qmark}{\texttt{\textbf{?}}}
+\newcommand{\ttus}{\char`_}
+
+\newcommand{\searchpath}[2]{{search\_path(#1, #2)}}
+\newcommand{\evaluate}[3]{{evaluate(#1, #2, #3)}}
+\newcommand{\updatehypothesis}[1]{{update\_hypothesis(#1)}}
+
+\newcommand{\partialadvice}[1]{partial@{#1}}
+
+%%%% Color definitions
+\definecolor{correctColor}{HTML}{19aa50}
+\definecolor{wrongColor}{HTML}{aa1950}
+\definecolor{adviceColor}{HTML}{1950aa}
+\definecolor{unknownColor}{HTML}{ca8520}
+
+\definecolor{bubbleColor}{HTML}{19aa50}
+\definecolor{quickColor}{HTML}{aa1950}
+
+%%%% algorithm2e macros
+\SetKwRepeat{Do}{do}{while}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%% Editor's commands %%%%
+\newcommand{\edcom}[1]{{\sf\color{red}$>>>$ #1}}
+\newcommand{\tbc}{\edcom{To be completed\ldots}}
+\setlength\marginparwidth{2cm}
+\newcommand{\ednote}[1]{\marginpar{\flushleft\tiny\sf\color{red}{#1}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{Results}\label{subsec:sorting-results}
+%
+Figure~\ref{fig:full and partial sorting coaching results} reports, for each of the three coaching styles, the number of coaching steps needed to reach the goal state as a function of state size, $n$. In every setting except partial advice with reflexive coaching, the learner successfully finished all coaching sessions with the intended outcomes. For reactive coaching with full advice (Fig.~\ref{fig:full sorting coaching results a}), employing either short or long memory does not seem to alter the number of coaching steps in any notable way, as anticipated given the limited applicability of the advice that is supplied. By contrast, partial advice (Fig.~\ref{fig:partial sorting coaching results a}) together with short or long memory yields fewer coaching steps, which can be explained symmetrically by the wider applicability of that advice. Observe also that, under full advice, the number of coaching steps scales in proportion to the big-O complexity of the underlying policy / sorting algorithm---again a consequence of restricted advice applicability, which effectively obliges the learner to request step-by-step guidance in each distinct case. Juxtaposed with the full-advice setting, the use of memory markedly cuts the coaching steps required per session, because the learner can then reuse previously acquired knowledge on new cases. Note further that, under long memory (Fig.~\ref{fig:partial sorting coaching results a}), the coaching-step curves for \bubblecoach and \quickcoach essentially coincide (dotted lines), suggesting that, with reactive coaching, retaining all prior advice eventually lets the learner generalize and reach the goal state largely without frequent interaction with its ``lazy'' supervisor.
+
+Turning to proactive coaching, where advice targets the learner's first wrong decision (Figs.~\ref{fig:full sorting coaching results p}, \ref{fig:partial sorting coaching results p}), full advice induces the same growth patterns in coaching steps as under reactive coaching. Supplying partial advice, however, substantially lowers the number of coaching steps per session---as with reactive coaching---since memory enables the learner to generalize from earlier cases. Notably, coaching steps remain systematically higher than in the corresponding reactive-coaching settings (Figs.~\ref{fig:partial sorting coaching results a}, \ref{fig:partial sorting coaching results p}). This mirrors the more ``meticulous'' interaction pattern of a proactive coach, which issues (even partial) advice that is more accurate and thereby curtails unnecessary exploration of the search space, at the expense of more frequent interaction with the learner than a reactive coach, which merely responds when further knowledge is requested.
+
+For reflexive coaching (Figs.~\ref{fig:full sorting coaching results r}, \ref{fig:partial sorting coaching results r}), the trends mirror those of proactive coaching. Here, however, the coach's random choice of intervention state raises the possibility that the same piece of advice is issued more than once. Sessions of this kind are counted as \emph{trivial runs}. As state size increases, so does the number of trivial runs, particularly under non-trivial memory configurations, where the learner's policy tends to be larger and it is therefore generally more likely that the same advice is received repeatedly.
+
+Finally, observe that the coaching policy ceases to matter once the learner has some form of memory, irrespective of advice type. For full advice this is expected, given that limited advice applicability prevents reuse of prior knowledge; partial advice, by contrast, lets the learner generalize in accordance with $\coachpolicy$ and thereby reduces the need for coach feedback. Focusing on partial advice without memory, reactive coaching produces sessions whose length scales with the complexity of the coaching policy, as noted above. The same does not hold for proactive and reflexive coaching, where the coach interacts with the learner more often---suggesting that, under reactive coaching, the learner may acquire an efficacious yet unfaithful policy, a phenomenon less likely under the other coaching styles.
+
+\begin{figure*}
+	\centering\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_a.pdf}\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_r.pdf}\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/fidelity_test_N20_reps20_step5_coach_p.pdf}\hfill%
+	\caption{Coaching fidelity against state size for reactive (left), reflexive (middle) and proactive (right) coaching.}
+	\label{fig:coaching fidelities}
+\end{figure*}
+
+Figure~\ref{fig:coaching fidelities} plots average coaching conformity against state size, $n$. Irrespective of memory configuration, full advice paired with reactive coaching yields a virtually fully conformant learner that replicates the coach's policy. Comparable outcomes arise for proactive and reflexive coaches as well. With partial advice, however, coaching conformity hinges on coaching style and memory configuration. In particular, under reactive coaching, partial advice drives conformity to near zero for every memory configuration. Under proactive coaching, by contrast, partial advice sustains consistently high conformity across all examined state sizes, with little sensitivity to memory configuration. Reflexive coaching likewise produces higher conformity than reactive coaching, broadly echoing the proactive results. Observe also that coach type does not influence conformity in any setting except partial advice with reactive coaching, where apparent differences diminish as state size grows.
+%
+\begin{figure*}
+	\centering\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/pper_fidelity_test_N20_reps20_step5_coaches3_partial_2_20_coach_a.pdf}\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/pper_fidelity_test_N20_reps20_step5_coaches3_partial_2_20_coach_r.pdf}\hfill%
+	\includegraphics[width=0.33\textwidth]{assets/images/pper_fidelity_test_N20_reps20_step5_coaches3_partial_2_20_coach_p.pdf}\hfill%
+	\caption{Coaching fidelity against advice coverage for reactive (left), reflexive (middle) and proactive (right) coaching.}
+	\label{fig:fidelities against coverage}
+\end{figure*}
+%
+Taken together, Figure~\ref{fig:coaching fidelities} points to a trade-off between advice specificity and coaching conformity: more specific advice yields greater conformity to the coaching policy, whereas looser advice affords more room for the learner to generalize from prior knowledge.
+
+Figure~\ref{fig:fidelities against coverage} presents coaching conformity against advice coverage for all coaching policies and styles, aggregated over state size, $n$. Coaching policy and memory configuration leave conformity largely unaffected; the dominant factor is coaching style. Under reactive coaching, low advice coverage lets the learner reach the goal state without conforming to the coach's search policy, whereas more specific advice makes the learner's search steps toward the goal more accurate. Under proactive and reflexive coaching, by contrast, conformity rises only slightly with advice coverage and remains relatively high even at lower coverage values. Relative to reactive coaching, proactive and reflexive coaching appear to sustain a stably high conformity and to mitigate the drawbacks of arbitrarily low coverage almost equally well. In effect, earlier coach intervention keeps the learner from straying far from the coach's guidance, even when advice is minimal and leaves room for generalization.
+
+\end{document}
