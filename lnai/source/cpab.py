@@ -1,5 +1,11 @@
 # cpab.py
 
+import os
+os.environ["OPENCV_VIDEOIO_PRIORITY_MSMF"] = "0"
+os.environ["OPENCV_LOG_LEVEL"] = "OFF"
+# Disable GStreamer plugin loading in OpenCV
+os.environ["FLAGS_gstreamer_verbose"] = "0"
+
 import json
 import numpy as np
 from typing import Callable
@@ -14,9 +20,19 @@ import seaborn as sns
 from lnai.rl.CurriculumSortEnv import CurriculumSortEnv
 from lnai.rl.CurriculumPPO_AnnealedBC import CurriculumPPO_AnnealedBC
 from lnai.rl.MixedCurriculumCallback import MixedCurriculumCallback
-from lnai.rl.Experts import BubbleSortExpert, QuickSortExpert
+from lnai.rl.Experts import BubbleSortExpert, SelectionSortExpert
 
 from plotters import plot_rolling_reward_plot
+
+
+def _make_env(setting, rank) -> Callable:
+    slug = f'logs/{setting.slug}_rank{rank}'
+    def _init():
+        env = CurriculumSortEnv(max_n=setting.max_n)
+        env = Monitor(env, filename=slug)
+        return env
+    return _init
+
 
 class TestConfiguration:
     def __init__(self, max_n: int, n_timesteps: int, succ_rate: float = 0.90, num_envs: int = 8, expert: str='b', bc: float=0.4) -> None:
@@ -24,27 +40,22 @@ class TestConfiguration:
         self.n_timesteps = n_timesteps
         self.succ_rate = succ_rate
         self.num_envs = num_envs
-        self.expert_class = BubbleSortExpert if expert == 'b' else QuickSortExpert
+        self.expert_class = BubbleSortExpert if expert == 'b' else SelectionSortExpert
+        self.window_scaling = None # Redundant
         self.bc = bc
         self.results = dict()
         self.slug = f'cpab_res_max_n{self.max_n}_t{self.n_timesteps}_sr{self.succ_rate}_e{expert}_bc{bc}'
 
 
-    def _make_env(self, rank) -> Callable:
-        slug = f'logs/{self.slug}_rank{rank}'
-        def _init():
-            env = CurriculumSortEnv(max_n=self.max_n)
-            env = Monitor(env, filename=slug)
-            return env
-        return _init
 
 
     def run(self) -> None:
-        self.env = SubprocVecEnv([self._make_env(i) for i in range(self.num_envs)])
+        self.env = SubprocVecEnv([_make_env(self, i) for i in range(self.num_envs)], start_method='spawn')
+        #self.env = DummyVecEnv([self._make_env(i) for i in range(self.num_envs)])
         dummy = CurriculumSortEnv(max_n=self.max_n)
 
         expert = self.expert_class(dummy.pair_to_action)
-        curriculum = MixedCurriculumCallback(target_success_rate=self.succ_rate, base_window_size=80)
+        curriculum = MixedCurriculumCallback(target_success_rate=self.succ_rate, base_window_size=80, window_update=self.window_scaling)
 
         self.model = CurriculumPPO_AnnealedBC(
             "MlpPolicy",
@@ -52,7 +63,7 @@ class TestConfiguration:
             expert=expert,
             initial_bc_coef=self.bc,
             learning_rate=3e-4,
-            n_steps=512,
+            n_steps=1024,
             batch_size=128,
             n_epochs=5,
             ent_coef=0.01,
@@ -61,6 +72,7 @@ class TestConfiguration:
 
         self.model.learn(total_timesteps=self.n_timesteps, callback=curriculum)
         self.model.save(f'{self.slug}.zip')
+        self.env.close()
 
 
     def _get_bubble_sort_action(self, arr: np.ndarray) -> tuple[int, int] | None:
@@ -77,7 +89,7 @@ class TestConfiguration:
 
     def evaluate_agent(
         self,
-        num_episodes: int = 100,
+        num_episodes: int = 5_000,
         max_steps_factor: float = 2.0
     ) -> None:
         """

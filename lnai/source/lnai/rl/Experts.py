@@ -19,7 +19,35 @@ class BubbleSortExpert:
         return 0
 
 
-import numpy as np
+class SelectionSortExpert:
+    def __init__(self, pair_to_action_map: dict | None=None):
+        """
+        pair_to_action_map: Dict mapping (min_idx, max_idx) tuple -> discrete action integer.
+        """
+        self.pair_to_action = pair_to_action_map
+
+    def get_action(self, obs: np.ndarray, current_n: int) -> int | tuple[int, int]:
+        """
+        Finds the first unsorted position 'i', locates the minimum element in 
+        obs[i:current_n], and returns the action corresponding to swapping (i, min_idx).
+        """
+        arr = obs[:current_n]
+
+        for i in range(current_n - 1):
+            # Find index of the minimum element in the remaining unsorted sub-array
+            min_offset = np.argmin(arr[i:])
+            min_idx = i + min_offset
+
+            # If the minimum element is not already in place, swap it
+            if min_idx != i:
+                pair = (min(i, min_idx), max(i, min_idx))
+                if self.pair_to_action is not None:
+                    return self.pair_to_action[pair]
+                return pair
+
+        # Default fallback: no-op/0 if already sorted
+        return 0
+
 
 class QuickSortExpert:
     """

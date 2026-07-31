@@ -1,20 +1,22 @@
 # MixedCurriculumCallback.py
 
 import numpy as np
+from typing import Callable
 from stable_baselines3.common.callbacks import BaseCallback
 
 class MixedCurriculumCallback(BaseCallback):
-    def __init__(self, target_success_rate: float = 0.80, base_window_size: int = 80, verbose: int = 1):
+    def __init__(self, target_success_rate: float = 0.80, base_window_size: int = 80, verbose: int = 1, window_update: Callable | None=None):
         super().__init__(verbose)
         self.target_success_rate = target_success_rate
         self.base_window_size = base_window_size
         self.successes = []
         self.current_stage = 2
         self.starting_stage = 2
+        self._window_update = window_update if window_update is not None else lambda n: n ** 2
         self._update_window_size()
 
     def _update_window_size(self) -> None:
-        self.window_size = self.base_window_size * (self.current_stage / self.starting_stage) ** 2
+        self.window_size = self.base_window_size * self._window_update(self.current_stage / self.starting_stage)
     
 
     def _on_step(self) -> bool:
