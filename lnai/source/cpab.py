@@ -47,8 +47,6 @@ class TestConfiguration:
         self.slug = f'cpab_res_max_n{self.max_n}_t{self.n_timesteps}_sr{self.succ_rate}_e{expert}_bc{bc}'
 
 
-
-
     def run(self) -> None:
         self.env = SubprocVecEnv([_make_env(self, i) for i in range(self.num_envs)], start_method='spawn')
         #self.env = DummyVecEnv([self._make_env(i) for i in range(self.num_envs)])
@@ -90,7 +88,8 @@ class TestConfiguration:
     def evaluate_agent(
         self,
         num_episodes: int = 5_000,
-        max_steps_factor: float = 2.0
+        max_steps_factor: float = 2.0,
+        criterion: str = 'sr',
     ) -> None:
         """
         Evaluates agent efficacy and conformity across multiple problem sizes (N).
@@ -148,8 +147,15 @@ class TestConfiguration:
                     # 5. Environment step
                     obs, reward, done, truncated, info = env.step(action)
                     if done or truncated:
-                        if info.get('is_success', False) or env.is_sorted(env.get_current_array()):
-                            successful_episodes += 1
+                        match criterion:
+                            case 'sr':
+                                if info.get('is_success', False) or env.is_sorted(env.get_current_array()):
+                                    successful_episodes += 1
+                            case 'sp':
+                                sp = env.sorted_percentage(env.get_current_array())
+                                successful_episodes += sp
+                            case 'i':
+                                pass
                         break
 
                 episode_steps_list.append(ep_steps)
@@ -168,8 +174,9 @@ class TestConfiguration:
         self.results = results
 
     
-    def save_results(self) -> None:
-        slug = f'{self.slug}.json'
+    def save_results(self, slug: str | None=None) -> None:
+        if slug is None:
+            slug = f'{self.slug}.json'
         res = {
             'results': self.results,
         }
@@ -179,7 +186,8 @@ class TestConfiguration:
 
 
     def load(self, path: str) -> None:
-        self.model = CurriculumPPO_AnnealedBC.load(path)
+        env = _make_env(self, 0)()
+        self.model = CurriculumPPO_AnnealedBC.load(path, env=env)
 
 def plot_coaching_evaluation_results(
     eval_data: dict[str, dict[str, dict[int, float]]],

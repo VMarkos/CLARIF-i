@@ -109,3 +109,11 @@ class CurriculumSortEnv(gym.Env):
     def is_sorted(arr: np.ndarray) -> bool:
         """Checks if the array is sorted in ascending order."""
         return np.all(arr[:-1] <= arr[1:])
+
+
+    @staticmethod
+    def sorted_percentage(arr: np.ndarray) -> float:
+        '''Returns the percentage of array elements that are sorted'''
+        sorted_arr = np.sort(arr.copy())
+        correct = len(arr) - np.count_nonzero(arr - sorted_arr)
+        return correct / len(arr)
