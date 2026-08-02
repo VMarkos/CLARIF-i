@@ -250,7 +250,7 @@ def plot_results(results):
 
 if __name__ == "__main__":
   MAX_N = 20
-  INITIAL_N = 4
+  INITIAL_N = 3
 
   train_env = SwapSortingEnv(max_n=MAX_N, initial_n=INITIAL_N, max_steps=40)
   eval_env = SwapSortingEnv(max_n=MAX_N, initial_n=INITIAL_N, max_steps=MAX_N ** 2)
@@ -273,8 +273,9 @@ if __name__ == "__main__":
   )
 
   print("Starting Training...")
-  model.learn(total_timesteps=1_000_000, callback=curriculum_callback)
+  model.learn(total_timesteps=10_000_000, callback=curriculum_callback)
   print("Training Complete!\n")
+  model.save(f'baseline_{MAX_N}_10000000.zip')
 
   # Run testing routine across all curriculum levels
   print("Evaluating Agent...")
