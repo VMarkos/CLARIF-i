@@ -1,7 +1,28 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
 \providecommand{\url}[1]{\texttt{#1}}
 \providecommand{\urlprefix}{URL }
 \providecommand{\doi}[1]{https://doi.org/#1}
+
+\bibitem{BARREDOARRIETA202082}
+{Barredo Arrieta}, A., Díaz-Rodríguez, N., {Del Ser}, J., Bennetot, A.,
+  Tabik, S., Barbado, A., Garcia, S., Gil-Lopez, S., Molina, D., Benjamins, R.,
+  Chatila, R., Herrera, F.: {Explainable Artificial Intelligence (XAI):
+  Concepts, taxonomies, opportunities and challenges toward responsible AI}.
+  Information Fusion  \textbf{58},  82--115 (2020).
+  \doi{https://doi.org/10.1016/j.inffus.2019.12.012},
+  \url{https://www.sciencedirect.com/science/article/pii/S1566253519308103}
+
+\bibitem{dongSu2017}
+Dong, Y., Su, H., Zhu, J., Zhang, B.: {Improving Interpretability of Deep
+  Neural Networks with Semantic Information} (2017).
+  \doi{10.48550/ARXIV.1703.04096}, \url{https://arxiv.org/abs/1703.04096}
+
+\bibitem{DUNG1995321}
+Dung, P.M.: On the acceptability of arguments and its fundamental role in
+  nonmonotonic reasoning, logic programming and n-person games. Artificial
+  Intelligence  \textbf{77}(2),  321--357 (1995).
+  \doi{https://doi.org/10.1016/0004-3702(94)00041-X},
+  \url{https://www.sciencedirect.com/science/article/pii/000437029400041X}
 
 \bibitem{ioannouKnowledgeBasedTranslationNatural2021}
 Ioannou, C., Michael, L.: Knowledge-{{Based Translation}} of {{Natural
@@ -9,6 +30,16 @@ Ioannou, C., Michael, L.: Knowledge-{{Based Translation}} of {{Natural
   and {{Cognitive Approaches To Dialog Agents Workshop}} - {{LaCATODA}} 2021.
   pp. 24--32. {Montreal, Canada} (2021),
   \url{http://ceur-ws.org/Vol-2935/\#paper3}
+
+\bibitem{kim2024megannohumanllmcollaborativeannotation}
+Kim, H., Mitra, K., Chen, R.L., Rahman, S., Zhang, D.: Meganno+: A human-llm
+  collaborative annotation system (2024),
+  \url{https://arxiv.org/abs/2402.18050}
+
+\bibitem{liu2023llmbasedhumanrobotcollaborationframework}
+Liu, H., Zhu, Y., Kato, K., Kondo, I., Aoyama, T., Hasegawa, Y.: Llm-based
+  human-robot collaboration framework for manipulation tasks (2023),
+  \url{https://arxiv.org/abs/2308.14972}
 
 \bibitem{proxyCoaching2022}
 Markos, V.T., Thoma, M., Michael, L.: Machine coaching with proxy coaches. In:
@@ -23,9 +54,119 @@ Markos, V., Michael, L.: Prudens: An argumentation-based language for cognitive
   assistants. In: Governatori, G., Turhan, A.Y. (eds.) Rules and Reasoning. pp.
   296--304. Springer International Publishing, Cham (2022)
 
+\bibitem{mccarthyProgramsCommonSense1959}
+McCarthy, J.: Programs with {{Common Sense}}. In: Proceedings of the
+  {{Teddington Conference}} on the {{Mechanization}} of {{Thought Processes}}.
+  pp. 75--91. {London, U.K} (1959),
+  \url{http://jmc.stanford.edu/articles/mcc59/mcc59.pdf}
+
+\bibitem{mccarthyElaborationTolerance1998}
+McCarthy, J.: Elaboration {{Tolerance}}. In: Common {{Sense}} 98. {London, U.K}
+  (1998), \url{http://www-formal.stanford.edu/jmc/elaboration.html}
+
+\bibitem{michaelAdviceTaker2017}
+Michael, L.: The {{Advice Taker}} 2.0. In: Proceedings of the 13th
+  {{International Symposium}} on {{Commonsense Reasoning}}. vol.~2052. {London,
+  U.K} (2017), \url{http://ceur-ws.org/Vol-2052/\#paper13}
+
 \bibitem{michaelMachineCoaching2019}
 Michael, L.: Machine {{Coaching}}. In: {{IJCAI}} 2019 {{Workshop}} on
   {{Explainable Artificial Intelligence}}. pp. 80--86. {Macau, China} (2019),
   \url{https://www.researchgate.net/publication/334989337\_Machine\_Coaching}
+
+\bibitem{prakkenAnAbstractFrameworkFA2010}
+Prakken, H.: An abstract framework for argumentation with structured arguments.
+  Argument {\&} Computation  \textbf{1}(2),  93--124 (Jun 2010).
+  \doi{10.1080/19462160903564592},
+  \url{https://doi.org/10.1080/19462160903564592}
+
+\bibitem{raghavanAllan2007}
+Raghavan, H., Allan, J.: An {{Interactive Algorithm}} for {{Asking}} and
+  {{Incorporating Feature Feedback}} into {{Support Vector Machines}}. In:
+  Proceedings of the 30th {{Annual International ACM SIGIR Conference}} on
+  {{Research}} and {{Development}} in {{Information Retrieval}}. pp. 79--86.
+  {{SIGIR}} '07, {Association for Computing Machinery}, {New York, NY, USA}
+  (2007). \doi{10.1145/1277741.1277758}
+
+\bibitem{ribeiro2016}
+Ribeiro, M.T., Singh, S., Guestrin, C.: "{{Why Should I Trust You}}?":
+  {{Explaining}} the {{Predictions}} of {{Any Classifier}}. In: Proceedings of
+  the 22nd {{ACM SIGKDD International Conference}} on {{Knowledge Discovery}}
+  and {{Data Mining}}. pp. 1135--1144. {{KDD}} '16, {Association for Computing
+  Machinery}, {New York, NY, USA} (2016). \doi{10.1145/2939672.2939778}
+
+\bibitem{riegerSingh2019}
+Rieger, L., Singh, C., Murdoch, W.J., Yu, B.: {Interpretations are Useful:
+  Penalizing Explanations to Align Neural Networks With Prior Knowledge}
+  (2019). \doi{10.48550/ARXIV.1909.13584},
+  \url{https://arxiv.org/abs/1909.13584}
+
+\bibitem{Selvaraju_2019}
+Selvaraju, R.R., Cogswell, M., Das, A., Vedantam, R., Parikh, D., Batra, D.:
+  {Grad-{CAM}: Visual Explanations from Deep Networks via Gradient-Based
+  Localization}. International Journal of Computer Vision  \textbf{128}(2),
+  336--359 (oct 2019). \doi{10.1007/s11263-019-01228-7},
+  \url{https://doi.org/10.1007\%2Fs11263-019-01228-7}
+
+\bibitem{Settles2009ActiveLL}
+Settles, B.: Active {{Learning Literature Survey}}. Technical {{Report}},
+  {University of Wisconsin-Madison Department of Computer Sciences} (2009),
+  \url{https://minds.wisconsin.edu/handle/1793/60660}
+
+\bibitem{settles-2011-closing}
+Settles, B.: Closing the {{Loop}}: {{Fast}}, {{Interactive Semi-Supervised
+  Annotation With Queries}} on {{Features}} and {{Instances}}. In: Proceedings
+  of the 2011 {{Conference}} on {{Empirical Methods}} in {{Natural Language
+  Processing}}. pp. 1467--1478. {Association for Computational Linguistics},
+  {Edinburgh, Scotland, UK.} (2011), \url{https://aclanthology.org/D11-1136}
+
+\bibitem{shivaswamyJoachims2015}
+Shivaswamy, P., Joachims, T.: Coactive {{Learning}}. Journal of Artificial
+  Intelligence Research  \textbf{53},  1--40 (2015). \doi{10.1613/jair.4539}
+
+\bibitem{tang2024}
+Tang, Y., Chang, C.M., Yang, X.: Pdfchatannotator: A human-llm collaborative
+  multi-modal data annotation tool for pdf-format catalogs. In: Proceedings of
+  the 29th International Conference on Intelligent User Interfaces. p.
+  419–430. IUI '24, Association for Computing Machinery, New York, NY, USA
+  (2024). \doi{10.1145/3640543.3645174},
+  \url{https://doi.org/10.1145/3640543.3645174}
+
+\bibitem{tesoKerstingIML2019}
+Teso, S., Kersting, K.: Explanatory {{Interactive Machine Learning}}. In:
+  Proceedings of the 2019 {{AAAI}}/{{ACM Conference}} on {{AI}}, {{Ethics}},
+  and {{Society}}. pp. 239--245. {{AIES}} '19, {Association for Computing
+  Machinery}, {New York, NY, USA} (2019). \doi{10.1145/3306618.3314293}
+
+\bibitem{valiantPAC1984}
+Valiant, L.G.: A {{Theory}} of the {{Learnable}}. Communications of the ACM
+  \textbf{27}(11),  1134--1142 (1984). \doi{10.1145/1968.1972}
+
+\bibitem{WANG2025425}
+Wang, X., Jiang, Z., Xiong, Y., Liu, A.: Human-llm collaboration in generative
+  design for customization. Journal of Manufacturing Systems  \textbf{80},
+  425--435 (2025). \doi{https://doi.org/10.1016/j.jmsy.2025.03.012},
+  \url{https://www.sciencedirect.com/science/article/pii/S0278612525000731}
+
+\bibitem{wang2024}
+Wang, X., Kim, H., Rahman, S., Mitra, K., Miao, Z.: Human-llm collaborative
+  annotation through effective verification of llm labels. In: Proceedings of
+  the 2024 CHI Conference on Human Factors in Computing Systems. CHI '24,
+  Association for Computing Machinery, New York, NY, USA (2024).
+  \doi{10.1145/3613904.3641960}, \url{https://doi.org/10.1145/3613904.3641960}
+
+\bibitem{welz2024}
+Welz, L., Lanquillon, C.: Enhancing large language models through external
+  domain knowledge. In: Degen, H., Ntoa, S. (eds.) Artificial Intelligence in
+  HCI. pp. 135--146. Springer Nature Switzerland, Cham (2024)
+
+\bibitem{zaidan2007using}
+Zaidan, O., Eisner, J., Piatko, C.: Using ``{{Annotator Rationales}}'' to
+  {{Improve Machine Learning}} for {{Text Categorization}}. In: Human
+  {{Language Technologies}} 2007: {{The Conference}} of the {{North American
+  Chapter}} of the {{Association}} for {{Computational Linguistics}};
+  {{Proceedings}} of the {{Main Conference}}. pp. 260--267. {Association for
+  Computational Linguistics}, {Rochester, New York} (2007),
+  \url{https://aclanthology.org/N07-1033}
 
 \end{thebibliography}
