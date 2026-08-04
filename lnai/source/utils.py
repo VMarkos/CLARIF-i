@@ -124,21 +124,25 @@ def test_agent(model, stage: int = 5, max_n: int = 10):
 
     obs, _ = env.reset()
     env.current_n = stage
-    env.state[:stage] = np.array([0.8, -0.4, 0.2, -0.9, 0.5])[:stage]
-    obs = np.append(env.state, -1.0 / len(env.swap_pairs)).astype(np.float32)
+    # Fixed active permutation for a reproducible smoke test.
+    env.state = np.arange(max_n, dtype=np.int64)
+    env.state[:stage] = np.array([4, 1, 3, 0, 2, 5, 6, 7, 8, 9][:stage], dtype=np.int64)
+    env._prev_tau = env._get_tau()
+    obs = env.state.copy()
 
-    print(f"Initial Vector: {env.state[:stage] * 10.0}")
+    print(f"Initial Vector: {env.state[:stage]}")
 
     done = False
     step_count = 0
     info = dict()
     while not done and step_count < 20:
-        action, _ = model.predict(obs, deterministic=True)
-        i, j = env.swap_pairs[action]
+        action_masks = env.action_masks()
+        action, _ = model.predict(obs, action_masks=action_masks, deterministic=True)
+        i, j = env.action_to_swap(action)
         obs, reward, terminated, truncated, info = env.step(action)
         done = terminated or truncated
         step_count += 1
-        print(f"Step {step_count}: Swapped ({i}, {j}) -> State: {env.state[:stage] * 10.0}")
+        print(f"Step {step_count}: Swapped ({i}, {j}) -> State: {env.state[:stage]}")
 
     if info.get("is_success", False):
         print("[TEST RESULT]: SUCCESS! Vector successfully sorted.")

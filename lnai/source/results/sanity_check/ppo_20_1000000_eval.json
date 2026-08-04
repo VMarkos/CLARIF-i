@@ -1,0 +1,112 @@
+{
+  "results": {
+    "3": {
+      "success_rate": 100.0,
+      "avg_steps": 1.44,
+      "num_episodes": 100,
+      "successes": 100
+    },
+    "4": {
+      "success_rate": 100.0,
+      "avg_steps": 2.04,
+      "num_episodes": 100,
+      "successes": 100
+    },
+    "5": {
+      "success_rate": 99.0,
+      "avg_steps": 2.676767676767677,
+      "num_episodes": 100,
+      "successes": 99
+    },
+    "6": {
+      "success_rate": 99.0,
+      "avg_steps": 3.696969696969697,
+      "num_episodes": 100,
+      "successes": 99
+    },
+    "7": {
+      "success_rate": 97.0,
+      "avg_steps": 4.412371134020619,
+      "num_episodes": 100,
+      "successes": 97
+    },
+    "8": {
+      "success_rate": 99.21875,
+      "avg_steps": 5.25984251968504,
+      "num_episodes": 128,
+      "successes": 127
+    },
+    "9": {
+      "success_rate": 99.38271604938271,
+      "avg_steps": 6.211180124223603,
+      "num_episodes": 162,
+      "successes": 161
+    },
+    "10": {
+      "success_rate": 97.5,
+      "avg_steps": 7.133333333333334,
+      "num_episodes": 200,
+      "successes": 195
+    },
+    "11": {
+      "success_rate": 97.93388429752066,
+      "avg_steps": 8.240506329113924,
+      "num_episodes": 242,
+      "successes": 237
+    },
+    "12": {
+      "success_rate": 97.22222222222221,
+      "avg_steps": 9.010714285714286,
+      "num_episodes": 288,
+      "successes": 280
+    },
+    "13": {
+      "success_rate": 95.85798816568047,
+      "avg_steps": 9.993827160493828,
+      "num_episodes": 338,
+      "successes": 324
+    },
+    "14": {
+      "success_rate": 96.42857142857143,
+      "avg_steps": 11.103174603174603,
+      "num_episodes": 392,
+      "successes": 378
+    },
+    "15": {
+      "success_rate": 6.888888888888889,
+      "avg_steps": 11.225806451612904,
+      "num_episodes": 450,
+      "successes": 31
+    },
+    "16": {
+      "success_rate": 0.390625,
+      "avg_steps": 10.5,
+      "num_episodes": 512,
+      "successes": 2
+    },
+    "17": {
+      "success_rate": 0.0,
+      "avg_steps": 289.0,
+      "num_episodes": 578,
+      "successes": 0
+    },
+    "18": {
+      "success_rate": 0.0,
+      "avg_steps": 324.0,
+      "num_episodes": 648,
+      "successes": 0
+    },
+    "19": {
+      "success_rate": 0.0,
+      "avg_steps": 361.0,
+      "num_episodes": 722,
+      "successes": 0
+    },
+    "20": {
+      "success_rate": 0.0,
+      "avg_steps": 400.0,
+      "num_episodes": 800,
+      "successes": 0
+    }
+  }
+}

@@ -49,11 +49,14 @@ class TestConfiguration:
 
     def run(self) -> None:
         self.env = SubprocVecEnv([_make_env(self, i) for i in range(self.num_envs)], start_method='spawn')
-        #self.env = DummyVecEnv([self._make_env(i) for i in range(self.num_envs)])
-        dummy = CurriculumSortEnv(max_n=self.max_n)
-
-        expert = self.expert_class(dummy.pair_to_action)
-        curriculum = MixedCurriculumCallback(target_success_rate=self.succ_rate, base_window_size=80, window_update=self.window_scaling)
+        expert = self.expert_class()
+        curriculum = MixedCurriculumCallback(
+            target_success_rate=self.succ_rate,
+            base_window_size=80,
+            window_update=self.window_scaling,
+            reward_thresh=10.5,
+            max_stage=self.max_n,
+        )
 
         self.model = CurriculumPPO_AnnealedBC(
             "MlpPolicy",
@@ -122,29 +125,24 @@ class TestConfiguration:
                 ep_steps = 0
 
                 while not done:
-                    # 1. Query agent for action
-                    action, _ = self.model.predict(obs, deterministic=True)
+                    action_masks = env.action_masks()
+                    action, _ = self.model.predict(
+                        obs, action_masks=action_masks, deterministic=True
+                    )
 
-                    # 2. Get current state array representation from env
                     current_array = env.get_current_array()
-
-                    # 3. Query coach/expert for ground truth decision at this state
                     coach_action = expert.get_action(current_array, len(current_array))
-
-                    # Convert model action back to swap indices (i, j) if encoded
                     agent_swap = env.action_to_swap(action)
+                    coach_swap = tuple(int(x) for x in np.asarray(coach_action).reshape(-1)[:2])
 
-                    # 4. Compute step-level conformity match
-                    if coach_action is not None and agent_swap == coach_action:
+                    if env.is_sorted(current_array):
                         total_matched_actions += 1
-                    elif coach_action is None and env.is_sorted(current_array):
-                        # Agent state is already sorted
+                    elif agent_swap == coach_swap or agent_swap == coach_swap[::-1]:
                         total_matched_actions += 1
 
                     total_eval_steps += 1
                     ep_steps += 1
 
-                    # 5. Environment step
                     obs, reward, done, truncated, info = env.step(action)
                     if done or truncated:
                         match criterion:
@@ -159,7 +157,6 @@ class TestConfiguration:
                         break
 
                 episode_steps_list.append(ep_steps)
-
             # Aggregate metrics for dimension N
             results['efficacy'][n] = successful_episodes / num_episodes
             results['conformity'][n] = (
